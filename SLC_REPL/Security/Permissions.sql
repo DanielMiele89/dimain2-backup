@@ -1,0 +1,154 @@
+﻿GRANT VIEW ANY COLUMN ENCRYPTION KEY DEFINITION TO PUBLIC;
+
+
+GO
+GRANT VIEW ANY COLUMN MASTER KEY DEFINITION TO PUBLIC;
+
+
+GO
+GRANT CONNECT TO [ChrisN];
+
+
+GO
+GRANT CONNECT TO [conord];
+
+
+GO
+GRANT CONNECT TO [danielm];
+
+
+GO
+GRANT CONNECT TO [DarrenW];
+
+
+GO
+GRANT CONNECT TO [datarecon];
+
+
+GO
+GRANT CONNECT TO [DIMAIN2\conordimain2];
+
+
+GO
+GRANT CONNECT TO [Ed];
+
+
+GO
+GRANT CONNECT TO [ExcelQuery_DataOps];
+
+
+GO
+GRANT CONNECT TO [glynd];
+
+
+GO
+GRANT CONNECT TO [GunayS];
+
+
+GO
+GRANT CONNECT TO [Hayden];
+
+
+GO
+GRANT CONNECT TO [kevinc];
+
+
+GO
+GRANT CONNECT TO [LeoP];
+
+
+GO
+GRANT CONNECT TO [MarkD];
+
+
+GO
+GRANT CONNECT TO [MatthewL];
+
+
+GO
+GRANT CONNECT TO [patrickm];
+
+
+GO
+GRANT CONNECT TO [peter];
+
+
+GO
+GRANT CONNECT TO [PhillipB];
+
+
+GO
+GRANT CONNECT TO [Process_AWS_SpendEarn];
+
+
+GO
+GRANT CONNECT TO [ProcessOp];
+
+
+GO
+GRANT CONNECT TO [Rory];
+
+
+GO
+GRANT CONNECT TO [RukanK];
+
+
+GO
+GRANT CONNECT TO [SamH];
+
+
+GO
+GRANT CONNECT TO [ShannonM];
+
+
+GO
+GRANT CONNECT TO [SLCReplication];
+
+
+GO
+GRANT CONNECT TO [tasfia];
+
+
+GO
+GRANT CONNECT TO [Vernon];
+
+
+GO
+GRANT CONNECT TO [virgin_etl_user];
+
+
+GO
+GRANT CONNECT TO [visa_etl_user];
+
+
+GO
+GRANT CONNECT TO [VitaliiV];
+
+
+GO
+GRANT CONNECT TO [WilliamA];
+
+
+GO
+GRANT CONNECT TO [Zoe];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[dbo] TO [Analyst];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[dbo] TO [Analyst];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[dbo] TO [Analyst];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[dbo] TO [Analyst];
+

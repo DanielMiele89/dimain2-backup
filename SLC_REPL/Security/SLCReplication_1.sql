@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [SLCReplication]
+    WITH PASSWORD = N'wsqqRkjy8<qpkq=q1fgMyei6msFT7_&#$!~<,qaiAxmbR4=Z', SID = 0x4A937E05DF0A544A86C02352B2D5972F, DEFAULT_LANGUAGE = [us_english];
+

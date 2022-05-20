@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [hayden]
+    WITH PASSWORD = N'XbvuLpyve}thbOwzPG;hvE:pmsFT7_&#$!~<0|ujyhVdcoii', SID = 0xCC90B2663B888E44B76ABF8E38E57C16, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

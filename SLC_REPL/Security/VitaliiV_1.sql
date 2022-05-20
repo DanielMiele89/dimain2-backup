@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [VitaliiV]
+    WITH PASSWORD = N'bvqupgy?vG:et`8hlPb<|zhvmsFT7_&#$!~<zFp=|urj<hdc', SID = 0x2D08581BA4AA6F4EB3AC7CC76FE6085B, DEFAULT_DATABASE = [Warehouse], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

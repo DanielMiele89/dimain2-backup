@@ -1,0 +1,7 @@
+﻿CREATE TABLE [COD].[BriefPublisher] (
+    [ID]          INT IDENTITY (1, 1) NOT FOR REPLICATION NOT NULL,
+    [BriefID]     INT NOT NULL,
+    [PublisherID] INT NOT NULL,
+    CONSTRAINT [PK__BriefPub__3214EC275F182CD0] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+

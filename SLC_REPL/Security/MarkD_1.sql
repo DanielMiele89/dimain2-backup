@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [MarkD]
+    WITH PASSWORD = N'bGvupyveG14Bthbzhuvp|<u3msFT7_&#$!~<jq6hkdcoimi|', SID = 0x67F5CD39CD7D584C93174F0EB4BCC5E8, DEFAULT_LANGUAGE = [us_english];
+

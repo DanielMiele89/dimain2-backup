@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [DarrenW]
+    WITH PASSWORD = N'bvupy?vetjhPbzhvps|{ujwhmsFT7_&#$!~<d~cog0}Xii|r', SID = 0xD5308CF1FC02A943B2767E548981907F, DEFAULT_DATABASE = [Warehouse], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+
