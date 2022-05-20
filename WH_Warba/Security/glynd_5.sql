@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [glynd]
+    WITH PASSWORD = N'`ldCrnvwbikdftNfgpZopxjtmsFT7_&#$!~<dl+|dka%f4{n', SID = 0x8A86B1528813644794E9CB0094BF3332, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+
