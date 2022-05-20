@@ -1,4 +1,6 @@
-﻿CREATE TABLE [inbound].[Matched_Transaction] (
+﻿/* DM_Github_Test - 19/05/2022  */
+
+CREATE TABLE [inbound].[Matched_Transaction] (
     [transactionguid]       UNIQUEIDENTIFIER NOT NULL,
     [externaltransactionid] VARCHAR (255)    NOT NULL,
     [customerguid]          UNIQUEIDENTIFIER NOT NULL,
