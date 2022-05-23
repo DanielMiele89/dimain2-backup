@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [conord]
+    WITH PASSWORD = N'Dcyiy}yvppfeM@fIwromaOb|msFT7_&#$!~<Vy2fj{jtgPaq', SID = 0xECEF1E09C8799647BE10C1CEDB301EA2, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [ProcessOp]
+    WITH PASSWORD = N'6kBn{Iblwgdg|bomkv7AjynxmsFT7_&#$!~<kJQrtizdeuri', SID = 0x0052E8CECCE79C418425A09292861541, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

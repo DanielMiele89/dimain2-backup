@@ -1,0 +1,25 @@
+﻿CREATE TABLE [RAS].[PANless_Transaction] (
+    [ID]                           INT           IDENTITY (1, 1) NOT FOR REPLICATION NOT NULL,
+    [FileID]                       INT           NOT NULL,
+    [PartnerID]                    INT           NOT NULL,
+    [InvoiceID]                    INT           NULL,
+    [TransactionDate]              DATETIME      NOT NULL,
+    [OfferCode]                    VARCHAR (32)  NOT NULL,
+    [OfferRate]                    REAL          NOT NULL,
+    [CashbackEarned]               SMALLMONEY    NOT NULL,
+    [CommissionRate]               REAL          NOT NULL,
+    [NetAmount]                    SMALLMONEY    NOT NULL,
+    [VATAmount]                    SMALLMONEY    NOT NULL,
+    [GrossAmount]                  SMALLMONEY    NOT NULL,
+    [MaskedCardNumber]             VARCHAR (19)  NOT NULL,
+    [VATRate]                      REAL          NOT NULL,
+    [Price]                        SMALLMONEY    NOT NULL,
+    [MerchantNumber]               NVARCHAR (50) NOT NULL,
+    [CustomerId]                   VARCHAR (20)  NULL,
+    [PublisherOfferCode]           VARCHAR (32)  NULL,
+    [FailedPANlessTransactionID]   INT           NULL,
+    [AddedDate]                    DATETIME      NOT NULL,
+    [PublisherUniqueTransactionID] VARCHAR (20)  NULL,
+    CONSTRAINT [PK_CRTPANlessTransaction] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+

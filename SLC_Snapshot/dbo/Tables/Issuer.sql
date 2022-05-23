@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[Issuer] (
+    [ID]   INT           IDENTITY (1, 1) NOT FOR REPLICATION NOT NULL,
+    [Name] NVARCHAR (50) NULL,
+    [Date] DATETIME      NOT NULL,
+    CONSTRAINT [PK_Issuer] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+
