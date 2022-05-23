@@ -1,0 +1,43 @@
+﻿CREATE ROLE [PII_Removed]
+    AUTHORIZATION [dbo];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [DarrenW];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [Ed];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [GunayS];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [LeoP];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [patrickm];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [PhillipB];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [RukanK];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [SamH];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [Vernon];
+
+
+GO
+ALTER ROLE [PII_Removed] ADD MEMBER [VitaliiV];
+

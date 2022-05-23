@@ -1,0 +1,26 @@
+﻿CREATE TABLE [RAS].[FailedPANlessTransaction] (
+    [FailedPANlessTransactionID]   INT            IDENTITY (1, 1) NOT FOR REPLICATION NOT NULL,
+    [FileID]                       INT            NOT NULL,
+    [PartnerID]                    INT            NULL,
+    [CashbackEarned]               SMALLMONEY     NULL,
+    [CommissionRate]               REAL           NULL,
+    [FailureReason]                NVARCHAR (MAX) NULL,
+    [GrossAmount]                  SMALLMONEY     NULL,
+    [MaskedCardNumber]             VARCHAR (18)   NULL,
+    [MerchantNumber]               NVARCHAR (50)  NULL,
+    [NetAmount]                    SMALLMONEY     NULL,
+    [OfferCode]                    VARCHAR (32)   NULL,
+    [OfferRate]                    REAL           NULL,
+    [Price]                        SMALLMONEY     NULL,
+    [RewardStatus]                 INT            NULL,
+    [TransactionDate]              DATETIME       NULL,
+    [VATAmount]                    SMALLMONEY     NULL,
+    [InternalError]                BIT            NULL,
+    [RetryCount]                   INT            NOT NULL,
+    [CreateDate]                   DATETIME       NULL,
+    [Active]                       BIT            NOT NULL,
+    [CustomerID]                   VARCHAR (20)   NULL,
+    [PublisherUniqueTransactionID] VARCHAR (20)   NULL,
+    CONSTRAINT [PK_FailedPANlessTransaction_FailedPANlessTransactionID] PRIMARY KEY CLUSTERED ([FailedPANlessTransactionID] ASC)
+);
+
