@@ -42,7 +42,7 @@ IF NOT EXISTS (
 		AND idx.Name = 'sn_Stuff01' 
 )
 BEGIN
-	CREATE INDEX [sn_Stuff01] ON SLC_REPL.dbo.IronOfferMember ([ImportDate], [CompositeID]) INCLUDE ([IronOfferID], [StartDate], [EndDate], [IsControl]) WITH (DATA_COMPRESSION = PAGE, SORT_IN_TEMPDB = ON, FILLFACTOR = 80)  ON [SLC_REPL_FastIndexes]
+	CREATE INDEX [sn_Stuff01] ON [SLC_REPL].[dbo].[IronOfferMember] ([ImportDate], [CompositeID]) INCLUDE ([IronOfferID], [StartDate], [EndDate], [IsControl]) WITH (DATA_COMPRESSION = PAGE, SORT_IN_TEMPDB = ON, FILLFACTOR = 80)  ON [SLC_REPL_FastIndexes]
 END
 
 IF NOT EXISTS (
@@ -55,7 +55,7 @@ BEGIN
 END
 
 IF NOT EXISTS (
-	SELECT 1 FROM sys.indexes idx 
+	SELECT 1 FROM [sys].[indexes] idx 
 	WHERE idx.object_id = OBJECT_ID(N'SLC_REPL.dbo.EmailActivity') 
 		AND idx.Name = 'ix_Stuff2' 
 )
