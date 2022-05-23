@@ -7,6 +7,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SLC_REPL", "SLC_REPL\SLC_RE
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "WH_Warba", "WH_Warba\WH_Warba.sqlproj", "{D6B875C0-F35D-4EF9-A3FA-629846953CF4}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Finance", "Finance\Finance.sqlproj", "{D78E1336-8A97-48A8-9041-5EF89118CC7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,12 @@ Global
 		{D6B875C0-F35D-4EF9-A3FA-629846953CF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6B875C0-F35D-4EF9-A3FA-629846953CF4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D6B875C0-F35D-4EF9-A3FA-629846953CF4}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{D78E1336-8A97-48A8-9041-5EF89118CC7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D78E1336-8A97-48A8-9041-5EF89118CC7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D78E1336-8A97-48A8-9041-5EF89118CC7A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{D78E1336-8A97-48A8-9041-5EF89118CC7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D78E1336-8A97-48A8-9041-5EF89118CC7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D78E1336-8A97-48A8-9041-5EF89118CC7A}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

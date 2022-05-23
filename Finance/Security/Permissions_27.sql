@@ -1,0 +1,5 @@
+﻿
+GO
+GRANT TAKE OWNERSHIP
+    ON SCHEMA::[dbo] TO [DataOps];
+

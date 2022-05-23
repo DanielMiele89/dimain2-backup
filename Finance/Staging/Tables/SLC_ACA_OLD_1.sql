@@ -1,0 +1,9 @@
+﻿CREATE TABLE [Staging].[SLC_ACA_OLD] (
+    [ID] INT NOT NULL
+);
+
+
+GO
+CREATE CLUSTERED INDEX [CIX]
+    ON [Staging].[SLC_ACA_OLD]([ID] ASC);
+
