@@ -675,8 +675,17 @@
       <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
       <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
     </ArtifactReference>
+    <ArtifactReference Include="..\dacpac_SLC_REPL.dacpac">
+      <HintPath>..\dacpac_SLC_REPL.dacpac</HintPath>
+      <SuppressMissingDependenciesErrors>True</SuppressMissingDependenciesErrors>
+      <DatabaseSqlCmdVariable>dacpac_SLC_REPL</DatabaseSqlCmdVariable>
+    </ArtifactReference>
   </ItemGroup>
   <ItemGroup>
+    <SqlCmdVariable Include="dacpac_SLC_REPL">
+      <DefaultValue>dacpac_SLC_REPL</DefaultValue>
+      <Value>$(SqlCmdVar__2)</Value>
+    </SqlCmdVariable>
     <SqlCmdVariable Include="SLC_REPL">
       <DefaultValue>SLC_REPL</DefaultValue>
       <Value>$(SqlCmdVar__1)</Value>
