@@ -1,0 +1,5 @@
+﻿
+GO
+GRANT VIEW CHANGE TRACKING
+    ON SCHEMA::[dbo] TO [DataOps];
+
