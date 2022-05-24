@@ -108,6 +108,7 @@
     <WarningLevel>4</WarningLevel>
     <DataRetentionEnabled>False</DataRetentionEnabled>
     <NoWarn>71562;</NoWarn>
+    <SuppressTSqlWarnings>71502;</SuppressTSqlWarnings>
   </PropertyGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>

@@ -109,6 +109,7 @@
     <DataRetentionEnabled>False</DataRetentionEnabled>
     <NoWarn>71562;</NoWarn>
     <PlatformTarget>x64</PlatformTarget>
+    <SuppressTSqlWarnings>71502;</SuppressTSqlWarnings>
   </PropertyGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
