@@ -9,9 +9,9 @@ AS
 
 WITH
 Customers AS (	
-				SELECT	FanID
+				SELECT	[cu].[FanID]
 					,	CASE
-							WHEN MarketableByEmail = 0 OR CurrentlyActive = 0 THEN 0
+							WHEN [cu].[MarketableByEmail] = 0 OR [cu].[CurrentlyActive] = 0 THEN 0
 							ELSE 1
 						END AS ToBeEmailed
 				FROM [Derived].[Customer] cu
@@ -24,10 +24,10 @@ Customers AS (
 				),
 
 Samples AS (	
-				SELECT	[FanID]	
+				SELECT	[slc].[FanID]	
 				FROM [Email].[SampleCustomersList] slc
 				WHERE 1 = 1
-				AND ID <= 750
+				AND [slc].[ID] <= 750
 				)
 
 
@@ -46,11 +46,11 @@ SELECT	[FanID] = CONVERT(INT, cu.[FanID])
 	,	[BurnOfferStartDate_4] = ''
 	,	[BurnOfferStartDate_5] = ''
 	
-	,	[BurnOfferEndDate_Hero] =	COALESCE([RedeemOfferEndDate_Hero], '')
-	,	[BurnOfferEndDate_2] =	COALESCE([RedeemOfferEndDate_1], '')
-	,	[BurnOfferEndDate_3] =	COALESCE([RedeemOfferEndDate_2], '')
-	,	[BurnOfferEndDate_4] =	COALESCE([RedeemOfferEndDate_3], '')
-	,	[BurnOfferEndDate_5] =	COALESCE([RedeemOfferEndDate_4], '')
+	,	[BurnOfferEndDate_Hero] =	COALESCE([rosd].[RedeemOfferEndDate_Hero], '')
+	,	[BurnOfferEndDate_2] =	COALESCE([rosd].[RedeemOfferEndDate_1], '')
+	,	[BurnOfferEndDate_3] =	COALESCE([rosd].[RedeemOfferEndDate_2], '')
+	,	[BurnOfferEndDate_4] =	COALESCE([rosd].[RedeemOfferEndDate_3], '')
+	,	[BurnOfferEndDate_5] =	COALESCE([rosd].[RedeemOfferEndDate_4], '')
 FROM Customers cu
 INNER JOIN [Email].[RedeemOfferSlotData] rosd
 	ON cu.[FanID] = rosd.[FanID]
@@ -72,11 +72,11 @@ SELECT	[FanID] = sa.[FanID]
 	,	[BurnOfferStartDate_4] = ''
 	,	[BurnOfferStartDate_5] = ''
 	
-	,	[BurnOfferEndDate_Hero] =	COALESCE([RedeemOfferEndDate_Hero], '')
-	,	[BurnOfferEndDate_2] =	COALESCE([RedeemOfferEndDate_1], '')
-	,	[BurnOfferEndDate_3] =	COALESCE([RedeemOfferEndDate_2], '')
-	,	[BurnOfferEndDate_4] =	COALESCE([RedeemOfferEndDate_3], '')
-	,	[BurnOfferEndDate_5] =	COALESCE([RedeemOfferEndDate_4], '')
+	,	[BurnOfferEndDate_Hero] =	COALESCE([rosd].[RedeemOfferEndDate_Hero], '')
+	,	[BurnOfferEndDate_2] =	COALESCE([rosd].[RedeemOfferEndDate_1], '')
+	,	[BurnOfferEndDate_3] =	COALESCE([rosd].[RedeemOfferEndDate_2], '')
+	,	[BurnOfferEndDate_4] =	COALESCE([rosd].[RedeemOfferEndDate_3], '')
+	,	[BurnOfferEndDate_5] =	COALESCE([rosd].[RedeemOfferEndDate_4], '')
 FROM Samples sa
 INNER JOIN [Email].[RedeemOfferSlotData] rosd
 	ON sa.[FanID] = rosd.[FanID]

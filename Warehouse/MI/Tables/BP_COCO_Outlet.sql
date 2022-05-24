@@ -1,0 +1,5 @@
+﻿CREATE TABLE [MI].[BP_COCO_Outlet] (
+    [OutletID] INT NOT NULL,
+    CONSTRAINT [PK_MI_BP_COCO_Outlet] PRIMARY KEY CLUSTERED ([OutletID] ASC)
+);
+

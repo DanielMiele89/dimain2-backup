@@ -79,7 +79,7 @@ AS
 				SET @Message = 'Hi,' + '<br>' + '<br>' + 'The MIDI Module spreadsheet has been succesfully imported, ## combinations have had their BrandID updated over # brands.' + '<br>' + '<br>' + 'Please see below the counts of combinations that have been updated split by brand. If you are happy with number of updates then proceed with the full import.' + '<br>' + '<br>'
 
 				
-				SET @Message = REPLACE(@Message, '##', (SELECT SUM(RowsUpdated) FROM #IncorrectlyBranded))
+				SET @Message = REPLACE(@Message, '##', (SELECT SUM(#IncorrectlyBranded.[RowsUpdated]) FROM #IncorrectlyBranded))
 				SET @Message = REPLACE(@Message, '#', (SELECT COUNT(*) FROM #IncorrectlyBranded))
 
 				Set @Regards = '<br>' + 'Regards,' + '<br>' + 'Data Operations'
@@ -90,13 +90,13 @@ AS
 		*******************************************************************************************************************************************/
 	
 			SELECT @Table = ISNULL(CONVERT(VARCHAR(MAX),
-							(SELECT '<td nowrap="nowrap">' + CONVERT(VARCHAR(MAX), UpdatedBrandName) + '</td>'
-								  + '<td>' + CONVERT(VARCHAR, BrandingUpdated) + '</td>'
-								  + '<td>' + CONVERT(VARCHAR, HighVarianced_OldNarratives) + '</td>'
-								  + '<td>' + CONVERT(VARCHAR, HighVarianced_NewNarratives) + '</td>'
+							(SELECT '<td nowrap="nowrap">' + CONVERT(VARCHAR(MAX), #IncorrectlyBranded.[UpdatedBrandName]) + '</td>'
+								  + '<td>' + CONVERT(VARCHAR, #IncorrectlyBranded.[BrandingUpdated]) + '</td>'
+								  + '<td>' + CONVERT(VARCHAR, #IncorrectlyBranded.[HighVarianced_OldNarratives]) + '</td>'
+								  + '<td>' + CONVERT(VARCHAR, #IncorrectlyBranded.[HighVarianced_NewNarratives]) + '</td>'
 							 FROM #IncorrectlyBranded
-							 ORDER BY RowsUpdated DESC
-								    , UpdatedBrandName
+							 ORDER BY #IncorrectlyBranded.[RowsUpdated] DESC
+								    , #IncorrectlyBranded.[UpdatedBrandName]
 							 FOR XML PATH ('tr'), TYPE)), '')
 
 			SET @Table = '<table style="border-collapse: collapse; border: 1px solid black">'

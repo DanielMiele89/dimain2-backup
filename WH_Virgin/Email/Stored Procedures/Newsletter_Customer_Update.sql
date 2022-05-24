@@ -21,15 +21,15 @@ BEGIN
 
 		TRUNCATE TABLE [Email].[Newsletter_Customer]
 
-		INSERT INTO [Email].[Newsletter_Customer] (	FanID
-												,	CompositeID
-												,	RandomNumber)
-		SELECT FanID
-			 , CompositeID
+		INSERT INTO [Email].[Newsletter_Customer] (	[Email].[Newsletter_Customer].[FanID]
+												,	[Email].[Newsletter_Customer].[CompositeID]
+												,	[Email].[Newsletter_Customer].[RandomNumber])
+		SELECT [Derived].[Customer].[FanID]
+			 , [Derived].[Customer].[CompositeID]
 			 , ABS(CHECKSUM(NEWID())) AS RandomNumber
 		FROM [Derived].[Customer]
-		WHERE MarketableByEmail = 1
-		AND CurrentlyActive = 1
+		WHERE [Derived].[Customer].[MarketableByEmail] = 1
+		AND [Derived].[Customer].[CurrentlyActive] = 1
 
 		ALTER INDEX CIX_RandomComp ON [Email].[Newsletter_Customer] REBUILD WITH (SORT_IN_TEMPDB = ON, DATA_COMPRESSION = PAGE)
 

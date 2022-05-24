@@ -10,19 +10,19 @@ BEGIN
 
 
 IF OBJECT_ID('tempdb..#FB') IS NOT NULL DROP TABLE #FB
-SELECT	CINID, FanID
+SELECT	[CL].[CINID], [C].[FanID]
 INTO	#FB
 FROM	Derived.Customer C
 JOIN	Derived.CINList CL ON CL.CIN = C.SourceUID
 WHERE	C.CurrentlyActive = 1
-AND		SourceUID NOT IN (SELECT SourceUID FROM Derived.Customer_DuplicateSourceUID) 
+AND		[C].[SourceUID] NOT IN (SELECT [Derived].[Customer_DuplicateSourceUID].[SourceUID] FROM Derived.Customer_DuplicateSourceUID) 
 
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
 SELECT	  CC.ConsumerCombinationID AS ConsumerCombinationID
 INTO	#CC 
 FROM	Trans.ConsumerCombination CC
-WHERE	BrandID IN (569,227,568,574,2592,402,24)			-- Competitors: Adidas, JD Sports, Nike, Under Armour, Gym Shark, Sports Direct, ASOS in the last 24 months
+WHERE	[CC].[BrandID] IN (569,227,568,574,2592,402,24)			-- Competitors: Adidas, JD Sports, Nike, Under Armour, Gym Shark, Sports Direct, ASOS in the last 24 months
 
 
 IF OBJECT_ID('tempdb..#Trans') IS NOT NULL DROP TABLE #Trans
@@ -37,7 +37,7 @@ GROUP BY CT.CINID
 
 
 IF OBJECT_ID('Sandbox.RukanK.VM_MMdirect_CompSteal13072021') IS NOT NULL DROP TABLE Sandbox.RukanK.VM_MMdirect_CompSteal13072021		--1,759,837
-SELECT	CINID
+SELECT	#Trans.[CINID]
 INTO Sandbox.RukanK.VM_MMdirect_CompSteal13072021
 FROM  #Trans
 
@@ -46,12 +46,12 @@ FROM  #Trans
 
 
 If Object_ID('WH_Virgin.Selections.MAM009_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.MAM009_PreSelection
-Select FanID
+Select [fb].[FanID]
 Into WH_Virgin.Selections.MAM009_PreSelection
 From #FB fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.RukanK.VM_MMdirect_CompSteal13072021 cs
-				WHERE fb.CINID = cs.CINID)
+				WHERE fb.CINID = #FB.[cs].CINID)
 
 
 END

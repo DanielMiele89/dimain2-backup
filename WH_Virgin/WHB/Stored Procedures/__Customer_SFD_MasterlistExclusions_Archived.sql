@@ -23,7 +23,7 @@ BEGIN TRY
 
 	TRUNCATE TABLE [Email].[SFD_NonMasterListCustomers]
 	INSERT INTO [Email].[SFD_NonMasterListCustomers]
-	SELECT	FanID
+	SELECT	[Staging].[Customer].[FanID]
 	FROM [Staging].[Customer] c
 	WHERE c.MarketableByEmail = 0
 	AND c.CurrentlyActive = 1
@@ -53,7 +53,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

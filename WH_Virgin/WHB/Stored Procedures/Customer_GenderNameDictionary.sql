@@ -32,23 +32,23 @@ BEGIN
 
 			IF OBJECT_ID('tempdb..#NameGender') IS NOT NULL DROP TABLE #NameGender;
 			WITH
-			NameGenderCounts AS (	SELECT	FirstName
-										,	SUM(CASE WHEN Gender = 'M' THEN 1 ELSE 0 END) AS Males
-										,	SUM(CASE WHEN Gender = 'F' THEN 1 ELSE 0 END) AS Females
-										,	SUM(CASE WHEN Gender NOT IN ('M', 'F') THEN 1 ELSE 0 END) AS Unknowns
+			NameGenderCounts AS (	SELECT	[Warehouse].[Relational].[Customer].[FirstName]
+										,	SUM(CASE WHEN [Warehouse].[Relational].[Customer].[Gender] = 'M' THEN 1 ELSE 0 END) AS Males
+										,	SUM(CASE WHEN [Warehouse].[Relational].[Customer].[Gender] = 'F' THEN 1 ELSE 0 END) AS Females
+										,	SUM(CASE WHEN [Warehouse].[Relational].[Customer].[Gender] NOT IN ('M', 'F') THEN 1 ELSE 0 END) AS Unknowns
 										,	COUNT(*) AS Total
 									FROM [Warehouse].[Relational].[Customer]
-									GROUP BY FirstName)
-			SELECT	FirstName
-				,	Males
-				,	Females
-				,	Unknowns
-				,	Total
-				,	Males * 1.0 / Total AS PercentageMale
-				,	Females * 1.0 / Total AS PercentageFemale
+									GROUP BY [Warehouse].[Relational].[Customer].[FirstName])
+			SELECT	[Warehouse].[Relational].[Customer].[FirstName]
+				,	[NameGenderCounts].[Males]
+				,	[NameGenderCounts].[Females]
+				,	[NameGenderCounts].[Unknowns]
+				,	[NameGenderCounts].[Total]
+				,	[NameGenderCounts].[Males] * 1.0 / [NameGenderCounts].[Total] AS PercentageMale
+				,	[NameGenderCounts].[Females] * 1.0 / [NameGenderCounts].[Total] AS PercentageFemale
 				,	CASE
-						WHEN @Boundary <= Males * 1.0 / Total THEN 'M'
-						WHEN @Boundary <= Females * 1.0 / Total THEN 'F'
+						WHEN @Boundary <= [NameGenderCounts].[Males] * 1.0 / [NameGenderCounts].[Total] THEN 'M'
+						WHEN @Boundary <= [NameGenderCounts].[Females] * 1.0 / [NameGenderCounts].[Total] THEN 'F'
 						ELSE 'U'
 					END AS InferredGender
 			INTO #NameGender
@@ -81,8 +81,8 @@ BEGIN
 				DECLARE @StartDate DATE = GETDATE()
 
 				INSERT INTO [Derived].[NameGenderDictionary]
-				SELECT	FirstName
-					,	InferredGender
+				SELECT	[ng].[FirstName]
+					,	[ng].[InferredGender]
 					,	@StartDate
 					,	NULL
 				FROM #NameGender ng
@@ -90,7 +90,7 @@ BEGIN
 									FROM [Derived].[NameGenderDictionary] ngd
 									WHERE ng.FirstName = ngd.FirstName
 									AND ngd.EndDate IS NULL)
-				ORDER BY FirstName
+				ORDER BY [ng].[FirstName]
 
 			EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Finished'
 
@@ -112,7 +112,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

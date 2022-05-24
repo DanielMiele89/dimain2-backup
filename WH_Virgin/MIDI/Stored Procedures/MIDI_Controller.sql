@@ -25,8 +25,8 @@ WHILE 0 < @FileIDsToRun
 		
 		SELECT @FileIDsToRun = COUNT(*)
 		FROM [WHB].[Inbound_Files] f
-		WHERE TableName = 'Transactions'
-		AND FileProcessed = 0
+		WHERE [f].[TableName] = 'Transactions'
+		AND [f].[FileProcessed] = 0
 
 	END
 

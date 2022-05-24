@@ -25,17 +25,17 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 			 , @Lapsed INT
 			 , @Lapsing INT
 
-		SELECT	@BrandID = BrandID
+		SELECT	@BrandID = [Warehouse].[Relational].[Partner].[BrandID]
 		FROM [Warehouse].[Relational].[Partner]
-		WHERE PartnerID = @PartnerID
+		WHERE [Warehouse].[Relational].[Partner].[PartnerID] = @PartnerID
 
 
-		SELECT @Acquire = Acquire 
-			 , @Lapsed = Lapsed
-			 , @Lapsing = Lapsed - 4
+		SELECT @Acquire = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings].[Acquire] 
+			 , @Lapsed = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings].[Lapsed]
+			 , @Lapsing = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings].[Lapsed] - 4
 		FROM [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings]
-		WHERE PartnerID = @PartnerID
-		AND EndDate IS NULL
+		WHERE [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings].[PartnerID] = @PartnerID
+		AND [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings].[EndDate] IS NULL
 	
 	/*******************************************************************************************************************************************
 		2. Run segmentation for spenders
@@ -80,18 +80,18 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 								,	Virgin BIT)
 
 			INSERT INTO #CCIDs
-			SELECT	ConsumerCombinationID
+			SELECT	[Warehouse].[Relational].[ConsumerCombination].[ConsumerCombinationID]
 				,	1 AS MyRewards
 				,	0 AS Virgin
 			FROM Warehouse.Relational.ConsumerCombination cc WITH (NOLOCK)
-			WHERE BrandID = @BrandID
+			WHERE [Warehouse].[Relational].[ConsumerCombination].[BrandID] = @BrandID
 	
 			INSERT INTO #CCIDs
-			SELECT	ConsumerCombinationID
+			SELECT	[WH_Virgin].[Trans].[ConsumerCombination].[ConsumerCombinationID]
 				,	0 AS MyRewards
 				,	1 AS Virgin
 			FROM WH_Virgin.Trans.ConsumerCombination cc WITH (NOLOCK)
-			WHERE BrandID = @BrandID
+			WHERE [WH_Virgin].[Trans].[ConsumerCombination].[BrandID] = @BrandID
 		
 			CREATE CLUSTERED INDEX CIX_CCID_CCID ON #CCIDs (ConsumerCombinationID)
 
@@ -125,7 +125,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 				 END AS Segment
 			FROM #CCIDs CCs
 			INNER JOIN Warehouse.Relational.ConsumerTransaction_MyRewards ct WITH (NOLOCK)
-				ON CCs.ConsumerCombinationID = ct.ConsumerCombinationID
+				ON CCs.ConsumerCombinationID = #CCIDs.[ct].ConsumerCombinationID
 				AND CCs.MyRewards = 1
 			INNER JOIN #Customers cu
 				ON	ct.CINID = cu.CINID
@@ -145,7 +145,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 				 END AS Segment
 			FROM #CCIDs CCs
 			INNER JOIN WH_Virgin.Trans.ConsumerTransaction ct
-				ON CCs.ConsumerCombinationID = ct.ConsumerCombinationID
+				ON CCs.ConsumerCombinationID = #CCIDs.[ct].ConsumerCombinationID
 				AND CCs.Virgin = 1
 			INNER JOIN #Customers cu
 				ON	ct.CINID = cu.CINID
@@ -198,15 +198,15 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 	*******************************************************************************************************************************************/
 				
 			IF OBJECT_ID('tempdb..#CustomersEarntOnOffer') IS NOT NULL DROP TABLE #CustomersEarntOnOffer
-			SELECT	FanID
+			SELECT	[Warehouse].[Relational].[PartnerTrans].[FanID]
 			INTO #CustomersEarntOnOffer
 			FROM Warehouse.[Relational].[PartnerTrans]
-			WHERE PartnerID = @PartnerID
+			WHERE [Warehouse].[Relational].[PartnerTrans].[PartnerID] = @PartnerID
 				
 			INSERT INTO #CustomersEarntOnOffer
-			SELECT	FanID
+			SELECT	[WH_Virgin].[derived].[PartnerTrans].[FanID]
 			FROM WH_Virgin.derived.[PartnerTrans]
-			WHERE PartnerID = @PartnerID
+			WHERE [WH_Virgin].[derived].[PartnerTrans].[PartnerID] = @PartnerID
 
 
 	/*******************************************************************************************************************************************
@@ -214,9 +214,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 	*******************************************************************************************************************************************/
 			
 		IF OBJECT_ID('[WH_Virgin].[Selections].[PM013_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[PM013_PreSelection]
-		SELECT	FanID
+		SELECT	#AllCustomers.[FanID]
 		INTO [WH_Virgin].[Selections].[PM013_PreSelection]
 		FROM #AllCustomers
-		WHERE Segment = 'Lapsing'
+		WHERE #AllCustomers.[Segment] = 'Lapsing'
 
 END

@@ -18,11 +18,11 @@ BEGIN
 
 		DELETE 
 		FROM [Email].[DailyData]
-		WHERE Email LIKE 'VirginSample[0-9]%@Rewardinsight.com'
+		WHERE [Email].[DailyData].[Email] LIKE 'VirginSample[0-9]%@Rewardinsight.com'
 
 		DELETE 
 		FROM [Email].[Actito_Deltas]
-		WHERE Email LIKE 'VirginSample[0-9]%@Rewardinsight.com'
+		WHERE [Email].[Actito_Deltas].[Email] LIKE 'VirginSample[0-9]%@Rewardinsight.com'
 		
 
 	/*******************************************************************************************************************************************

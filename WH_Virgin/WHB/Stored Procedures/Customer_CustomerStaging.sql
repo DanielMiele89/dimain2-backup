@@ -41,10 +41,10 @@ BEGIN
 
 					IF OBJECT_ID('tempdb..#HardbounceCustomers_AllTime') IS NOT NULL DROP TABLE #HardbounceCustomers_AllTime
 					SELECT	DISTINCT
-							FanID
+							[ee].[FanID]
 					INTO #HardbounceCustomers_AllTime
 					FROM [Derived].[EmailEvent] ee
-					WHERE EmailEventCodeID IN (702)	--	Hard bounce
+					WHERE [ee].[EmailEventCodeID] IN (702)	--	Hard bounce
 	
 					CREATE CLUSTERED INDEX CIX_FanID ON #HardbounceCustomers_AllTime (FanID)
 
@@ -53,16 +53,16 @@ BEGIN
 				***********************************************************************************************************************************/
 
 					IF OBJECT_ID('tempdb..#HardbounceCustomers') IS NOT NULL DROP TABLE #HardbounceCustomers
-					SELECT	FanID
-						,	MAX(EventDate) AS HardBounceDate
+					SELECT	[ee].[FanID]
+						,	MAX([ee].[EventDate]) AS HardBounceDate
 						,	1 AS HardBounced
 					INTO #HardbounceCustomers
 					FROM [Derived].[EmailEvent] ee
 					WHERE EXISTS (	SELECT 1
 									FROM #HardbounceCustomers_AllTime hb
-									WHERE ee.FanID = hb.FanID)
-					GROUP BY FanID
-					HAVING MAX(EventDate) = MAX(CASE WHEN EmailEventCodeID = 702 THEN EventDate ELSE NULL END)
+									WHERE #HardbounceCustomers_AllTime.[ee].FanID = hb.FanID)
+					GROUP BY [ee].[FanID]
+					HAVING MAX([ee].[EventDate]) = MAX(CASE WHEN [ee].[EmailEventCodeID] = 702 THEN [ee].[EventDate] ELSE NULL END)
 
 					CREATE CLUSTERED INDEX CIX_FanID ON #HardbounceCustomers (FanID)
 
@@ -82,11 +82,11 @@ BEGIN
 
 				IF OBJECT_ID('tempdb..#Unsubscribed') IS NOT NULL DROP TABLE #Unsubscribed
 				SELECT	DISTINCT
-						FanID
+						[ee].[FanID]
 					,	1 AS Unsubscribed
 				INTO #Unsubscribed
 				FROM [Derived].[EmailEvent] ee
-				WHERE EmailEventCodeID IN (301)	--	Unsubscribe
+				WHERE [ee].[EmailEventCodeID] IN (301)	--	Unsubscribe
 
 				CREATE CLUSTERED INDEX CIX_FanID ON #Unsubscribed (FanID)
 
@@ -96,14 +96,14 @@ BEGIN
 
 			IF OBJECT_ID('tempdb..#NoAccountEntry') IS NOT NULL DROP TABLE #NoAccountEntry
 
-			SELECT VirginCustomerID
+			SELECT [cu].[VirginCustomerID]
 			INTO #NoAccountEntry
 			FROM [WHB].[Inbound_Customers] cu
 			WHERE NOT EXISTS (	SELECT 1
 								FROM [WHB].[Inbound_Accounts] ia
 								WHERE cu.CustomerID = ia.CustomerID)
-			AND DATEDIFF(hour, RegistrationDate, GETDATE()) >= 24
-			ORDER BY RegistrationDate
+			AND DATEDIFF(hour, [cu].[RegistrationDate], GETDATE()) >= 24
+			ORDER BY [cu].[RegistrationDate]
 
 
 
@@ -224,8 +224,8 @@ BEGIN
 				LEFT JOIN [WHB].[Inbound_Balances] bal
 					ON cu.CustomerID = bal.CustomerID
 				INNER JOIN [DIMAIN_TR].[SLC_REPL].[dbo].[Fan] fa
-					ON fa.ID = cu.CustomerID
-					AND fa.ClubID = 166
+					ON #NoAccountEntry.[fa].ID = cu.CustomerID
+					AND #NoAccountEntry.[fa].ClubID = 166
 				LEFT JOIN #HardbounceCustomers hb
 					ON fa.ID = hb.FanID
 				LEFT JOIN #Unsubscribed uns
@@ -238,9 +238,9 @@ BEGIN
 				CREATE NONCLUSTERED INDEX IX_Email ON #Customer (Email)
 
 				UPDATE cu
-				SET cu.EmailStructureValid = esv.EmailStructureValid
+				SET cu.EmailStructureValid = #Customer.[esv].EmailStructureValid
 				,	cu.MarketableByEmail =	CASE
-												WHEN esv.EmailStructureValid = 0 THEN 0
+												WHEN #Customer.[esv].EmailStructureValid = 0 THEN 0
 												ELSE cu.MarketableByEmail
 											END
 				FROM #Customer cu
@@ -251,7 +251,7 @@ BEGIN
 			***************************************************************************************************************************************/
 			
 			UPDATE cu
-			SET DeactivatedDate = DATEADD(day, 1, RegistrationDate)
+			SET [cu].[DeactivatedDate] = DATEADD(day, 1, RegistrationDate)
 			FROM #Customer cu 
 			INNER JOIN #NoAccountEntry nae
 			ON cu.VirginCustomerID = nae.VirginCustomerID
@@ -279,33 +279,33 @@ BEGIN
 	
 				UPDATE cu
 				SET cu.PostalSector = CASE
-											WHEN REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', '') LIKE '[a-z][0-9][0-9][a-z][a-z]'
-															THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 2) + ' ' + RIGHT(LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 3), 1)
-											WHEN REPLACE(REPLACE(PostCode, CHAR(160),''),' ','') LIKE '[a-z][0-9][0-9][0-9][a-z][a-z]'
-															THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(Left(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4), 1)
-											WHEN REPLACE(REPLACE(PostCode, CHAR(160),''),' ','') LIKE '[a-z][a-z][0-9][0-9][a-z][a-z]'
-															THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(Left(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4), 1)
-											WHEN REPLACE(REPLACE(PostCode, CHAR(160),''),' ','') LIKE '[a-z][0-9][a-z][0-9][a-z][a-z]'
-															THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(Left(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4), 1)
-											WHEN REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][0-9][0-9][a-z][a-z]'
-															THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4) + ' ' + RIGHT(Left(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 5), 1)
-											WHEN REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][a-z][0-9][a-z][a-z]'
-															THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4) + ' ' + RIGHT(Left(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 5), 1)
+											WHEN REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', '') LIKE '[a-z][0-9][0-9][a-z][a-z]'
+															THEN LEFT(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 2) + ' ' + RIGHT(LEFT(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 3), 1)
+											WHEN REPLACE(REPLACE([cu].[Postcode], CHAR(160),''),' ','') LIKE '[a-z][0-9][0-9][0-9][a-z][a-z]'
+															THEN LEFT(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(Left(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 4), 1)
+											WHEN REPLACE(REPLACE([cu].[Postcode], CHAR(160),''),' ','') LIKE '[a-z][a-z][0-9][0-9][a-z][a-z]'
+															THEN LEFT(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(Left(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 4), 1)
+											WHEN REPLACE(REPLACE([cu].[Postcode], CHAR(160),''),' ','') LIKE '[a-z][0-9][a-z][0-9][a-z][a-z]'
+															THEN LEFT(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(Left(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 4), 1)
+											WHEN REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][0-9][0-9][a-z][a-z]'
+															THEN LEFT(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 4) + ' ' + RIGHT(Left(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 5), 1)
+											WHEN REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][a-z][0-9][a-z][a-z]'
+															THEN LEFT(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 4) + ' ' + RIGHT(Left(REPLACE(REPLACE([cu].[Postcode], CHAR(160), ''), ' ', ''), 5), 1)
 											ELSE ''
 									  END 
-				  , cu.Region = pa.Region
+				  , cu.Region = #Customer.[pa].Region
 				FROM #Customer cu
 				INNER JOIN [Warehouse].[Staging].[PostArea] pa
-					ON cu.PostArea = pa.PostAreaCode
+					ON cu.PostArea = #Customer.[pa].PostAreaCode
 
 
 					
 				UPDATE cu
-				SET cu.City = pd.town
-				,	cu.County = pd.region
+				SET cu.City = #Customer.[pd].town
+				,	cu.County = #Customer.[pd].region
 				FROM #Customer cu
 				INNER JOIN [Warehouse].[Staging].[PostcodeDistrict] pd
-					ON cu.PostCodeDistrict = pd.UK_PDIST
+					ON cu.PostCodeDistrict = #Customer.[pd].UK_PDIST
 
 
 			/***************************************************************************************************************************************
@@ -313,13 +313,13 @@ BEGIN
 			***************************************************************************************************************************************/
 					
 				IF OBJECT_ID('tempdb..#CustomersWithOnlyClosedAccounts') IS NOT NULL DROP TABLE #CustomersWithOnlyClosedAccounts
-				SELECT	CustomerID
-					,	MAX(LoadDate) AS LoadDate
+				SELECT	[WHB].[Inbound_Accounts].[CustomerID]
+					,	MAX([WHB].[Inbound_Accounts].[LoadDate]) AS LoadDate
 				INTO #CustomersWithOnlyClosedAccounts
 				FROM [WHB].[Inbound_Accounts]
-				GROUP BY CustomerID
-				HAVING MIN(AccountStatus) = MAX(AccountStatus)
-				AND MIN(AccountStatus) = 'closed'
+				GROUP BY [WHB].[Inbound_Accounts].[CustomerID]
+				HAVING MIN([WHB].[Inbound_Accounts].[AccountStatus]) = MAX([WHB].[Inbound_Accounts].[AccountStatus])
+				AND MIN([WHB].[Inbound_Accounts].[AccountStatus]) = 'closed'
 
 				UPDATE cu
 				SET	cu.ClosedDate = cwoca.LoadDate
@@ -336,34 +336,34 @@ BEGIN
 			IF OBJECT_ID('tempdb..#AccountTypes_Open') IS NOT NULL DROP TABLE #AccountTypes_Open
 			SELECT	DISTINCT
 					ac.CustomerID
-				,	AccountType = STUFF((	SELECT	', ' + AccountType
+				,	AccountType = STUFF((	SELECT	', ' + [ac2].[AccountType]
 											FROM (	SELECT	DISTINCT
-															CustomerID
-														,	AccountType
+															[WHB].[Inbound_Accounts].[CustomerID]
+														,	[WHB].[Inbound_Accounts].[AccountType]
 													FROM [WHB].[Inbound_Accounts]
-													WHERE AccountStatus = 'open') ac2
+													WHERE [WHB].[Inbound_Accounts].[AccountStatus] = 'open') ac2
 											WHERE ac.CustomerID = ac2.CustomerID
 											FOR XML PATH('')), 1, 1, '')
 			INTO #AccountTypes_Open
 			FROM [WHB].[Inbound_Accounts] ac
-			WHERE AccountStatus = 'open'
+			WHERE [ac].[AccountStatus] = 'open'
 
 			CREATE CLUSTERED INDEX CIX_CustomerID ON #AccountTypes_Open (CustomerID)
 			
 			IF OBJECT_ID('tempdb..#AccountTypes_Closed') IS NOT NULL DROP TABLE #AccountTypes_Closed
 			SELECT	DISTINCT
 					ac.CustomerID
-				,	AccountType = STUFF((	SELECT	', ' + AccountType
+				,	AccountType = STUFF((	SELECT	', ' + [ac2].[AccountType]
 											FROM (	SELECT	DISTINCT
-															CustomerID
-														,	AccountType
+															[WHB].[Inbound_Accounts].[CustomerID]
+														,	[WHB].[Inbound_Accounts].[AccountType]
 													FROM [WHB].[Inbound_Accounts]
-													WHERE AccountStatus = 'closed') ac2
+													WHERE [WHB].[Inbound_Accounts].[AccountStatus] = 'closed') ac2
 											WHERE ac.CustomerID = ac2.CustomerID
 											FOR XML PATH('')), 1, 1, '')
 			INTO #AccountTypes_Closed
 			FROM [WHB].[Inbound_Accounts] ac
-			WHERE AccountStatus = 'closed'
+			WHERE [ac].[AccountStatus] = 'closed'
 			
 			CREATE CLUSTERED INDEX CIX_CustomerID ON #AccountTypes_Closed (CustomerID)
 
@@ -373,46 +373,46 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			TRUNCATE TABLE [WHB].[Customer]
-			INSERT INTO [WHB].[Customer] (	RewardCustomerID
-										,	VirginCustomerID
-										,	FanID
-										,	ClubID
-										,	CompositeID
-										,	SourceUID
-										,	AccountType
-										,	Email
-										,	EmailStructureValid
-										,	MobileTelephone
-										,	Title
-										,	FirstName
-										,	LastName
-										,	Address1
-										,	Address2
-										,	City
-										,	County
-										,	Postcode
-										,	Region
-										,	PostalSector
-										,	PostCodeDistrict
-										,	PostArea
-										,	CAMEOCode
-										,	Gender
-										,	DOB
-										,	AgeCurrent
-										,	AgeCurrentBandText
-										,	CashbackPending
-										,	CashbackAvailable
-										,	CashbackLTV
-										,	Unsubscribed
-										,	Hardbounced
-										,	MarketableByEmail
-										,	MarketableByPush
-										,	MarketableByPhone
-										,	MarketableBySMS
-										,	CurrentlyActive
-										,	RegistrationDate
-										,	ClosedDate
-										,	DeactivatedDate)
+			INSERT INTO [WHB].[Customer] (	[WHB].[Customer].[RewardCustomerID]
+										,	[WHB].[Customer].[VirginCustomerID]
+										,	[WHB].[Customer].[FanID]
+										,	[WHB].[Customer].[ClubID]
+										,	[WHB].[Customer].[CompositeID]
+										,	[WHB].[Customer].[SourceUID]
+										,	[WHB].[Customer].[AccountType]
+										,	[WHB].[Customer].[Email]
+										,	[WHB].[Customer].[EmailStructureValid]
+										,	[WHB].[Customer].[MobileTelephone]
+										,	[WHB].[Customer].[Title]
+										,	[WHB].[Customer].[FirstName]
+										,	[WHB].[Customer].[LastName]
+										,	[WHB].[Customer].[Address1]
+										,	[WHB].[Customer].[Address2]
+										,	[WHB].[Customer].[City]
+										,	[WHB].[Customer].[County]
+										,	[WHB].[Customer].[Postcode]
+										,	[WHB].[Customer].[Region]
+										,	[WHB].[Customer].[PostalSector]
+										,	[WHB].[Customer].[PostCodeDistrict]
+										,	[WHB].[Customer].[PostArea]
+										,	[WHB].[Customer].[CAMEOCode]
+										,	[WHB].[Customer].[Gender]
+										,	[WHB].[Customer].[DOB]
+										,	[WHB].[Customer].[AgeCurrent]
+										,	[WHB].[Customer].[AgeCurrentBandText]
+										,	[WHB].[Customer].[CashbackPending]
+										,	[WHB].[Customer].[CashbackAvailable]
+										,	[WHB].[Customer].[CashbackLTV]
+										,	[WHB].[Customer].[Unsubscribed]
+										,	[WHB].[Customer].[Hardbounced]
+										,	[WHB].[Customer].[MarketableByEmail]
+										,	[WHB].[Customer].[MarketableByPush]
+										,	[WHB].[Customer].[MarketableByPhone]
+										,	[WHB].[Customer].[MarketableBySMS]
+										,	[WHB].[Customer].[CurrentlyActive]
+										,	[WHB].[Customer].[RegistrationDate]
+										,	[WHB].[Customer].[ClosedDate]
+										,	[WHB].[Customer].[DeactivatedDate])
 			SELECT	DISTINCT
 					cu.RewardCustomerID
 				,	cu.VirginCustomerID
@@ -485,7 +485,7 @@ BEGIN
 		IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-		INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+		INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 		VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

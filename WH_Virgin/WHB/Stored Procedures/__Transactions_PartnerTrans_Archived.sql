@@ -126,19 +126,19 @@ BEGIN
 		SET DATEFIRST 1; --set the first day of the week to Monday. This influences the return value of DATEPART()
 	
 		UPDATE [Staging].[PartnerTrans]
-		SET	TransactionWeekStarting = DATEADD(dd, - 1 * (DATEPART(dw, TransactionDate) - 1) , TransactionDate)
-		  , TransactionMonth = MONTH(TransactionDate)
-		  , TransactionYear = YEAR(TransactionDate)
-		  , TransactionWeekStartingCampaign = CASE
-													WHEN DATEADD(dd, 3, DATEADD(dd, - 1 * (DATEPART(dw, TransactionDate) - 1) , TransactionDate)) > TransactionDate THEN DATEADD(dd,-4,DATEADD(dd, - 1 * (DATEPART(dw, TransactionDate) - 1) , TransactionDate))
-													ELSE DATEADD(dd, 3, DATEADD(dd, - 1 * (DATEPART(dw, TransactionDate) - 1) , TransactionDate))
+		SET	[Staging].[PartnerTrans].[TransactionWeekStarting] = DATEADD(dd, - 1 * (DATEPART(dw, [Staging].[PartnerTrans].[TransactionDate]) - 1) , [Staging].[PartnerTrans].[TransactionDate])
+		  , [Staging].[PartnerTrans].[TransactionMonth] = MONTH([Staging].[PartnerTrans].[TransactionDate])
+		  , [Staging].[PartnerTrans].[TransactionYear] = YEAR([Staging].[PartnerTrans].[TransactionDate])
+		  , [Staging].[PartnerTrans].[TransactionWeekStartingCampaign] = CASE
+													WHEN DATEADD(dd, 3, DATEADD(dd, - 1 * (DATEPART(dw, [Staging].[PartnerTrans].[TransactionDate]) - 1) , [Staging].[PartnerTrans].[TransactionDate])) > [Staging].[PartnerTrans].[TransactionDate] THEN DATEADD(dd,-4,DATEADD(dd, - 1 * (DATEPART(dw, [Staging].[PartnerTrans].[TransactionDate]) - 1) , [Staging].[PartnerTrans].[TransactionDate]))
+													ELSE DATEADD(dd, 3, DATEADD(dd, - 1 * (DATEPART(dw, [Staging].[PartnerTrans].[TransactionDate]) - 1) , [Staging].[PartnerTrans].[TransactionDate]))
 											  END
-		  , AddedWeekStarting = DATEADD(dd, - 1 * (DATEPART(dw, AddedDate) - 1) , AddedDate)
-		  , AddedMonth = MONTH(AddedDate)
-		  , AddedYear = YEAR(AddedDate)
-		  , ExtremeValueFlag = 0
-		  , EligibleForCashBack = CASE WHEN [Status] = 1 AND RewardStatus IN (0,1) THEN 1 ELSE 0 END
-		  , CommissionChargable = CASE WHEN CommissionChargable IS NOT NULL THEN CommissionChargable ELSE (CASE WHEN [Status] = 1 AND RewardStatus IN (0,1) THEN 1 ELSE 0 END * AffiliateCommissionAmount) END -- Jason Shipp 08/11/2019
+		  , [Staging].[PartnerTrans].[AddedWeekStarting] = DATEADD(dd, - 1 * (DATEPART(dw, [Staging].[PartnerTrans].[AddedDate]) - 1) , [Staging].[PartnerTrans].[AddedDate])
+		  , [Staging].[PartnerTrans].[AddedMonth] = MONTH([Staging].[PartnerTrans].[AddedDate])
+		  , [Staging].[PartnerTrans].[AddedYear] = YEAR([Staging].[PartnerTrans].[AddedDate])
+		  , [Staging].[PartnerTrans].[ExtremeValueFlag] = 0
+		  , [Staging].[PartnerTrans].[EligibleForCashBack] = CASE WHEN [Staging].[PartnerTrans].[Status] = 1 AND [Staging].[PartnerTrans].[RewardStatus] IN (0,1) THEN 1 ELSE 0 END
+		  , [Staging].[PartnerTrans].[CommissionChargable] = CASE WHEN [Staging].[PartnerTrans].[CommissionChargable] IS NOT NULL THEN [Staging].[PartnerTrans].[CommissionChargable] ELSE (CASE WHEN [Staging].[PartnerTrans].[Status] = 1 AND [Staging].[PartnerTrans].[RewardStatus] IN (0,1) THEN 1 ELSE 0 END * [Staging].[PartnerTrans].[AffiliateCommissionAmount]) END -- Jason Shipp 08/11/2019
 
 		IF OBJECT_ID('tempdb..#CBEarned') IS NOT NULL DROP TABLE #CBEarned
 		SELECT DISTINCT
@@ -173,9 +173,9 @@ BEGIN
 		  , t.IronOfferID = pcr.RequiredIronOfferID
 		FROM [Staging].[PartnerTrans] t
 		INNER JOIN #Match m
-			on t.MatchID = m.MatchID
+			on #Match.[t].MatchID = m.MatchID
 		INNER JOIN Warehouse.[APW].[DirectLoad_OutletOinToPartnerID] o
-			ON COALESCE(m.RetailOutletID, m.DirectDebitOriginatorID) = COALESCE(o.OutletID, o.DirectDebitOriginatorID) -- Captures POS and MFDD transactions -- Jason Shipp 15/05/2019
+			ON COALESCE(m.RetailOutletID, m.DirectDebitOriginatorID) = COALESCE(#Match.[o].OutletID, #Match.[o].DirectDebitOriginatorID) -- Captures POS and MFDD transactions -- Jason Shipp 15/05/2019
 		LEFT JOIN #CBEarned CBEarned -- Jason Shipp 15/05/2019
 			ON t.MatchID = CBEarned.MatchID
 		LEFT JOIN [SLC_Report].[dbo].[PartnerCommissionRule] pcr 
@@ -186,7 +186,7 @@ BEGIN
 		--	on t.MatchID = MCHP.MatchID
 	
 		
-		DELETE FROM [Staging].[PartnerTrans] WHERE PartnerID IS NULL;
+		DELETE FROM [Staging].[PartnerTrans] WHERE [Staging].[PartnerTrans].[PartnerID] IS NULL;
 
 
 		--Flag the extreme values on the transactions
@@ -194,16 +194,16 @@ BEGIN
 		select	t.MatchID,
 				t.PartnerID,
 				t.TransactionAmount,
-				ntile(100) over (partition by PartnerID order by TransactionAmount) ValuePercentile
+				ntile(100) over (partition by [staging].[PartnerTrans].[PartnerID] order by [staging].[PartnerTrans].[TransactionAmount]) ValuePercentile
 		into	#temp1
 		from	staging.PartnerTrans t 
-		order by PartnerID;
+		order by [staging].[PartnerTrans].[PartnerID];
 
 		update	tr
 		set		tr.ExtremeValueFlag = 1
 		from	staging.PartnerTrans tr
 				inner join #temp1 te
-					 on tr.MatchID = te.MatchID
+					 on #temp1.[tr].MatchID = te.MatchID
 		where	te.ValuePercentile in (1,2,3,4,5,96,97,98,99,100);		--Top and bottom 5% of transactions are flagged as extreme values
 
 		---------------------------------------------------------------------------------------------------------------------
@@ -242,10 +242,10 @@ BEGIN
 	
 		if object_id ('tempdb..#PTWithPostLaunchCBR') is not null drop table #PTWithPostLaunchCBR;
 		SELECT	Distinct
-			pt.MatchID,
+			#PtSeg.[pt].MatchID,
 			Cast(CASE	
-					WHEN CashBackEarned > 0 and CashbackEarned > Cast(TransactionAmount * (po.CashBackRateNumeric+0.005) AS NUMERIC(36,2)) THEN 1
-					WHEN CashBackEarned < 0 and CashbackEarned < Cast(TransactionAmount * (po.CashBackRateNumeric+0.005) AS NUMERIC(36,2)) THEN 1
+					WHEN #PtSeg.[CashBackEarned] > 0 and #PtSeg.[CashbackEarned] > Cast(#PtSeg.[TransactionAmount] * (#PtSeg.[po].CashBackRateNumeric+0.005) AS NUMERIC(36,2)) THEN 1
+					WHEN #PtSeg.[CashBackEarned] < 0 and #PtSeg.[CashbackEarned] < Cast(#PtSeg.[TransactionAmount] * (#PtSeg.[po].CashBackRateNumeric+0.005) AS NUMERIC(36,2)) THEN 1
 					ELSE 0
 			END as Int) as AboveBase
 		INTO #PTWithPostLaunchCBR
@@ -255,7 +255,7 @@ BEGIN
 				(po.EndDate IS NULL OR TransactionDate <= po.EndDate) and 
 				EligibleForCashBack = 1 and CashbackEarned <> 0
 		LEFT OUTER JOIN #PtSeg AS PTSEG
-			ON PT.MatchID = PTSeg.MatchID
+			ON #PtSeg.[PT].MatchID = PTSeg.MatchID
 		Where PTSeg.MatchID is null;
 
 		--Select * from #PTWithPostLaunchCBR
@@ -283,23 +283,23 @@ BEGIN
 		----------------------------------------------------------------------
 
 		Update staging.PartnerTrans
-		Set Abovebase = pt.AboveBase
+		Set [staging].[PartnerTrans].[Abovebase] = pt.AboveBase
 		FROM staging.PartnerTrans p
 		LEFT OUTER JOIN #PTWithAB pt
-			ON p.MatchID = pt.MatchID;
+			ON #PTWithAB.[p].MatchID = pt.MatchID;
 
 		---------------------------------------------------------------------------------------------
 		-----------------Set Above Base to 1 for all non coalition partners--------------------------
 		---------------------------------------------------------------------------------------------
 
 		Update staging.PartnerTrans
-		Set Abovebase = 1
-		Where	PartnerID in (Select PartnerID from [Derived].[Partner_CBPDates] Where [Coalition_Member] = 0) 
-				and AboveBase is null;
+		Set [staging].[PartnerTrans].[Abovebase] = 1
+		Where	[staging].[PartnerTrans].[PartnerID] in (Select PartnerID from [Derived].[Partner_CBPDates] Where [Coalition_Member] = 0) 
+				and [staging].[PartnerTrans].[AboveBase] is null;
 
 		--Delete not eligible for cashback transactions-------------------------------
 		
-		Delete from staging.partnertrans Where Eligibleforcashback = 0;
+		Delete from staging.partnertrans Where [staging].[partnertrans].[Eligibleforcashback] = 0;
 	
 
 		--Build final tables in relational schema -PartnerTrans-------*/
@@ -308,32 +308,32 @@ BEGIN
 		ALTER INDEX i_TransactionWeekStarting ON Derived.PartnerTrans  DISABLE;
 
 		Insert into	Derived.PartnerTrans
-		select	MatchID,
-				FanID,
-				PartnerID,
-				OutletID,
-				IsOnline,
-				CardHolderPresentData,
-				TransactionAmount,
-				ExtremeValueFlag,
-				TransactionDate,
-				TransactionWeekStarting,
-				TransactionMonth,
-				TransactionYear,
-				TransactionWeekStartingCampaign,
-				AddedDate,
-				AddedWeekStarting,
-				AddedMonth,
-				AddedYear,
-				status,
-				rewardstatus,
-				AffiliateCommissionAmount,
-				EligibleForCashBack,
-				CommissionChargable,
-				CashbackEarned,
-				IronOfferID,
-				ActivationDays,
-				AboveBase,
+		select	[staging].[PartnerTrans].[MatchID],
+				[staging].[PartnerTrans].[FanID],
+				[staging].[PartnerTrans].[PartnerID],
+				[staging].[PartnerTrans].[OutletID],
+				[staging].[PartnerTrans].[IsOnline],
+				[staging].[PartnerTrans].[CardHolderPresentData],
+				[staging].[PartnerTrans].[TransactionAmount],
+				[staging].[PartnerTrans].[ExtremeValueFlag],
+				[staging].[PartnerTrans].[TransactionDate],
+				[staging].[PartnerTrans].[TransactionWeekStarting],
+				[staging].[PartnerTrans].[TransactionMonth],
+				[staging].[PartnerTrans].[TransactionYear],
+				[staging].[PartnerTrans].[TransactionWeekStartingCampaign],
+				[staging].[PartnerTrans].[AddedDate],
+				[staging].[PartnerTrans].[AddedWeekStarting],
+				[staging].[PartnerTrans].[AddedMonth],
+				[staging].[PartnerTrans].[AddedYear],
+				[staging].[PartnerTrans].[status],
+				[staging].[PartnerTrans].[rewardstatus],
+				[staging].[PartnerTrans].[AffiliateCommissionAmount],
+				[staging].[PartnerTrans].[EligibleForCashBack],
+				[staging].[PartnerTrans].[CommissionChargable],
+				[staging].[PartnerTrans].[CashbackEarned],
+				[staging].[PartnerTrans].[IronOfferID],
+				[staging].[PartnerTrans].[ActivationDays],
+				[staging].[PartnerTrans].[AboveBase],
 				0 as PaymentMethodID
 		FROM staging.PartnerTrans
 
@@ -348,7 +348,7 @@ BEGIN
 -------------------------------------------------------------------------------
 	
 		Update pt
-		Set PaymentMethodID =	Case
+		Set [relational].[PartnerTrans].[PaymentMethodID] =	Case
 									When CardTypeID = 1 then 1 -- Credit Card
 									When CardTypeID = 2 then 0 -- Debit Card
 									Else 3
@@ -368,12 +368,12 @@ BEGIN
 
 --Populate PartnerTrans AboveBase field----------------------------------
 UPDATE Derived.Partnertrans
-	SET AboveBase = 0
-WHERE AboveBase is null 
-	AND Cast(CashbackEarned as real) / TransactionAmount Between -.0125 and .0125
+	SET [Derived].[Partnertrans].[AboveBase] = 0
+WHERE [Derived].[Partnertrans].[AboveBase] is null 
+	AND Cast([Derived].[Partnertrans].[CashbackEarned] as real) / [Derived].[Partnertrans].[TransactionAmount] Between -.0125 and .0125
 
 UPDATE pt
-	SET AboveBase = 0
+	SET [pt].[AboveBase] = 0
 FROM Derived.PartnerTrans as pt
 INNER JOIN [Derived].[Partner_NonCoreBaseOffer] as n
 	on pt.IronOfferID = n.IronOfferID
@@ -398,7 +398,7 @@ INNER JOIN [Derived].[Partner_NonCoreBaseOffer] as n
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

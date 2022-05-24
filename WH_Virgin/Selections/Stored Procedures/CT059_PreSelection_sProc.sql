@@ -15,10 +15,10 @@ and AccountType IS NOT NULL
 
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-SELECT ConsumerCombinationID
+SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
 INTO	#CC
 FROM	WH_Virgin.trans.ConsumerCombination  CC
-WHERE	BrandID IN (195,294,366,417)			-- Competitors:  Hawes & Curtis, TM Lewin, Moss Bros and Reiss.
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN (195,294,366,417)			-- Competitors:  Hawes & Curtis, TM Lewin, Moss Bros and Reiss.
 
 
 DECLARE @DATE_6 DATE = DATEADD(MONTH, -6, GETDATE())
@@ -27,7 +27,7 @@ IF OBJECT_ID('tempdb..#Trans') IS NOT NULL DROP TABLE #Trans
 SELECT	F.CINID
 INTO #Trans
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB F ON F.CINID = CT.CINID
+JOIN	#FB F ON F.CINID = #FB.[CT].CINID
 JOIN	#CC C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	TranDate > @DATE_6
 		AND Amount > 0
@@ -35,10 +35,10 @@ GROUP BY F.CINID
 
 
 IF OBJECT_ID('Sandbox.SamH.VM_CharlesTyrwhitt_CS_210921') IS NOT NULL DROP TABLE Sandbox.SamH.VM_CharlesTyrwhitt_CS_210921
-SELECT	CINID
+SELECT	#Trans.[CINID]
 INTO Sandbox.SamH.VM_CharlesTyrwhitt_CS_210921
 FROM	#Trans 
-GROUP BY CINID
+GROUP BY #Trans.[CINID]
 
 --RBS CODE: --------------------------------------------------------------------------------
 --IF OBJECT_ID('tempdb..#FB') IS NOT NULL DROP TABLE #FB
@@ -117,7 +117,7 @@ INTO [WH_Virgin].[Selections].[CT059_PreSelection]
 FROM #FB fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.SamH.VM_CharlesTyrwhitt_CS_210921 sb
-				WHERE fb.CINID = sb.CINID)
+				WHERE fb.CINID = #FB.[sb].CINID)
 
 
 END;

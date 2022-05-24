@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [SSO]
+    AUTHORIZATION [dbo];
+

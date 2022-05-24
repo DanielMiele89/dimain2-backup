@@ -34,10 +34,10 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			IF OBJECT_ID('tempdb..#Duplicates') IS NOT NULL DROP TABLE #Duplicates
-			SELECT	SourceUID
+			SELECT	[WHB].[Customer].[SourceUID]
 			INTO #Duplicates
 			FROM [WHB].[Customer]
-			GROUP BY	SourceUID
+			GROUP BY	[WHB].[Customer].[SourceUID]
 			HAVING COUNT(*) > 1
 
 			CREATE CLUSTERED INDEX CIX_SourceUID ON #Duplicates (SourceUID)
@@ -49,9 +49,9 @@ BEGIN
 		
 			--DECLARE @RunDate DATE = GETDATE()
 
-			INSERT INTO [Derived].[Customer_DuplicateSourceUID] (SourceUID
-															   , StartDate
-															   , EndDate)
+			INSERT INTO [Derived].[Customer_DuplicateSourceUID] ([Derived].[Customer_DuplicateSourceUID].[SourceUID]
+															   , [Derived].[Customer_DuplicateSourceUID].[StartDate]
+															   , [Derived].[Customer_DuplicateSourceUID].[EndDate])
 			SELECT	dup.SourceUID
 				,	@RunDate AS StartDate
 				,	NULL AS EndDate
@@ -74,7 +74,7 @@ BEGIN
 			WHERE dsu.EndDate IS NULL
 			AND NOT EXISTS (	SELECT 1
 								FROM #Duplicates dup
-								WHERE dsu.SourceUID = dup.SourceUID)
+								WHERE #Duplicates.[dsu].SourceUID = dup.SourceUID)
 
 			CREATE CLUSTERED INDEX CIX_ID ON #NoLongerDuplicated (ID)
 
@@ -86,11 +86,11 @@ BEGIN
 			DECLARE @EndDate DATE = DATEADD(DAY, -1, @RunDate)
 
 			UPDATE dsu
-			SET EndDate = @EndDate
+			SET [dsu].[EndDate] = @EndDate
 			FROM [Derived].[Customer_DuplicateSourceUID] dsu
 			WHERE EXISTS (	SELECT 1
 							FROM #NoLongerDuplicated nld
-							WHERE dsu.ID = nld.ID)
+							WHERE #NoLongerDuplicated.[dsu].ID = nld.ID)
 
 			EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Finished'
 
@@ -112,7 +112,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

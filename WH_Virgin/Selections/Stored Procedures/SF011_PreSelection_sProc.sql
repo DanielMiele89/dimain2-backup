@@ -14,16 +14,16 @@ and AccountType IS NOT NULL
 
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-SELECT ConsumerCombinationID
+SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
 INTO #CC
 FROM	WH_Virgin.trans.ConsumerCombination  CC
-WHERE	BrandID IN (2868,2867)						-- Competitors: Lookiero, Thread
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN (2868,2867)						-- Competitors: Lookiero, Thread
 
 IF OBJECT_ID('tempdb..#Trans') IS NOT NULL DROP TABLE #Trans
 SELECT	F.CINID
 INTO #Trans
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB F ON F.CINID = CT.CINID
+JOIN	#FB F ON F.CINID = #FB.[CT].CINID
 JOIN	#CC C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	TranDate > DATEADD(MONTH, -6, GETDATE())
 		AND Amount > 0
@@ -31,17 +31,17 @@ GROUP BY F.CINID
 
 
 IF OBJECT_ID('Sandbox.MichaelM.Stitchfix_VM_CompSteal_23092021') IS NOT NULL DROP TABLE Sandbox.MichaelM.Stitchfix_VM_CompSteal_23092021
-SELECT	CINID
+SELECT	#Trans.[CINID]
 INTO Sandbox.MichaelM.Stitchfix_VM_CompSteal_23092021
 FROM  #Trans
 
 
 If Object_ID('Selections.SF011_PreSelection') Is Not Null Drop Table Selections.SF011_PreSelection
-Select FanID
+Select [F].[FanID]
 Into Selections.SF011_PreSelection
 FROM #FB F
 INNER JOIN Sandbox.MichaelM.Stitchfix_VM_CompSteal_23092021 R
-ON R.CINID = F.CINID
+ON #FB.[R].CINID = F.CINID
 
 END
 

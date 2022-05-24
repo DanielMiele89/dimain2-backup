@@ -23,15 +23,15 @@ BEGIN
 			1.		Find most recent Email Send Date & associated LionSendIDs
 	*******************************************************************************************************************************************/
 
-		DECLARE	@EmailSendDate DATE = (SELECT MAX(EmailSendDate) FROM [Report].[V_0003_NewsletterVolumes])
+		DECLARE	@EmailSendDate DATE = (SELECT MAX([Report].[V_0003_NewsletterVolumes].[EmailSendDate]) FROM [Report].[V_0003_NewsletterVolumes])
 			,	@Today DATE = GETDATE()
 
 		IF OBJECT_ID('tempdb..#LionSendID') IS NOT NULL DROP TABLE #LionSendID
 		SELECT	DISTINCT
-				LionSendID
+				[ls].[LionSendID]
 		INTO #LionSendID
 		FROM [Report].[V_0003_NewsletterVolumes] ls
-		WHERE EmailSendDate = @EmailSendDate
+		WHERE [ls].[EmailSendDate] = @EmailSendDate
 
 
 	/*******************************************************************************************************************************************
@@ -43,7 +43,7 @@ BEGIN
 						WHERE @EmailSendDate = lsc.EmailSendDate
 						AND EXISTS (SELECT 1
 									FROM #LionSendID ls
-									WHERE lsc.LionSendID = ls.LionSendID))
+									WHERE #LionSendID.[lsc].LionSendID = ls.LionSendID))
 
 			BEGIN
 
@@ -62,7 +62,7 @@ BEGIN
 				FROM [Email].[NominatedLionSendComponent] ls
 				WHERE EXISTS (	SELECT 1
 								FROM #LionSendID lsi
-								WHERE ls.LionSendID = lsi.LionSendID)
+								WHERE #LionSendID.[ls].LionSendID = lsi.LionSendID)
 				UNION ALL
 				SELECT	ls.LionSendID
 					,	@EmailSendDate AS EmailSendDate
@@ -73,7 +73,7 @@ BEGIN
 				FROM [Email].[NominatedLionSendComponent_RedemptionOffers] ls
 				WHERE EXISTS (	SELECT 1
 								FROM #LionSendID lsi
-								WHERE ls.LionSendID = lsi.LionSendID)
+								WHERE #LionSendID.[ls].LionSendID = lsi.LionSendID)
 
 
 				IF OBJECT_ID('tempdb..#LionSend_Offers') IS NOT NULL DROP TABLE #LionSend_Offers
@@ -101,20 +101,20 @@ BEGIN
 
 			
 
-				INSERT INTO [Email].[Newsletter_Offers] (	LionSendID
-														,	EmailSendDate
-														,	CompositeID
-														,	FanID
-														,	TypeID
-														,	ItemID
-														,	OfferSlot)
-				SELECT	LionSendID
-					,	EmailSendDate
-					,	CompositeID
-					,	FanID
-					,	TypeID
-					,	ItemID
-					,	ItemRank
+				INSERT INTO [Email].[Newsletter_Offers] (	[Email].[Newsletter_Offers].[LionSendID]
+														,	[Email].[Newsletter_Offers].[EmailSendDate]
+														,	[Email].[Newsletter_Offers].[CompositeID]
+														,	[Email].[Newsletter_Offers].[FanID]
+														,	[Email].[Newsletter_Offers].[TypeID]
+														,	[Email].[Newsletter_Offers].[ItemID]
+														,	[Email].[Newsletter_Offers].[OfferSlot])
+				SELECT	#LionSend_Offers.[LionSendID]
+					,	#LionSend_Offers.[EmailSendDate]
+					,	#LionSend_Offers.[CompositeID]
+					,	#LionSend_Offers.[FanID]
+					,	#LionSend_Offers.[TypeID]
+					,	#LionSend_Offers.[ItemID]
+					,	#LionSend_Offers.[ItemRank]
 				FROM #LionSend_Offers
 			
 				EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Loaded new rows to [Email].[Newsletter_Offers]'
@@ -156,18 +156,18 @@ BEGIN
 
 				-- Initial populatiON of tables
 
-				INSERT INTO [Email].[Newsletter_Customers] (LionSendID
-														, EmailSendDate
-														, CompositeID
-														, FanID
-														, ClubID
-														, CustomerSegment)
-				SELECT	LionSendID
-					,	EmailSendDate
-					,	CompositeID
-					,	FanID
-					,	ClubID
-					,	CustomerSegment
+				INSERT INTO [Email].[Newsletter_Customers] ([Email].[Newsletter_Customers].[LionSendID]
+														, [Email].[Newsletter_Customers].[EmailSendDate]
+														, [Email].[Newsletter_Customers].[CompositeID]
+														, [Email].[Newsletter_Customers].[FanID]
+														, [Email].[Newsletter_Customers].[ClubID]
+														, [Email].[Newsletter_Customers].[CustomerSegment])
+				SELECT	#LionSend_Customers.[LionSendID]
+					,	#LionSend_Customers.[EmailSendDate]
+					,	#LionSend_Customers.[CompositeID]
+					,	#LionSend_Customers.[FanID]
+					,	#LionSend_Customers.[ClubID]
+					,	#LionSend_Customers.[CustomerSegment]
 				FROM #LionSend_Customers
 
 				ALTER INDEX [IX_LionCampaignClubFan] ON [Email].[Newsletter_Customers] REBUILD WITH (SORT_IN_TEMPDB = ON)
@@ -178,18 +178,18 @@ BEGIN
 
 				IF OBJECT_ID('tempdb..#EmailCampaign') IS NOT NULL DROP TABLE #EmailCampaign
 				SELECT	ec.CampaignKey
-					,	CampaignName
-					,	SendDate
+					,	[ec].[CampaignName]
+					,	[ec].[SendDate]
 					,	166 AS ClubID
 					 ,	NULL AS IsLoyalty
 					 ,	CASE
-							WHEN PATINDEX('%LSID%', CampaignName) > 0 THEN SUBSTRING(CampaignName, PATINDEX('%LSID%', CampaignName) + 4, 3)
+							WHEN PATINDEX('%LSID%', [ec].[CampaignName]) > 0 THEN SUBSTRING([ec].[CampaignName], PATINDEX('%LSID%', [ec].[CampaignName]) + 4, 3)
 							ELSE NULL
 						END AS LionSendID
 				INTO #EmailCampaign
 				FROM [Derived].[EmailCampaign] ec
-				WHERE CampaignName LIKE '%Newsletter_LSID[0-9][0-9][0-9]_[0-9]%'
-				AND CampaignName NOT LIKE 'TEST%'
+				WHERE [ec].[CampaignName] LIKE '%Newsletter_LSID[0-9][0-9][0-9]_[0-9]%'
+				AND [ec].[CampaignName] NOT LIKE 'TEST%'
 
 				UPDATE ls
 				SET ls.CampaignKey = ec.CampaignKey
@@ -224,7 +224,7 @@ BEGIN
 					AND ens.CampaignKey = ee.CampaignKey
 
 				UPDATE lsc
-				SET	EmailSent = 1
+				SET	[lsc].[EmailSent] = 1
 				FROM [Email].[Newsletter_Customers] lsc
 				INNER JOIN #EmailSent es
 					ON lsc.CampaignKey = es.CampaignKey
@@ -255,8 +255,8 @@ BEGIN
 					  , ee.FanID
 
 				UPDATE lsc
-				SET	EmailOpened = 1
-				,	EmailOpenedDate = EventDate
+				SET	[lsc].[EmailOpened] = 1
+				,	[lsc].[EmailOpenedDate] = [eo].[EventDate]
 				FROM [Email].[Newsletter_Customers] lsc
 				INNER JOIN #EmailOpens eo
 					ON lsc.CampaignKey = eo.CampaignKey
@@ -291,7 +291,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

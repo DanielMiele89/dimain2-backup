@@ -44,9 +44,9 @@ BEGIN
 		--FROM Monitor.vw_PackageLog_LatestRunID
 		--WHERE PackageID = @PackageID
 
-		SELECT @SourceTypeID = SourceTypeID
+		SELECT @SourceTypeID = [Monitor].[Package_SourceType].[SourceTypeID]
 		FROM Monitor.Package_SourceType
-		WHERE @SourceName LIKE MatchString
+		WHERE @SourceName LIKE [Monitor].[Package_SourceType].[MatchString]
 
 		SET @SourceTypeID = COALESCE(@SourceTypeID, 3) -- If doesn't match any string, set to Task type id
 
@@ -57,15 +57,15 @@ BEGIN
 	----------------------------------------------------------------------
 	INSERT INTO Monitor.Package_Log
 	(
-		RunID
-	  , PackageID
-	  , SourceID
-	  , SourceName
-	  , RunStartDateTime
-	  , RunEndDateTime
-	  , isError
-	  , SourceTypeID
-	  , RowCnt
+		[Monitor].[Package_Log].[RunID]
+	  , [Monitor].[Package_Log].[PackageID]
+	  , [Monitor].[Package_Log].[SourceID]
+	  , [Monitor].[Package_Log].[SourceName]
+	  , [Monitor].[Package_Log].[RunStartDateTime]
+	  , [Monitor].[Package_Log].[RunEndDateTime]
+	  , [Monitor].[Package_Log].[isError]
+	  , [Monitor].[Package_Log].[SourceTypeID]
+	  , [Monitor].[Package_Log].[RowCnt]
 	)
 
 	 SELECT

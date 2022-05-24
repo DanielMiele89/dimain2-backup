@@ -32,14 +32,14 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			IF OBJECT_ID('tempdb..#FilesToProcess') IS NOT NULL DROP TABLE #FilesToProcess
-			SELECT	ID AS FileID
-				,	LoadDate
-				,	FileName
+			SELECT	[f].[ID] AS FileID
+				,	[f].[LoadDate]
+				,	[f].[FileName]
 			INTO #FilesToProcess
 			FROM [WHB].[Inbound_Files] f
-			WHERE TableName = 'Login'
-			AND FileProcessed = 0
-			ORDER BY ID
+			WHERE [f].[TableName] = 'Login'
+			AND [f].[FileProcessed] = 0
+			ORDER BY [f].[ID]
 
 
 		/*******************************************************************************************************************************************
@@ -47,16 +47,16 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			IF OBJECT_ID('tempdb..#TrackingData') IS NOT NULL DROP TABLE #TrackingData
-			SELECT	CustomerID AS FanID
-				,	LoginDateTime AS TrackDate
+			SELECT	[td].[CustomerID] AS FanID
+				,	[td].[LoginDateTime] AS TrackDate
 				,	0 AS TrackTypeID
-				,	LoginInformation AS FanData
+				,	[td].[LoginInformation] AS FanData
 			INTO #TrackingData
 			FROM [Inbound].[Login] td
 			WHERE EXISTS (	SELECT 1
 							FROM #FilesToProcess ftp
-							WHERE td.FileName = ftp.FileName
-							AND td.LoadDate = ftp.LoadDate)
+							WHERE #FilesToProcess.[td].FileName = ftp.FileName
+							AND #FilesToProcess.[td].LoadDate = ftp.LoadDate)
 			AND EXISTS (SELECT 1
 						FROM [WHB].[Customer] cu
 						WHERE td.CustomerID = cu.FanID)
@@ -69,16 +69,16 @@ BEGIN
 			3. Insert all events that do not currently exist in [Derived].[AppLogins]
 		*******************************************************************************************************************************************/
 
-			INSERT INTO [Derived].[AppLogins]	(	FanID
-												,	TrackTypeID
-												,	TrackDate
-												,	LoginInfoID
-												,	FanData)
-			SELECT	FanID
-				,	TrackTypeID
-				,	TrackDate
+			INSERT INTO [Derived].[AppLogins]	(	[Derived].[AppLogins].[FanID]
+												,	[Derived].[AppLogins].[TrackTypeID]
+												,	[Derived].[AppLogins].[TrackDate]
+												,	[Derived].[AppLogins].[LoginInfoID]
+												,	[Derived].[AppLogins].[FanData])
+			SELECT	[td].[FanID]
+				,	[td].[TrackTypeID]
+				,	[td].[TrackDate]
 				,	LoginInfoID
-				,	FanData
+				,	[td].[FanData]
 			FROM #TrackingData td
 			LEFT JOIN [Derived].[LoginInfo] li -- left join in the event that the table isn't updated otherwise rows can be skipped from processing
 				ON td.FanData = li.UserAgent
@@ -117,12 +117,12 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			UPDATE f
-			SET FileProcessed = 1
+			SET [f].[FileProcessed] = 1
 			FROM [WHB].[Inbound_Files] f
 			WHERE EXISTS (	SELECT 1
 							FROM #FilesToProcess ftp
-							WHERE f.ID = ftp.FileID
-							AND f.LoadDate = ftp.LoadDate)
+							WHERE #FilesToProcess.[f].ID = ftp.FileID
+							AND #FilesToProcess.[f].LoadDate = ftp.LoadDate)
 	
 			EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Finished'
 
@@ -144,7 +144,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

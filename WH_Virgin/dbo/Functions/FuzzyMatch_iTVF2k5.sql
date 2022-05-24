@@ -12,14 +12,14 @@ SELECT
    d.Method, 
    MatchRatio = CAST(CASE 
       WHEN d.Method = 1 THEN 100
-      WHEN d.Method = 3 THEN LenTarget*100.00/LenReference
-      WHEN d.Method = 4 THEN LenReference*100.00/LenTarget
+      WHEN d.Method = 3 THEN [d].[LenTarget]*100.00/[d].[LenReference]
+      WHEN d.Method = 4 THEN [d].[LenReference]*100.00/[d].[LenTarget]
  
       WHEN d.Method = 5 THEN
          (
          SELECT 
             MatchPC = (100.00 * ISNULL(NULLIF(SUM(
-                  CASE WHEN Tally.n < PosInTarget THEN Tally.n/PosInTarget ELSE PosInTarget/Tally.n END
+                  CASE WHEN Tally.n < [x].[PosInTarget] THEN Tally.n/[x].[PosInTarget] ELSE [x].[PosInTarget]/Tally.n END
                            ),0)+2.00,0) / LenReference) 
                   * CASE WHEN LenTarget > LenReference THEN LenReference/LenTarget ELSE 1.00 END    
          FROM ( -- Tally
@@ -34,7 +34,7 @@ SELECT
          (
          SELECT
             MatchPC = (100.00 * ISNULL(NULLIF(SUM(
-                  CASE WHEN Tally.n < PosInTarget THEN Tally.n/PosInTarget ELSE PosInTarget/Tally.n END
+                  CASE WHEN Tally.n < [x].[PosInTarget] THEN Tally.n/[x].[PosInTarget] ELSE [x].[PosInTarget]/Tally.n END
                            ),0)+1.00,0) / LenReference)  
                   * CASE WHEN LenTarget > LenReference THEN LenReference/LenTarget ELSE 1.00 END
          FROM ( -- Tally

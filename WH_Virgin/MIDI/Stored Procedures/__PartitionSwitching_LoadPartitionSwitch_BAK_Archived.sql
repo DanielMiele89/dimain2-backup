@@ -26,7 +26,7 @@ BEGIN
 	--------------------------------------------------------------------------------------------------------------------------
 	-- Create the shadow table, drop it first if necessary
 	--------------------------------------------------------------------------------------------------------------------------
-	IF EXISTS(SELECT 1 FROM SYS.TABLES WHERE [Name] = 'ConsumerTransaction_p' + @strPartitionID + '_Stage')
+	IF EXISTS(SELECT 1 FROM SYS.TABLES WHERE [SYS].[TABLES].[Name] = 'ConsumerTransaction_p' + @strPartitionID + '_Stage')
 	BEGIN
 		-- check if the table has any content before dropping
 		DECLARE @SQLString nvarchar(500) = N'SELECT @SourceRowCount = COUNT(*) FROM Trans.ConsumerTransaction_p' + @strPartitionID + '_Stage'; 

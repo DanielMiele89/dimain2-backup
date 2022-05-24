@@ -14,7 +14,7 @@ AS
 BEGIN
 
 	UPDATE mnc
-	SET IsHighVariance = 0
+	SET [mnc].[IsHighVariance] = 0
 	FROM [MIDI].[CTLoad_MIDINewCombo] mnc
 
 	UPDATE mnc
@@ -30,14 +30,14 @@ BEGIN
 		ON mnc.ID = ni.ID
 	
 	UPDATE mnc
-	SET IsHighVariance = 1
+	SET [mnc].[IsHighVariance] = 1
 	FROM [MIDI].[CTLoad_MIDINewCombo] mnc
-	WHERE OriginalNarrative != UpdatedNarrative
-	AND (UpdatedNarrative LIKE '%[%]%' OR UpdatedNarrative LIKE '%[_]%' OR UpdatedNarrative LIKE '%[[0-9]]%')
+	WHERE [mnc].[OriginalNarrative] != [mnc].[UpdatedNarrative]
+	AND ([mnc].[UpdatedNarrative] LIKE '%[%]%' OR [mnc].[UpdatedNarrative] LIKE '%[_]%' OR [mnc].[UpdatedNarrative] LIKE '%[[0-9]]%')
 		
 	UPDATE mnc
 	SET mnc.IsUKSpend = CASE
-							WHEN LocationCountry = 'GB' THEN 1
+							WHEN [mnc].[LocationCountry] = 'GB' THEN 1
 							WHEN br.IsNamedException = 1 THEN 1
 							ELSE 0
 						END
@@ -49,7 +49,7 @@ BEGIN
 
 	DELETE
 	FROM [MIDI].[CTLoad_MIDINewCombo_Log]
-	WHERE RunDate = @RunDate
+	WHERE [MIDI].[CTLoad_MIDINewCombo_Log].[RunDate] = @RunDate
 
 	INSERT INTO [MIDI].[CTLoad_MIDINewCombo_Log]
 	SELECT *

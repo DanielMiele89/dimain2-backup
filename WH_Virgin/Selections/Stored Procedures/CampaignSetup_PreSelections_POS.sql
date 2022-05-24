@@ -28,21 +28,21 @@ BEGIN
 	*******************************************************************************************************************************************/
 
 		IF OBJECT_ID('tempdb..#AllCampaigns') IS NOT NULL DROP TABLE #AllCampaigns
-		SELECT	ID
-			,	PartnerID
-			,	ClientServicesRef
-			,	OfferID
-			,	NotIn_TableName1
-			,	MustBeIn_TableName1
-			,	sProcPreSelection
-			,	PriorityFlag
-			,	NewCampaign
-			,	CustomerBaseOfferDate
-			,	SelectionRun
-			,	ReadyToRun
+		SELECT	[Selections].[CampaignSetup_POS].[ID]
+			,	[Selections].[CampaignSetup_POS].[PartnerID]
+			,	[Selections].[CampaignSetup_POS].[ClientServicesRef]
+			,	[Selections].[CampaignSetup_POS].[OfferID]
+			,	[Selections].[CampaignSetup_POS].[NotIn_TableName1]
+			,	[Selections].[CampaignSetup_POS].[MustBeIn_TableName1]
+			,	[Selections].[CampaignSetup_POS].[sProcPreSelection]
+			,	[Selections].[CampaignSetup_POS].[PriorityFlag]
+			,	[Selections].[CampaignSetup_POS].[NewCampaign]
+			,	[Selections].[CampaignSetup_POS].[CustomerBaseOfferDate]
+			,	[Selections].[CampaignSetup_POS].[SelectionRun]
+			,	[Selections].[CampaignSetup_POS].[ReadyToRun]
 		INTO #AllCampaigns
 		FROM [Selections].[CampaignSetup_POS]
-		WHERE EmailDate = @EmailDate
+		WHERE [Selections].[CampaignSetup_POS].[EmailDate] = @EmailDate
 
 		CREATE CLUSTERED INDEX CIX_PartnerID ON #AllCampaigns (PartnerID)
 
@@ -64,30 +64,30 @@ BEGIN
 												, sProcPreSelectionCounts BIGINT NULL)
 			
 				;WITH
-				PreSelectionsToRun AS (	SELECT	PartnerID
-											,	ClientServicesRef
-											,	NotIn_TableName1
-											,	MustBeIn_TableName1
-											,	sProcPreSelection
-											,	MIN(PriorityFlag) AS PriorityFlag
+				PreSelectionsToRun AS (	SELECT	#AllCampaigns.[PartnerID]
+											,	#AllCampaigns.[ClientServicesRef]
+											,	#AllCampaigns.[NotIn_TableName1]
+											,	#AllCampaigns.[MustBeIn_TableName1]
+											,	#AllCampaigns.[sProcPreSelection]
+											,	MIN(#AllCampaigns.[PriorityFlag]) AS PriorityFlag
 										FROM #AllCampaigns
-										WHERE ReadyToRun = 1
-										AND sProcPreSelection != ''
-										AND SelectionRun = 0
-										GROUP BY	PartnerID
-												,	ClientServicesRef
-												,	NotIn_TableName1
-												,	MustBeIn_TableName1
-												,	sProcPreSelection)
+										WHERE #AllCampaigns.[ReadyToRun] = 1
+										AND #AllCampaigns.[sProcPreSelection] != ''
+										AND #AllCampaigns.[SelectionRun] = 0
+										GROUP BY	#AllCampaigns.[PartnerID]
+												,	#AllCampaigns.[ClientServicesRef]
+												,	#AllCampaigns.[NotIn_TableName1]
+												,	#AllCampaigns.[MustBeIn_TableName1]
+												,	#AllCampaigns.[sProcPreSelection])
 
 				INSERT INTO #PreSelectionsToRun
 				SELECT	 DISTINCT
-						 DENSE_RANK() OVER (ORDER BY PartnerID, PriorityFlag) AS RunID
-					,	 PartnerID
-					,	 ClientServicesRef
-					,	 NotIn_TableName1
-					,	 MustBeIn_TableName1
-					,	 sProcPreSelection
+						 DENSE_RANK() OVER (ORDER BY [PreSelectionsToRun].[PartnerID], [PreSelectionsToRun].[PriorityFlag]) AS RunID
+					,	 [PreSelectionsToRun].[PartnerID]
+					,	 [PreSelectionsToRun].[ClientServicesRef]
+					,	 [PreSelectionsToRun].[NotIn_TableName1]
+					,	 [PreSelectionsToRun].[MustBeIn_TableName1]
+					,	 [PreSelectionsToRun].[sProcPreSelection]
 					,	 CONVERT(BIGINT, NULL) AS sProcPreSelectionCounts
 				FROM PreSelectionsToRun
 				ORDER BY RunID
@@ -99,7 +99,7 @@ BEGIN
 				SELECT 'PreSelections to run through' AS [Result set displayed below]
 				SELECT *
 				FROM #PreSelectionsToRun
-				ORDER BY RunID
+				ORDER BY #PreSelectionsToRun.[RunID]
 
 
 	/*******************************************************************************************************************************************
@@ -115,30 +115,30 @@ BEGIN
 			,	@TableName VARCHAR(500)
 
 		SELECT @RunID = 1
-			 , @MaxRunID = Max(RunID)
+			 , @MaxRunID = Max(#PreSelectionsToRun.[RunID])
 		FROM #PreSelectionsToRun
 			
 			WHILE @RunID <= @MaxRunID 
 				BEGIN
 
-					SELECT @PreSelectionsProc = sProcPreSelection
+					SELECT @PreSelectionsProc = #PreSelectionsToRun.[sProcPreSelection]
 					FROM #PreSelectionsToRun
-					WHERE RunID = @RunID
+					WHERE #PreSelectionsToRun.[RunID] = @RunID
 
 					EXEC @PreSelectionsProc
 
 					SET @PreSelectionRowCount = (SELECT @@ROWCOUNT)
 
 					UPDATE #PreSelectionsToRun
-					SET sProcPreSelectionCounts = @PreSelectionRowCount
-					WHERE RunID = @RunID
+					SET #PreSelectionsToRun.[sProcPreSelectionCounts] = @PreSelectionRowCount
+					WHERE #PreSelectionsToRun.[RunID] = @RunID
 
 					SELECT @TableName = CASE
-											WHEN LEN(MustBeIn_TableName1) < 5 THEN NotIn_TableName1
-											ELSE MustBeIn_TableName1
+											WHEN LEN(#PreSelectionsToRun.[MustBeIn_TableName1]) < 5 THEN #PreSelectionsToRun.[NotIn_TableName1]
+											ELSE #PreSelectionsToRun.[MustBeIn_TableName1]
 										END
 					FROM #PreSelectionsToRun
-					WHERE RunID = @RunID
+					WHERE #PreSelectionsToRun.[RunID] = @RunID
 
 					SET @CreateIndex = 'Create Index CIX_Fan on ' + @TableName + ' (FanID)'
 
@@ -147,16 +147,16 @@ BEGIN
 							If IndexProperty(Object_Id(@TableName), 'CIX_Fan', 'IndexID') IS NULL EXEC (@CreateIndex)
 						END
 
-					SELECT @RunID = Min(RunID)
+					SELECT @RunID = Min(#PreSelectionsToRun.[RunID])
 					FROM #PreSelectionsToRun
-					WHERE RunID > @RunID
+					WHERE #PreSelectionsToRun.[RunID] > @RunID
 
 				END	--	@RunID <= @MaxRunID
 
 		SELECT 'PreSelections ran'
 		SELECT *
 		FROM #PreSelectionsToRun
-		ORDER BY RunID
+		ORDER BY #PreSelectionsToRun.[RunID]
 
 
 	/*******************************************************************************************************************************************
@@ -172,8 +172,8 @@ BEGIN
 					ac.PartnerID
 			INTO #CurrentCustomerSegment
 			FROM #AllCampaigns ac
-			WHERE SelectionRun = 0
-			AND ReadyToRun = 1
+			WHERE [ac].[SelectionRun] = 0
+			AND [ac].[ReadyToRun] = 1
 
 			CREATE CLUSTERED INDEX CIX_PartnerID ON #CurrentCustomerSegment (PartnerID)
 
@@ -222,11 +222,11 @@ BEGIN
 			IF OBJECT_ID('tempdb..#ExistingUniverseOffers') IS NOT NULL DROP TABLE #ExistingUniverseOffers
 			SELECT	DISTINCT
 					ac.CustomerBaseOfferDate
-				,	iof.Item AS IronOfferID
+				,	#AllCampaigns.[iof].Item AS IronOfferID
 			INTO #ExistingUniverseOffers
 			FROM #AllCampaigns ac
-			CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (OfferID, ',') iof
-			WHERE iof.Item > 0
+			CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] ([ac].[OfferID], ',') iof
+			WHERE #AllCampaigns.[iof].Item > 0
 			AND ac.ReadyToRun = 1
 			AND ac.SelectionRun = 0
 

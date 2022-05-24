@@ -46,9 +46,9 @@ ELSE
 	1.	Collect previously-unseen MCCs from the new data
 *******************************************************************************************************************************************/
 
-	INSERT INTO [Warehouse].[Relational].[MCCList] (MCC, MCCGroup, MCCCategory, MCCDesc, SectorID)
+	INSERT INTO [Warehouse].[Relational].[MCCList] ([Warehouse].[Relational].[MCCList].[MCC], [Warehouse].[Relational].[MCCList].[MCCGroup], [Warehouse].[Relational].[MCCList].[MCCCategory], [Warehouse].[Relational].[MCCList].[MCCDesc], [Warehouse].[Relational].[MCCList].[SectorID])
 	SELECT	DISTINCT 
-			MCC
+			[mh].[MCC]
 		,	''
 		,	''
 		,	''
@@ -56,7 +56,7 @@ ELSE
 	FROM [MIDI].[CTLoad_MIDIHolding] mh
 	WHERE NOT EXISTS (	SELECT 1
 						FROM [Warehouse].[Relational].[MCCList] mcc
-						WHERE mcc.MCC = mh.MCC)
+						WHERE [MIDI].[CTLoad_MIDIHolding].[mcc].MCC = mh.MCC)
 
 -- 0 / 00:00:02
 	
@@ -64,7 +64,7 @@ ELSE
 	2.	Collect previously-unseen CINs from the new data
 *******************************************************************************************************************************************/
 
-	INSERT INTO [Derived].[CINList] (CIN)
+	INSERT INTO [Derived].[CINList] ([Derived].[CINList].[CIN])
 	SELECT	DISTINCT
 			fa.SourceUID
 	FROM [MIDI].[CTLoad_MIDIHolding] mh
@@ -190,14 +190,14 @@ ELSE
 			IF OBJECT_ID('tempdb..#PaypalMIDNew') IS NOT NULL DROP TABLE #PaypalMIDNew
 			CREATE TABLE #PaypalMIDNew (MID VARCHAR(50) PRIMARY KEY
 									,	TranCount INT NOT NULL)
-			INSERT INTO #PaypalMIDNew (	MID
-									,	TranCount)
-			SELECT	MID
+			INSERT INTO #PaypalMIDNew (	#PaypalMIDNew.[MID]
+									,	#PaypalMIDNew.[TranCount])
+			SELECT	[MIDI].[CTLoad_MIDIHolding].[MID]
 				,	TranCount = COUNT(*)
 			FROM [MIDI].[CTLoad_MIDIHolding]
-			WHERE MerchantName LIKE 'PAYPAL%'
-			AND ConsumerCombinationID IS NULL
-			GROUP BY MID
+			WHERE [MIDI].[CTLoad_MIDIHolding].[MerchantName] LIKE 'PAYPAL%'
+			AND [MIDI].[CTLoad_MIDIHolding].[ConsumerCombinationID] IS NULL
+			GROUP BY [MIDI].[CTLoad_MIDIHolding].[MID]
 			HAVING COUNT(*) <= 0
 
 			-- (298 rows affected) / 00:00:01
@@ -207,19 +207,19 @@ ELSE
 					with a generic MID & Narrative
 		*******************************************************************************/
 		
-			INSERT INTO [Trans].[ConsumerCombination] (	BrandID
-													,	MID
-													,	Narrative
-													,	LocationCountry
-													,	MCCID
-													,	IsHighVariance
-													,	IsUKSpend
-													,	PaymentGatewayStatusID)
+			INSERT INTO [Trans].[ConsumerCombination] (	[Trans].[ConsumerCombination].[BrandID]
+													,	[Trans].[ConsumerCombination].[MID]
+													,	[Trans].[ConsumerCombination].[Narrative]
+													,	[Trans].[ConsumerCombination].[LocationCountry]
+													,	[Trans].[ConsumerCombination].[MCCID]
+													,	[Trans].[ConsumerCombination].[IsHighVariance]
+													,	[Trans].[ConsumerCombination].[IsUKSpend]
+													,	[Trans].[ConsumerCombination].[PaymentGatewayStatusID])
 			SELECT	943 AS BrandID
 				,	'%' AS MID
 				,	'PAYPAL%' AS Narrative
-				,	MerchantCountry AS LocationCountry
-				,	MCCID
+				,	[mh].[MerchantCountry] AS LocationCountry
+				,	[mh].[MCCID]
 				,	1 AS IsHighVariance
 				,	CASE
 						WHEN mh.MerchantCountry = 'GB' THEN 1
@@ -232,7 +232,7 @@ ELSE
 			AND mh.MCCID IS NOT NULL
 			AND EXISTS (SELECT 1
 						FROM #PaypalMIDNew pn
-						WHERE mh.MID = pn.MID)
+						WHERE #PaypalMIDNew.[mh].MID = pn.MID)
 			AND NOT EXISTS (SELECT 1 
 							FROM [Trans].[ConsumerCombination] cc
 							WHERE cc.PaymentGatewayStatusID = 1
@@ -252,7 +252,7 @@ ELSE
 			,	mh.RequiresSecondaryID = 1
 			FROM [MIDI].[CTLoad_MIDIHolding] mh
 			CROSS APPLY (	SELECT	TOP 1
-									ConsumerCombinationID
+									[cc].[ConsumerCombinationID]
 							FROM [Trans].[ConsumerCombination] cc
 							WHERE cc.PaymentGatewayStatusID = 1
 							AND mh.MerchantCountry = cc.LocationCountry
@@ -261,7 +261,7 @@ ELSE
 			AND mh.ConsumerCombinationID IS NULL
 			AND EXISTS (SELECT 1
 						FROM #PaypalMIDNew pn
-						WHERE mh.MID = pn.MID)
+						WHERE #PaypalMIDNew.[mh].MID = pn.MID)
 
 			-- (95,440 rows affected) / 00:00:01
 
@@ -275,12 +275,12 @@ ELSE
 		5.1.	Insert new secondary combinations
 	***********************************************************************************************************************/
 
-		INSERT INTO [MIDI].[PaymentGatewaySecondaryDetail] (ConsumerCombinationID
-														,	MID
-														,	Narrative)
-		SELECT	ConsumerCombinationID
-			,	MID
-			,	MerchantName
+		INSERT INTO [MIDI].[PaymentGatewaySecondaryDetail] ([MIDI].[PaymentGatewaySecondaryDetail].[ConsumerCombinationID]
+														,	[MIDI].[PaymentGatewaySecondaryDetail].[MID]
+														,	[MIDI].[PaymentGatewaySecondaryDetail].[Narrative])
+		SELECT	[mh].[ConsumerCombinationID]
+			,	[mh].[MID]
+			,	[mh].[MerchantName]
 		FROM [MIDI].[CTLoad_MIDIHolding] mh
 		WHERE mh.RequiresSecondaryID = 1 
 		AND NOT EXISTS (SELECT 1
@@ -348,40 +348,40 @@ ELSE
 	7.	Log Stats for the processed file
 *******************************************************************************************************************************************/
 
-	INSERT INTO [MIDI].[CardTransaction_QA] (	FileID
-											,	FileCount
-											,	MatchedCount
-											,	UnmatchedCount
-											,	NoCINCount
-											,	PositiveCount)
-	SELECT	FileID
+	INSERT INTO [MIDI].[CardTransaction_QA] (	[MIDI].[CardTransaction_QA].[FileID]
+											,	[MIDI].[CardTransaction_QA].[FileCount]
+											,	[MIDI].[CardTransaction_QA].[MatchedCount]
+											,	[MIDI].[CardTransaction_QA].[UnmatchedCount]
+											,	[MIDI].[CardTransaction_QA].[NoCINCount]
+											,	[MIDI].[CardTransaction_QA].[PositiveCount])
+	SELECT	[MIDI].[CTLoad_MIDIHolding].[FileID]
 		,	COUNT(1) AS FileCount
-		,	SUM(CASE WHEN ConsumerCombinationID IS NULL THEN 0 ELSE 1 END) AS MatchedCount
-		,	SUM(CASE WHEN ConsumerCombinationID IS NULL THEN 1 ELSE 0 END) AS UnmatchedCount
-		,	SUM(CASE WHEN CINID IS NOT NULL THEN 0 ELSE 1 END) AS NoCINCount
-		,	SUM(CASE WHEN IsRefund = 0 THEN 1 ELSE 0 END) AS PositiveCount
+		,	SUM(CASE WHEN [MIDI].[CTLoad_MIDIHolding].[ConsumerCombinationID] IS NULL THEN 0 ELSE 1 END) AS MatchedCount
+		,	SUM(CASE WHEN [MIDI].[CTLoad_MIDIHolding].[ConsumerCombinationID] IS NULL THEN 1 ELSE 0 END) AS UnmatchedCount
+		,	SUM(CASE WHEN [MIDI].[CTLoad_MIDIHolding].[CINID] IS NOT NULL THEN 0 ELSE 1 END) AS NoCINCount
+		,	SUM(CASE WHEN [MIDI].[CTLoad_MIDIHolding].[IsRefund] = 0 THEN 1 ELSE 0 END) AS PositiveCount
 	FROM [MIDI].[CTLoad_MIDIHolding]
-	GROUP BY FileID
+	GROUP BY [MIDI].[CTLoad_MIDIHolding].[FileID]
 
 	
 /*******************************************************************************************************************************************
 	8.	Load transaction with an assigned CINID & ConsumerCombinationID to permanent holding table
 *******************************************************************************************************************************************/
 
-	INSERT INTO [MIDI].[ConsumerTransactionHolding] (	FileID
-													,	RowNum
-													,	ConsumerCombinationID
-													,	SecondaryCombinationID
-													,	BankID
-													,	LocationID
-													,	CardholderPresentData
-													,	TranDate
-													,	CINID
-													,	Amount
-													,	IsRefund
-													,	IsOnline
-													,	InputModeID
-													,	PaymentTypeID)
+	INSERT INTO [MIDI].[ConsumerTransactionHolding] (	[MIDI].[ConsumerTransactionHolding].[FileID]
+													,	[MIDI].[ConsumerTransactionHolding].[RowNum]
+													,	[MIDI].[ConsumerTransactionHolding].[ConsumerCombinationID]
+													,	[MIDI].[ConsumerTransactionHolding].[SecondaryCombinationID]
+													,	[MIDI].[ConsumerTransactionHolding].[BankID]
+													,	[MIDI].[ConsumerTransactionHolding].[LocationID]
+													,	[MIDI].[ConsumerTransactionHolding].[CardholderPresentData]
+													,	[MIDI].[ConsumerTransactionHolding].[TranDate]
+													,	[MIDI].[ConsumerTransactionHolding].[CINID]
+													,	[MIDI].[ConsumerTransactionHolding].[Amount]
+													,	[MIDI].[ConsumerTransactionHolding].[IsRefund]
+													,	[MIDI].[ConsumerTransactionHolding].[IsOnline]
+													,	[MIDI].[ConsumerTransactionHolding].[InputModeID]
+													,	[MIDI].[ConsumerTransactionHolding].[PaymentTypeID])
 	SELECT	mh.FileID
 		,	mh.RowNum
 		,	mh.ConsumerCombinationID
@@ -397,13 +397,13 @@ ELSE
 		,	mh.InputModeID
 		,	mh.PaymentTypeID	
 	FROM [MIDI].[CTLoad_MIDIHolding] mh
-	WHERE CINID IS NOT NULL
-	AND ConsumerCombinationID IS NOT NULL
+	WHERE [mh].[CINID] IS NOT NULL
+	AND [mh].[ConsumerCombinationID] IS NOT NULL
 	AND NOT EXISTS (SELECT 1
 					FROM [MIDI].[ConsumerTransactionHolding] cth
 					WHERE mh.FileID = cth.FileID
 					AND mh.RowNum = cth.RowNum)
-	ORDER BY FileID, RowNum
+	ORDER BY [mh].[FileID], [mh].[RowNum]
 
 	
 /*******************************************************************************************************************************************
@@ -425,10 +425,10 @@ ELSE
 							WHERE EXISTS (	SELECT 1
 											FROM [MIDI].[CTLoad_MIDIHolding] mh
 											WHERE fp.FileID = mh.FileID)
-							ORDER BY FileID DESC)
+							ORDER BY [fp].[FileID] DESC)
 	UPDATE RowToUpdate
-	SET	RowsProcessed = ISNULL(RowsProcessed,0) + ISNULL(@RowsAffected,0)
-	,	ProcessedDate = GETDATE()
+	SET	[MIDI].[GenericTrans_FilesProcessed].[RowsProcessed] = ISNULL([MIDI].[GenericTrans_FilesProcessed].[RowsProcessed],0) + ISNULL(@RowsAffected,0)
+	,	[MIDI].[GenericTrans_FilesProcessed].[ProcessedDate] = GETDATE()
 						
 	SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - End of second part'; EXEC [Monitor].[ProcessLogger] 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 

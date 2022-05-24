@@ -42,7 +42,7 @@ BEGIN TRY
 	CREATE TABLE #Digits 
 		(Digit INT NOT NULL PRIMARY KEY);
 
-	INSERT INTO #Digits(Digit)
+	INSERT INTO #Digits(#Digits.[Digit])
 	 VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9);
 
 	IF OBJECT_ID('tempdb..#Numbers') IS NOT NULL 
@@ -96,10 +96,10 @@ BEGIN TRY
 		UNION ALL
 		SELECT DISTINCT
 			@Today AS ReportDate
-			, DATEADD(dd, -(DATEPART(dw, CalendarDate)-1), CalendarDate) AS WeekStart -- For each calendar date in #Dates, minus days since the most recent Monday  
-			, DATEADD(dd, -(DATEPART(dw, CalendarDate)-1)+6, CalendarDate)AS WeekEnd -- For each calendar date in #Dates, minus days since the most recent Sunday
+			, DATEADD(dd, -(DATEPART(dw, #Dates.[CalendarDate])-1), #Dates.[CalendarDate]) AS WeekStart -- For each calendar date in #Dates, minus days since the most recent Monday  
+			, DATEADD(dd, -(DATEPART(dw, #Dates.[CalendarDate])-1)+6, #Dates.[CalendarDate])AS WeekEnd -- For each calendar date in #Dates, minus days since the most recent Sunday
 		FROM #Dates
-		WHERE CalendarDate BETWEEN DATEADD(week, -@WholeWeeksToDisplay, @WeekEnd) AND @WeekEnd
+		WHERE #Dates.[CalendarDate] BETWEEN DATEADD(week, -@WholeWeeksToDisplay, @WeekEnd) AND @WeekEnd
 		) calbase;
 
 
@@ -155,9 +155,9 @@ BEGIN TRY
 	INTO #Redems
 	FROM #Calendar cal
 	INNER JOIN Derived.Redemptions r WITH(NOLOCK)
-		ON CAST(r.RedeemDate AS DATE) BETWEEN cal.WeekStart AND cal.WeekEnd
+		ON CAST(#Calendar.[r].RedeemDate AS DATE) BETWEEN cal.WeekStart AND cal.WeekEnd
 	INNER JOIN SLC_Report.dbo.trans t
-		ON r.TranID = t.ID
+		ON #Calendar.[r].TranID = #Calendar.[t].ID
 	INNER JOIN #RedeemItems items
 		ON t.ItemID = items.ItemID
 	WHERE r.RedeemType = 'Trade Up'
@@ -200,14 +200,14 @@ BEGIN TRY
 		, i.Description
 		)
 	INSERT INTO Report.Weekly_Card_Redemptions
-		(ReportDate
-		, WeekStart
-		, WeekEnd
-		, WeekID
-		, PartnerID
-		, RedemptionDescription
-		, Redemptions
-		, CurrentStockLevel
+		([Report].[Weekly_Card_Redemptions].[ReportDate]
+		, [Report].[Weekly_Card_Redemptions].[WeekStart]
+		, [Report].[Weekly_Card_Redemptions].[WeekEnd]
+		, [Report].[Weekly_Card_Redemptions].[WeekID]
+		, [Report].[Weekly_Card_Redemptions].[PartnerID]
+		, [Report].[Weekly_Card_Redemptions].[RedemptionDescription]
+		, [Report].[Weekly_Card_Redemptions].[Redemptions]
+		, [Report].[Weekly_Card_Redemptions].[CurrentStockLevel]
 		)
 	SELECT
 		r.ReportDate
@@ -217,19 +217,19 @@ BEGIN TRY
 		, r.PartnerID
 		, r.[Description] AS RedemptionDescription
 		, r.Redemptions
-		, s.CurrentStockLevel
+		, #Redems.[s].CurrentStockLevel
 	FROM #Redems r
 	LEFT JOIN OfferStock s
 		ON r.PartnerID = s.PartnerID
 		AND r.[Description] = s.[Description]
 	WHERE NOT EXISTS
 		(SELECT * FROM Report.Weekly_Card_Redemptions d
-		WHERE r.ReportDate = d.ReportDate
-			AND r.WeekStart = d.WeekStart 
-			AND r.WeekEnd = d.WeekEnd 
-			AND r.WeekID = d.WeekID 
-			AND r.PartnerID = d.PartnerID
-			AND r.[Description] = d.RedemptionDescription
+		WHERE r.ReportDate = #Redems.[d].ReportDate
+			AND r.WeekStart = #Redems.[d].WeekStart 
+			AND r.WeekEnd = #Redems.[d].WeekEnd 
+			AND r.WeekID = #Redems.[d].WeekID 
+			AND r.PartnerID = #Redems.[d].PartnerID
+			AND r.[Description] = #Redems.[d].RedemptionDescription
 		);
 
 	RETURN 0; -- normal exit here
@@ -250,7 +250,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

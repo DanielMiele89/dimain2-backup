@@ -80,7 +80,7 @@ Begin
 
 		-- Update count of offers with errors in the message text
 		  
-		Set @Message = '<p>' + Replace(@Message, '#', (Select Count(Distinct IronOfferID) From ##Newsletter_OfferPrioritisation_Errors)) + '</p>'
+		Set @Message = '<p>' + Replace(@Message, '#', (Select Count(Distinct ##Newsletter_OfferPrioritisation_Errors.[IronOfferID]) From ##Newsletter_OfferPrioritisation_Errors)) + '</p>'
 
 		-- Format list into bullet points
 
@@ -103,11 +103,11 @@ Begin
 
 				Set @Table = IsNull(Convert(VarChar(Max),
 								(Select '<td nowrap="nowrap">' + IsNull(Convert(VarChar(100), PartnerName), '')
-												 + '</td><td>' + IsNull(Convert(VarChar(100), IronOfferID), '')
-												 + '</td><td>' + IsNull(Convert(VarChar(100), Substring(IronOfferName, CharIndex('/', IronOfferName) + 1, Len(IronOfferName))), '')
-												 + '</td><td>' + IsNull(Convert(VarChar(100), StartDate, 23), '')
-												 + '</td><td>' + IsNull(Convert(VarChar(100), EndDate, 23), '')
-												 + '</td><td>' + IsNull(Convert(VarChar(100), Status), '')
+												 + '</td><td>' + IsNull(Convert(VarChar(100), ##Newsletter_OfferPrioritisation_Errors.[IronOfferID]), '')
+												 + '</td><td>' + IsNull(Convert(VarChar(100), Substring(##Newsletter_OfferPrioritisation_Errors.[IronOfferName], CharIndex('/', ##Newsletter_OfferPrioritisation_Errors.[IronOfferName]) + 1, Len(##Newsletter_OfferPrioritisation_Errors.[IronOfferName]))), '')
+												 + '</td><td>' + IsNull(Convert(VarChar(100), ##Newsletter_OfferPrioritisation_Errors.[StartDate], 23), '')
+												 + '</td><td>' + IsNull(Convert(VarChar(100), ##Newsletter_OfferPrioritisation_Errors.[EndDate], 23), '')
+												 + '</td><td>' + IsNull(Convert(VarChar(100), ##Newsletter_OfferPrioritisation_Errors.[Status]), '')
 												 + '</td>'
 								 From ##Newsletter_OfferPrioritisation_Errors owe
 								 Left join [Derived].[Partner] pa
@@ -133,12 +133,12 @@ Begin
 	
 
 	
-		If (Select Count(Distinct IronOfferID) From ##Newsletter_OfferPrioritisation_Errors) != 0 
+		If (Select Count(Distinct ##Newsletter_OfferPrioritisation_Errors.[IronOfferID]) From ##Newsletter_OfferPrioritisation_Errors) != 0 
 			Begin
 				Set @Body = @Style + @Message + @List + @Table + @Regards
 			End
 	
-		If (Select Count(Distinct IronOfferID) From ##Newsletter_OfferPrioritisation_Errors) = 0
+		If (Select Count(Distinct ##Newsletter_OfferPrioritisation_Errors.[IronOfferID]) From ##Newsletter_OfferPrioritisation_Errors) = 0
 			Begin
 				Set @Body = @Style + Replace(@Message, ', these are shown in the table below', '') + @List + @Regards
 			End

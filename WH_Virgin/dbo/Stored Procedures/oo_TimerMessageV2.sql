@@ -19,7 +19,7 @@ BEGIN
 	BEGIN
 
 		-- If not an interactive SSMS query, then don't bother with any output...
-		IF (select PROGRAM_NAME from master.dbo.sysprocesses where spid=@@spid) <> 'Microsoft SQL Server Management Studio - Query'
+		IF (select [master].[dbo].[sysprocesses].[PROGRAM_NAME] from master.dbo.sysprocesses where [master].[dbo].[sysprocesses].[spid]=@@spid) <> 'Microsoft SQL Server Management Studio - Query'
 		BEGIN	
 			SET @SSMS = 0
 		END

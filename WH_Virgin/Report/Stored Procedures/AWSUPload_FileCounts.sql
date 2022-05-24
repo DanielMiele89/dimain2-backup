@@ -7,23 +7,23 @@ AS
 	SELECT CAST(@CalendarDate AS DATE) [CalendarDate] 
 	INTO #CalDates
 	INSERT INTO [Inbound].[FileCounts]
-		(CalendarDate, Customers, Trans, Balances, Login, Redemptions, Goodwill)
-	SELECT cd.CalendarDate, c.Customers, t.Trans --, mt.MatchedTrans
-			, b.Balances, l.Login, r.Redemptions, cr.Goodwill
+		([Inbound].[FileCounts].[CalendarDate], [Inbound].[FileCounts].[Customers], [Inbound].[FileCounts].[Trans], [Inbound].[FileCounts].[Balances], [Inbound].[FileCounts].[Login], [Inbound].[FileCounts].[Redemptions], [Inbound].[FileCounts].[Goodwill])
+	SELECT cd.CalendarDate, #CalDates.[c].Customers, #CalDates.[t].Trans --, mt.MatchedTrans
+			, #CalDates.[b].Balances, #CalDates.[l].Login, #CalDates.[r].Redemptions, #CalDates.[cr].Goodwill
 	FROM #CalDates cd
 	LEFT JOIN
 	(
-		select cast(loaddate as date) [LoadDate], count(*) [Customers]
+		select cast([Inbound].[customers].[LoadDate] as date) [LoadDate], count(*) [Customers]
 		from [Inbound].[customers]
-		group by cast(loaddate as date)
+		group by cast([Inbound].[customers].[LoadDate] as date)
 	) c
-	on c.LoadDate = cd.CalendarDate
+	on #CalDates.[c].LoadDate = cd.CalendarDate
 	LEFT JOIN (
-		select  cast(loaddate as date) [LoadDate], count(*) [Trans]
+		select  cast([Inbound].[Transactions].[LoadDate] as date) [LoadDate], count(*) [Trans]
 		from [Inbound].[Transactions]
-		group by cast(loaddate as date)
+		group by cast([Inbound].[Transactions].[LoadDate] as date)
 		) t
-	ON t.LoadDate =  cd.CalendarDate
+	ON #CalDates.[t].LoadDate =  cd.CalendarDate
 	-- LEFT JOIN (
 	--	select cast(loaddate as date) [LoadDate], count(*) [MatchedTrans]
 	--	from WH_Virgin.inbound.MatchedTransactions
@@ -31,28 +31,28 @@ AS
 	--	) mt 
 	--on MT.LoadDate =  cd.CalendarDate
 		LEFT JOIN (
-		select cast(loaddate as date) [LoadDate], count(*) [Balances]
+		select cast([Inbound].[Balances].[LoadDate] as date) [LoadDate], count(*) [Balances]
 		from [Inbound].[Balances]
-		group by cast(loaddate as date)
+		group by cast([Inbound].[Balances].[LoadDate] as date)
 		) b 
-		ON b.LoadDate =  cd.CalendarDate
+		ON #CalDates.[b].LoadDate =  cd.CalendarDate
 		LEFT JOIN (
-		select cast(loaddate as date) [LoadDate], count(*) [Login]
+		select cast([Inbound].[Login].[LoadDate] as date) [LoadDate], count(*) [Login]
 		from [Inbound].[Login]
-		group by cast(loaddate as date)
+		group by cast([Inbound].[Login].[LoadDate] as date)
 		) l 
-	ON l.LoadDate =  cd.CalendarDate
+	ON #CalDates.[l].LoadDate =  cd.CalendarDate
 		LEFT JOIN (
-		select cast(loaddate as date) [LoadDate], count(*) [Redemptions]
+		select cast([Inbound].[Redemptions].[LoadDate] as date) [LoadDate], count(*) [Redemptions]
 		from [Inbound].[Redemptions]
-		group by cast(loaddate as date)
+		group by cast([Inbound].[Redemptions].[LoadDate] as date)
 		) r 
-	ON r.LoadDate =  cd.CalendarDate
+	ON #CalDates.[r].LoadDate =  cd.CalendarDate
 		LEFT JOIN (
-		select cast(loaddate as date) [LoadDate], count(*) [Goodwill]
+		select cast([Inbound].[Goodwill].[LoadDate] as date) [LoadDate], count(*) [Goodwill]
 		from [Inbound].[Goodwill]
-		group by cast(loaddate as date)
+		group by cast([Inbound].[Goodwill].[LoadDate] as date)
 		) cr
-	ON cr.LoadDate =  cd.CalendarDate
+	ON #CalDates.[cr].LoadDate =  cd.CalendarDate
 
 

@@ -1,0 +1,16 @@
+﻿CREATE TABLE [MI].[TotalBrandSpend_RBSG_SectorGroup] (
+    [ID]                 INT          IDENTITY (1, 1) NOT NULL,
+    [FilterID]           INT          NULL,
+    [SectorGroupID]      INT          NULL,
+    [SectorGroupName]    VARCHAR (50) NULL,
+    [TransactionChannel] VARCHAR (20) NULL,
+    [CustomerType]       VARCHAR (20) NULL,
+    [TransactionType]    VARCHAR (20) NULL,
+    [Amount]             MONEY        NULL,
+    [Transactions]       BIGINT       NULL,
+    [Customers]          INT          NULL,
+    [TotalCustomers]     INT          NULL,
+    [CurrentYear]        BIT          NULL,
+    [AmountExclRefunds]  MONEY        NULL
+);
+

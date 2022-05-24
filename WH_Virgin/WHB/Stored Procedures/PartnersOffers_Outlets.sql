@@ -26,39 +26,39 @@ BEGIN
 		*******************************************************************************************************************************************/
 			
 			IF OBJECT_ID('tempdb..#Outlet') IS NOT NULL DROP TABLE #Outlet
-			SELECT	ro.PartnerID
-				,	ro.ID AS OutletID
-				,	ro.MerchantID
-				,	ro.Channel	--1 = Online, 2 = Offline
-				,	ro.PartnerOutletReference AS OutletReference
+			SELECT	[DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[ro].PartnerID
+				,	[DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[ro].ID AS OutletID
+				,	[DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[ro].MerchantID
+				,	[DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[ro].Channel	--1 = Online, 2 = Offline
+				,	[DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[ro].PartnerOutletReference AS OutletReference
 				,	LTRIM(RTRIM(fa.Address1)) AS Address1
 				,	LTRIM(RTRIM(fa.Address2)) AS Address2
 				,	LTRIM(RTRIM(fa.City)) AS City
 				,	LTRIM(RTRIM(fa.PostCode)) AS Postcode
 				,	CASE
-						WHEN REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', '') LIKE '[a-z][0-9][0-9][a-z][a-z]'
-							THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 2) + ' ' + RIGHT(LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 3), 1)
-						WHEN REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', '') LIKE '[a-z][0-9][0-9][0-9][a-z][a-z]'
-							THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4), 1)
-						WHEN REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][0-9][a-z][a-z]'
-							THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4), 1)
-						WHEN REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', '') LIKE '[a-z][0-9][a-z][0-9][a-z][a-z]'
-							THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4), 1)
-						WHEN REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][0-9][0-9][a-z][a-z]'
-							THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4) + ' ' + RIGHT(LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 5), 1)
-						WHEN REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][a-z][0-9][a-z][a-z]'
-							THEN LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 4) + ' ' + RIGHT(LEFT(REPLACE(REPLACE(PostCode, CHAR(160), ''), ' ', ''), 5), 1)
+						WHEN REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', '') LIKE '[a-z][0-9][0-9][a-z][a-z]'
+							THEN LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 2) + ' ' + RIGHT(LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 3), 1)
+						WHEN REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', '') LIKE '[a-z][0-9][0-9][0-9][a-z][a-z]'
+							THEN LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 4), 1)
+						WHEN REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][0-9][a-z][a-z]'
+							THEN LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 4), 1)
+						WHEN REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', '') LIKE '[a-z][0-9][a-z][0-9][a-z][a-z]'
+							THEN LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 3) + ' ' + RIGHT(LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 4), 1)
+						WHEN REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][0-9][0-9][a-z][a-z]'
+							THEN LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 4) + ' ' + RIGHT(LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 5), 1)
+						WHEN REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', '') LIKE '[a-z][a-z][0-9][a-z][0-9][a-z][a-z]'
+							THEN LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 4) + ' ' + RIGHT(LEFT(REPLACE(REPLACE([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], CHAR(160), ''), ' ', ''), 5), 1)
 						ELSE ''
 					END AS PostalSector
 				,	CASE 
-						WHEN PostCode LIKE '[A-Z][0-9]%' THEN LEFT(PostCode, 1)
-						ELSE LEFT(PostCode, 2)
+						WHEN [DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode] LIKE '[A-Z][0-9]%' THEN LEFT([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], 1)
+						ELSE LEFT([DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[PostCode], 2)
 					END AS PostArea				 
-				,	SUBSTRING(CONVERT(VARCHAR(100), ro.Coordinates), 8, LEN(CONVERT(VARCHAR(100), ro.Coordinates)) - 8) AS Coordinates
+				,	SUBSTRING(CONVERT(VARCHAR(100), [DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[ro].Coordinates), 8, LEN(CONVERT(VARCHAR(100), [DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[ro].Coordinates)) - 8) AS Coordinates
 			INTO #Outlet
 			FROM OPENQUERY([DIMAIN_TR],'SELECT * FROM [SLC_REPL].[dbo].[RetailOutlet]') ro
 			INNER JOIN [DIMAIN_TR].[SLC_REPL].[dbo].[Fan] fa 
-				ON ro.FanID = fa.ID
+				ON [DIMAIN_TR].[SLC_REPL].[dbo].[Fan].[ro].FanID = fa.ID
 			WHERE EXISTS (	SELECT 1
 							FROM [Derived].[Partner] pa
 							WHERE ro.PartnerID = pa.PartnerID)
@@ -85,12 +85,12 @@ BEGIN
 				,	o.Postcode
 				,	o.PostalSector
 				,	o.PostArea
-				,	pa.Region
+				,	#Outlet.[pa].Region
 				,	RIGHT(o.Coordinates, LEN(o.Coordinates) -  PATINDEX('% %', o.Coordinates)) AS Latitude
 				,	LEFT(o.Coordinates, PATINDEX('% %', o.Coordinates) - 1) AS Longitude
 			FROM #Outlet o
 			LEFT JOIN [Warehouse].[Staging].[PostArea] pa
-				ON o.PostArea = pa.PostAreaCode
+				ON o.PostArea = #Outlet.[pa].PostAreaCode
 
 			-- log it
 			SET @RowsAffected = @@ROWCOUNT;SET @msg = 'Loaded rows to [Derived].[Outlet] [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'
@@ -116,7 +116,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

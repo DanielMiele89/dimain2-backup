@@ -41,5 +41,5 @@ CREATE TRIGGER [Derived].[Trigger_IronOfferMember_ModifiedDate]
 ON [WH_Virgin].[Derived].[IronOfferMember]
 AFTER UPDATE AS
 	UPDATE WH_Virgin.Derived.IronOfferMember
-	SET ModifiedDate = GETDATE()
-	WHERE IronOfferMemberID IN (SELECT IronOfferMemberID FROM inserted);
+	SET [WH_Virgin].[Derived].[IronOfferMember].[ModifiedDate] = GETDATE()
+	WHERE [WH_Virgin].[Derived].[IronOfferMember].[IronOfferMemberID] IN (SELECT [WH_Virgin].[Derived].[IronOfferMember].[IronOfferMemberID] FROM inserted);

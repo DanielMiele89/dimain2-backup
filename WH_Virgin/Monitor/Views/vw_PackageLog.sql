@@ -3,14 +3,14 @@ CREATE VIEW [Monitor].[vw_PackageLog]
 AS
 
 	SELECT
-		ID
-	  , RunID
-	  , PackageID
-	  , SourceID
-	  , SourceName
-	  , RunStartDateTime
-	  , RunEndDateTime
-	  , COALESCE(rx.childRowCnt, rw.scriptRowCnt, RowCnt)		AS RowCnt
+		[pl].[ID]
+	  , [pl].[RunID]
+	  , [pl].[PackageID]
+	  , [pl].[SourceID]
+	  , [pl].[SourceName]
+	  , [pl].[RunStartDateTime]
+	  , [pl].[RunEndDateTime]
+	  , COALESCE(rx.childRowCnt, rw.scriptRowCnt, [pl].[RowCnt])		AS RowCnt
 	  , CONVERT(VARCHAR(12), d.diff / 60 / 60 / 24) + ' '
 		+ RIGHT('0' + CONVERT(VARCHAR(12), d.diff / 60 / 60 % 24), 2) + ':'
 		+ RIGHT('0' + CONVERT(VARCHAR(2), d.diff / 60 % 60), 2) + ':'
@@ -21,7 +21,7 @@ AS
 	  , STUFF(
 		(
 			SELECT
-				' | ' + ErrorDetails
+				' | ' + [pe].[ErrorDetails]
 			FROM Monitor.Package_Errors pe
 			WHERE pe.RunID = pl.RunID
 				AND pe.PackageID = pl.PackageID
@@ -36,14 +36,14 @@ AS
 		ON pl.SourceTypeID = pst.SourceTypeID
 	OUTER APPLY (
 		SELECT
-			RowCnt
+			[plx].[RowCnt]
 		FROM Monitor.Package_Log plx
 		WHERE pl.ID = plx.ID - 1
 			AND plx.SourceName LIKE 'Script - Set RowCount%'
 	) rw (scriptRowCnt)
 	OUTER APPLY (
 		SELECT
-			SUM(RowCnt)
+			SUM([plx].[RowCnt])
 		  , CAST(MAX(CAST(plx.isError AS INT)) AS BIT)
 		FROM Monitor.Package_Log plx
 		WHERE plx.SourceTypeID > pl.SourceTypeID
@@ -52,7 +52,7 @@ AS
 	) rx (childRowCnt, childIsErr)
 	CROSS APPLY (
 		SELECT
-			DATEDIFF(SECOND, RunStartDateTime, RunEndDateTime)
+			DATEDIFF(SECOND, [Monitor].[Package_Log].[RunStartDateTime], [Monitor].[Package_Log].[RunEndDateTime])
 	) d (diff)
 	WHERE pl.SourceName NOT LIKE 'Script - Set RowCount%'
 

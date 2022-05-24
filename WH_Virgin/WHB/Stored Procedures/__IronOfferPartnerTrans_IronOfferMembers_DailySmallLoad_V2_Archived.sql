@@ -58,7 +58,7 @@ BEGIN TRY
 	Set @Rows = (Select Coalesce(Count(*), 0)
 				 From #LoadedOffers as lo
 				 Inner join Iron.OfferMemberAddition oma
-					on lo.IronOfferID = oma.IronOfferID)
+					on lo.IronOfferID = #LoadedOffers.[oma].IronOfferID)
 
 
 	------------------------------------------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ BEGIN TRY
 		-------------------------------------------------------------------------------------------
 
 			If Object_ID('tempdb..#Customers') Is Not Null Drop Table #Customers
-			Select CompositeID
+			Select [Relational].[Customer].[CompositeID]
 			Into #Customers
 			From Relational.Customer
 
@@ -85,10 +85,10 @@ BEGIN TRY
 		------------------------------------------------------------------------------------
 
 			If Object_ID('tempdb..#NewCustomers') Is Not Null Drop Table #NewCustomers
-			Select CompositeID
+			Select [Relational].[Customer].[CompositeID]
 			Into #NewCustomers
 			From Relational.Customer c With (NoLock)
-			Where ActivatedDate Between @Weekago and @Yesterday
+			Where [Relational].[Customer].[ActivatedDate] Between @Weekago and @Yesterday
 
 			Create Clustered Index CIX_Customers_CompositeID on #NewCustomers (CompositeID)
 
@@ -101,47 +101,47 @@ BEGIN TRY
 				  , @TDay DateTime = @Today
 
 			If Object_ID('tempdb..#Memberships') Is Not Null Drop Table #Memberships
-			Select ioms.IronOfferID
-				 , ioms.CompositeID
-				 , ioms.StartDate
-				 , ioms.EndDate
-				 , ioms.ImportDate
+			Select #Customers.[ioms].IronOfferID
+				 , #Customers.[ioms].CompositeID
+				 , #Customers.[ioms].StartDate
+				 , #Customers.[ioms].EndDate
+				 , #Customers.[ioms].ImportDate
 			Into #Memberships
 			From SLC_report.dbo.IronofferMember ioms With (NoLock)
 			Inner join #Customers as c
-				on ioms.CompositeID = c.CompositeID
-			Where ImportDate >= @YDay
-			And ImportDate <  @TDay
+				on #Customers.[ioms].CompositeID = c.CompositeID
+			Where #Customers.[ImportDate] >= @YDay
+			And #Customers.[ImportDate] <  @TDay
 			And Not Exists (Select 1
 							From Relational.IronOfferMember iomw
-							Where ioms.CompositeID = iomw.CompositeID
-							And ioms.StartDate = iomw.StartDate
-							And ioms.IronOfferID = iomw.IronOfferID)
+							Where #Customers.[ioms].CompositeID = #Customers.[iomw].CompositeID
+							And #Customers.[ioms].StartDate = #Customers.[iomw].StartDate
+							And #Customers.[ioms].IronOfferID = #Customers.[iomw].IronOfferID)
 
 		-----------------------------------------------------------------------------------
 		-------------- Add entries of customers activated between date range --------------
 		-----------------------------------------------------------------------------------
 
 			Insert Into #Memberships
-			Select ioms.IronOfferID
-				 , ioms.CompositeID
-				 , ioms.StartDate
-				 , ioms.EndDate
-				 , ioms.ImportDate
+			Select #NewCustomers.[ioms].IronOfferID
+				 , #NewCustomers.[ioms].CompositeID
+				 , #NewCustomers.[ioms].StartDate
+				 , #NewCustomers.[ioms].EndDate
+				 , #NewCustomers.[ioms].ImportDate
 			From #NewCustomers as c
 			inner join SLC_report.dbo.IronofferMember ioms With (NoLock)
-				on c.CompositeID = ioms.CompositeID
-			Where IsControl = 0
+				on c.CompositeID = #NewCustomers.[ioms].CompositeID
+			Where #NewCustomers.[IsControl] = 0
 			And Not Exists (Select 1
 							From #Memberships m
-							Where ioms.CompositeID = m.CompositeID
-							And ioms.StartDate = m.StartDate
-							And ioms.IronOfferID = m.IronOfferID)
+							Where #Memberships.[ioms].CompositeID = m.CompositeID
+							And #Memberships.[ioms].StartDate = m.StartDate
+							And #Memberships.[ioms].IronOfferID = m.IronOfferID)
 			And Not Exists (Select 1
 							From Relational.IronOfferMember iomw
-							Where ioms.CompositeID = iomw.CompositeID
-							And ioms.StartDate = iomw.StartDate
-							And ioms.IronOfferID = iomw.IronOfferID)
+							Where #NewCustomers.[ioms].CompositeID = #NewCustomers.[iomw].CompositeID
+							And #NewCustomers.[ioms].StartDate = #NewCustomers.[iomw].StartDate
+							And #NewCustomers.[ioms].IronOfferID = #NewCustomers.[iomw].IronOfferID)
 
 			Create Clustered Index CIX_MS_CompositeID_IronOfferID_StartDate on #Memberships (StartDate, IronOfferID, CompositeID)
 
@@ -157,11 +157,11 @@ BEGIN TRY
 		-------------------------------------------------------------------------------------------
 
 			Insert into relational.IronOfferMember
-			Select IronOfferID
-				 , CompositeID
-				 , StartDate
-				 , EndDate
-				 , ImportDate
+			Select [m].[IronOfferID]
+				 , [m].[CompositeID]
+				 , [m].[StartDate]
+				 , [m].[EndDate]
+				 , [m].[ImportDate]
 			From #Memberships m
 			Set @RowCount = @@ROWCOUNT
 
@@ -255,7 +255,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

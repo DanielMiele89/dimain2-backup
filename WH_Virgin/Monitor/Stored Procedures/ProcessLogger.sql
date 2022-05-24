@@ -18,7 +18,7 @@ AS
 
 	IF @SSMS IS NULL -- First time in, is this program called from SSMS?
 	BEGIN
-		IF 'Microsoft SQL Server Management Studio - Query' = (SELECT PROGRAM_NAME FROM master.dbo.sysprocesses WHERE spid = @@spid) 
+		IF 'Microsoft SQL Server Management Studio - Query' = (SELECT [master].[dbo].[sysprocesses].[PROGRAM_NAME] FROM master.dbo.sysprocesses WHERE [master].[dbo].[sysprocesses].[spid] = @@spid) 
 		BEGIN	
 			SET @SSMS = 1
 		END
@@ -27,7 +27,7 @@ AS
 	END
 
 	IF @SSMS IN (0,2) BEGIN
-		INSERT INTO monitor.ProcessLog (ProcessName, ActionName)
+		INSERT INTO monitor.ProcessLog ([monitor].[ProcessLog].[ProcessName], [monitor].[ProcessLog].[ActionName])
 		VALUES (@ProcessName, @Activity)
 	END
 	

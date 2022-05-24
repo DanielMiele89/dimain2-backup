@@ -1,0 +1,26 @@
+﻿CREATE TABLE [Staging].[CTLoad_MIDIHolding] (
+    [FileID]                 INT          NOT NULL,
+    [RowNum]                 INT          NOT NULL,
+    [BankID]                 TINYINT      NULL,
+    [MID]                    VARCHAR (50) NOT NULL,
+    [Narrative]              VARCHAR (22) NOT NULL,
+    [LocationAddress]        VARCHAR (18) NOT NULL,
+    [LocationCountry]        VARCHAR (3)  NOT NULL,
+    [CardholderPresentData]  TINYINT      NOT NULL,
+    [TranDate]               DATE         NOT NULL,
+    [CINID]                  INT          NULL,
+    [Amount]                 MONEY        NOT NULL,
+    [IsOnline]               BIT          NULL,
+    [IsRefund]               BIT          NULL,
+    [OriginatorID]           VARCHAR (11) NOT NULL,
+    [MCCID]                  SMALLINT     NULL,
+    [PostStatusID]           TINYINT      NULL,
+    [LocationID]             INT          NULL,
+    [ConsumerCombinationID]  INT          NULL,
+    [SecondaryCombinationID] INT          NULL,
+    [InputModeID]            TINYINT      NOT NULL,
+    [PaymentTypeID]          TINYINT      NOT NULL,
+    [RequiresSecondaryID]    BIT          CONSTRAINT [DF_Staging_CTLoad_MIDIHolding] DEFAULT ((0)) NOT NULL,
+    CONSTRAINT [PK_Staging_CTLoad_MIDIHolding] PRIMARY KEY CLUSTERED ([FileID] ASC, [RowNum] ASC)
+);
+

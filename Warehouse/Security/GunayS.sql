@@ -1,0 +1,2 @@
+﻿CREATE USER [GunayS] FOR LOGIN [GunayS];
+

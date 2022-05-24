@@ -23,22 +23,22 @@ BEGIN
 		***********************************************************************************************************************/
 	
 			IF OBJECT_ID('tempdb..#SampleCustomers') IS NOT NULL DROP TABLE #SampleCustomers
-			SELECT CompositeID
-				 , MIN(LionSendID) AS LionSendID
+			SELECT [ls].[CompositeID]
+				 , MIN([ls].[LionSendID]) AS LionSendID
 			INTO #SampleCustomers
 			FROM [Email].[NominatedLionSendComponent] ls
-			GROUP BY CompositeID
-			HAVING COUNT(DISTINCT LionSendID) > 1
+			GROUP BY [ls].[CompositeID]
+			HAVING COUNT(DISTINCT [ls].[LionSendID]) > 1
 
 			INSERT INTO #SampleCustomers
-			SELECT CompositeID
-				 , MIN(LionSendID) AS LionSendID
+			SELECT [ls].[CompositeID]
+				 , MIN([ls].[LionSendID]) AS LionSendID
 			FROM [Email].[NominatedLionSendComponent_RedemptionOffers] ls
 			WHERE NOT EXISTS (	SELECT 1
 								FROM #SampleCustomers sc
-								WHERE ls.CompositeID = sc.CompositeID)
-			GROUP BY CompositeID
-			HAVING COUNT(DISTINCT LionSendID) > 1
+								WHERE #SampleCustomers.[ls].CompositeID = sc.CompositeID)
+			GROUP BY [ls].[CompositeID]
+			HAVING COUNT(DISTINCT [ls].[LionSendID]) > 1
 			
 
 		/***********************************************************************************************************************
@@ -95,10 +95,10 @@ BEGIN
 				 , NULL AS RedeemOffer3EndDate
 				 , NULL AS RedeemOffer4EndDate
 				 , NULL AS RedeemOffer5EndDate
-			FROM (	SELECT LionSendID
-						 , FanID
-						 , Slot
-						 , IronOfferID
+			FROM (	SELECT #Customers.[LionSendID]
+						 , #Customers.[FanID]
+						 , #Customers.[Slot]
+						 , #Customers.[IronOfferID]
 					FROM #Customers) cu
 			PIVOT(AVG(IronOfferID) FOR Slot IN ([1], [2], [3], [4], [5])) AS pt
 

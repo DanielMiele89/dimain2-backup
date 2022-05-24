@@ -18,14 +18,14 @@ BEGIN TRY
 	-----------------------------------------------------------------------------------------
 	if object_id('tempdb..#UnSub') is not null drop table #UnSub
 
-	Select	Cast([Date] as date) as EntryDate,
-			FanID
+	Select	Cast([Staging].[InsightArchiveData].[Date] as date) as EntryDate,
+			[Staging].[InsightArchiveData].[FanID]
 	Into #UnSub
 	from Staging.InsightArchiveData as iad
-	Where TypeID = 3 and
+	Where [Staging].[InsightArchiveData].[TypeID] = 3 and
 			iad.Date > @LaunchDate
 
-	Order by EntryDate,FanID
+	Order by EntryDate,[Staging].[InsightArchiveData].[FanID]
 
 	-----------------------------------------------------------------------------------------
 	--------------------------Find Unsubscribes ChangeLog where Status = 1-------------------
@@ -41,14 +41,14 @@ BEGIN TRY
 	from #UnSub as u
 	inner join Derived.customer as c
 		on	u.FanID = c.fanid and
-			Cast(c.ActivatedDate as date) <= EntryDate
+			Cast(#UnSub.[c].ActivatedDate as date) <= [u].[EntryDate]
 	) as a
 
 	--------------------------------------------------------------------------
 	----------------Combine ChangeLog entries with SFD Events 301-------------
 	--------------------------------------------------------------------------
 	if object_id('tempdb..#Unsubscribes') is not null drop table #Unsubscribes
-	Select FanID,Min(EventDate) as EventDate, 1 as Accurate
+	Select #Unsubs_StillActive.[FanID],Min(#Unsubs_StillActive.[EventDate]) as EventDate, 1 as Accurate
 	Into #Unsubscribes
 	From
 		( Select *
@@ -59,7 +59,7 @@ BEGIN TRY
 		  Where	ee.EmaileventCodeID = 301 and 
 				ee.EventDate >= @LaunchDate
 		) as a
-	Group by FanID 
+	Group by #Unsubs_StillActive.[FanID] 
 
 	--------------------------------------------------------------------------------
 	-----------Pull off other SFD Unusbcribes not including initial list------------
@@ -68,13 +68,13 @@ BEGIN TRY
 		ones to the table 
 	*/
 	if object_id('tempdb..#UnsubsSFD') is not null drop table #UnsubsSFD
-	Select a.FanID,Min(StartDate) as EventDate,0 as Accurate
+	Select #Unsubscribes.[a].FanID,Min(#Unsubscribes.[StartDate]) as EventDate,0 as Accurate
 	Into #UnsubsSFD
 	from Derived.SmartFocusUnSubscribes as a
 	Left Outer join #Unsubscribes as u
-		on a.FanID = u.Fanid
-	Where EndDate is null and StartDate > @SFDDate and u.FanID is null
-	Group by a.FanID
+		on #Unsubscribes.[a].FanID = u.Fanid
+	Where #Unsubscribes.[EndDate] is null and #Unsubscribes.[StartDate] > @SFDDate and u.FanID is null
+	Group by #Unsubscribes.[a].FanID
 
 	---------------------------------------------------------------------------------
 	------------Pull off last email accessed for SFD initial list data---------------
@@ -84,7 +84,7 @@ BEGIN TRY
 		the last email was accessed as this should be when they unsubscribed
 	*/
 	if object_id('tempdb..#UnSubsSFD2') is not null drop table #UnSubsSFD2
-	Select FanID,EventDate,0 as Accurate
+	Select FanID,[a].[EventDate],0 as Accurate
 	into #UnSubsSFD2
 	from
 	(Select a.FanID,StartDate,Max(ee.EventDate) as EventDate
@@ -96,8 +96,8 @@ BEGIN TRY
 	Where EndDate is null and StartDate = @SFDDate
 	Group by a.FanID,StartDate
 	) as a
-	Where EventDate <= @SFDDate
-	Order by EventDate
+	Where [a].[EventDate] <= @SFDDate
+	Order by [a].[EventDate]
 
 	---------------------------------------------------------------------------------
 	--------------------------------------Dedup--------------------------------------
@@ -137,9 +137,9 @@ BEGIN TRY
 	TRUNCATE TABLE Derived.Customer_UnsubscribeDates
 
 	Insert Into Derived.Customer_UnsubscribeDates
-	Select	FanID,
-			EventDate,
-			Cast(Accurate as bit) as Accuracy
+	Select	#Final_UnSubs.[FanID],
+			#Final_UnSubs.[EventDate],
+			Cast(#Final_UnSubs.[Accurate] as bit) as Accuracy
 	from #Final_UnSubs
 
 	--ALTER INDEX ALL ON Relational.Customer_UnsubscribeDates Rebuild
@@ -163,7 +163,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

@@ -35,20 +35,20 @@ BEGIN
 		
 			IF OBJECT_ID('tempdb..#PaymentMethodsAvailable') IS NOT NULL DROP TABLE #PaymentMethodsAvailable;
 			WITH
-			CardTypes AS (	SELECT	FanID
+			CardTypes AS (	SELECT	[cu].[FanID]
 								,	MAX(0) AS IsDebit
 								,	MAX(1) AS IsCredit
 							FROM [WHB].[Customer] cu
 							LEFT JOIN [WHB].[Inbound_Cards] ca
 								ON cu.FanID = ca.PrimaryCustomerID
-							GROUP BY FanID)
+							GROUP BY [cu].[FanID])
 		
-			SELECT FanID
+			SELECT [CardTypes].[FanID]
 				 , CASE
-						WHEN IsDebit = 1 AND IsCredit = 0 THEN 0	--	Debit Only
-						WHEN IsDebit = 0 AND IsCredit = 1 THEN 1	--	Credit Only
-						WHEN IsDebit = 1 AND IsCredit = 1 THEN 2	--	Both Debit & Credit
-						WHEN IsDebit = 0 AND IsCredit = 0 THEN 3	--	No Active Cards
+						WHEN [CardTypes].[IsDebit] = 1 AND [CardTypes].[IsCredit] = 0 THEN 0	--	Debit Only
+						WHEN [CardTypes].[IsDebit] = 0 AND [CardTypes].[IsCredit] = 1 THEN 1	--	Credit Only
+						WHEN [CardTypes].[IsDebit] = 1 AND [CardTypes].[IsCredit] = 1 THEN 2	--	Both Debit & Credit
+						WHEN [CardTypes].[IsDebit] = 0 AND [CardTypes].[IsCredit] = 0 THEN 3	--	No Active Cards
 				   END AS PaymentMethodsAvailableID
 			INTO #PaymentMethodsAvailable
 			FROM CardTypes
@@ -68,8 +68,8 @@ BEGIN
 			WHERE cpma.EndDate IS NULL
 			AND NOT EXISTS (SELECT 1
 							FROM #PaymentMethodsAvailable pma
-							WHERE pma.FanID = cpma.FanID
-							AND pma.PaymentMethodsAvailableID = cpma.PaymentMethodsAvailableID)
+							WHERE pma.FanID = #PaymentMethodsAvailable.[cpma].FanID
+							AND pma.PaymentMethodsAvailableID = #PaymentMethodsAvailable.[cpma].PaymentMethodsAvailableID)
 								
 
 		/*******************************************************************************************************************************************
@@ -78,12 +78,12 @@ BEGIN
 		
 			--DECLARE @RunDate DATE = GETDATE()
 
-			INSERT INTO [Derived].[Customer_PaymentMethodsAvailable] (	FanID
-																	,	PaymentMethodsAvailableID
-																	,	StartDate
-																	,	EndDate)
-			SELECT FanID
-				 , PaymentMethodsAvailableID
+			INSERT INTO [Derived].[Customer_PaymentMethodsAvailable] (	[Derived].[Customer_PaymentMethodsAvailable].[FanID]
+																	,	[Derived].[Customer_PaymentMethodsAvailable].[PaymentMethodsAvailableID]
+																	,	[Derived].[Customer_PaymentMethodsAvailable].[StartDate]
+																	,	[Derived].[Customer_PaymentMethodsAvailable].[EndDate])
+			SELECT [pma].[FanID]
+				 , [pma].[PaymentMethodsAvailableID]
 				 , @RunDate AS StartDate
 				 , NULL AS EndDate
 			FROM #PaymentMethodsAvailable pma
@@ -112,7 +112,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

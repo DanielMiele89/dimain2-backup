@@ -52,27 +52,27 @@ INNER JOIN Derived.[Partner] p
 
 --Enhance Data in Staging - Start - Outlet
 UPDATE staging.Outlet
-set	PostalSector =	
+set	[staging].[Outlet].[PostalSector] =	
 			Case
-				When replace(replace(PostCode,char(160),''),' ','') like '[a-z][0-9][0-9][a-z][a-z]' Then
-						Left(replace(replace(PostCode,char(160),''),' ',''),2)+' '+Right(Left(replace(replace(PostCode,char(160),''),' ',''),3),1)
-				When replace(replace(PostCode,char(160),''),' ','') like '[a-z][0-9][0-9][0-9][a-z][a-z]' or
-						replace(replace(PostCode,char(160),''),' ','') like '[a-z][a-z][0-9][0-9][a-z][a-z]' or 
-						replace(replace(PostCode,char(160),''),' ','') like '[a-z][0-9][a-z][0-9][a-z][a-z]' Then 
-						Left(replace(replace(PostCode,char(160),''),' ',''),3)+' '+Right(Left(replace(replace(PostCode,char(160),''),' ',''),4),1)
-				When replace(replace(PostCode,char(160),''),' ','') like '[a-z][a-z][0-9][0-9][0-9][a-z][a-z]' or
-						replace(replace(PostCode,char(160),''),' ','') like '[a-z][a-z][0-9][a-z][0-9][a-z][a-z]'Then 
-						Left(replace(replace(PostCode,char(160),''),' ',''),4)+' '+Right(Left(replace(replace(PostCode,char(160),''),' ',''),5),1)
+				When replace(replace([staging].[Outlet].[PostCode],char(160),''),' ','') like '[a-z][0-9][0-9][a-z][a-z]' Then
+						Left(replace(replace([staging].[Outlet].[PostCode],char(160),''),' ',''),2)+' '+Right(Left(replace(replace([staging].[Outlet].[PostCode],char(160),''),' ',''),3),1)
+				When replace(replace([staging].[Outlet].[PostCode],char(160),''),' ','') like '[a-z][0-9][0-9][0-9][a-z][a-z]' or
+						replace(replace([staging].[Outlet].[PostCode],char(160),''),' ','') like '[a-z][a-z][0-9][0-9][a-z][a-z]' or 
+						replace(replace([staging].[Outlet].[PostCode],char(160),''),' ','') like '[a-z][0-9][a-z][0-9][a-z][a-z]' Then 
+						Left(replace(replace([staging].[Outlet].[PostCode],char(160),''),' ',''),3)+' '+Right(Left(replace(replace([staging].[Outlet].[PostCode],char(160),''),' ',''),4),1)
+				When replace(replace([staging].[Outlet].[PostCode],char(160),''),' ','') like '[a-z][a-z][0-9][0-9][0-9][a-z][a-z]' or
+						replace(replace([staging].[Outlet].[PostCode],char(160),''),' ','') like '[a-z][a-z][0-9][a-z][0-9][a-z][a-z]'Then 
+						Left(replace(replace([staging].[Outlet].[PostCode],char(160),''),' ',''),4)+' '+Right(Left(replace(replace([staging].[Outlet].[PostCode],char(160),''),' ',''),5),1)
 				Else ''
 			End,
-	PostArea =		
+	[staging].[Outlet].[PostArea] =		
 			case 
-				when PostCode like '[A-Z][0-9]%' then left(PostCode,1) 
-				else left(PostCode,2) 
+				when [staging].[Outlet].[PostCode] like '[A-Z][0-9]%' then left([staging].[Outlet].[PostCode],1) 
+				else left([staging].[Outlet].[PostCode],2) 
 			end,
-	IsOnline =		
+	[staging].[Outlet].[IsOnline] =		
 			case 
-				when Channel = 1 then 1 
+				when [staging].[Outlet].[Channel] = 1 then 1 
 				else 0 
 			end		--Channel = 1 represents an online outlet
 
@@ -85,17 +85,17 @@ inner join Staging.PostArea on staging.Outlet.PostArea = Staging.PostArea.PostAr
 -- Build final tables in relational schema - Outlet 
 TRUNCATE TABLE Derived.Outlet
 INSERT INTO Derived.Outlet
-SELECT	OutletID,
-	IsOnline,
-	MerchantID,
-	PartnerID,
-	Address1,
-	Address2,
-	City,
-	PostCode,
-	PostalSector,
-	PostArea,
-	Region
+SELECT	[Staging].[Outlet].[OutletID],
+	[Staging].[Outlet].[IsOnline],
+	[Staging].[Outlet].[MerchantID],
+	[Staging].[Outlet].[PartnerID],
+	[Staging].[Outlet].[Address1],
+	[Staging].[Outlet].[Address2],
+	[Staging].[Outlet].[City],
+	[Staging].[Outlet].[PostCode],
+	[Staging].[Outlet].[PostalSector],
+	[Staging].[Outlet].[PostArea],
+	[Staging].[Outlet].[Region]
 FROM Staging.Outlet 
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'IronOfferPartnerTrans_Outlet_V1_5', 'Finished'
@@ -147,7 +147,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'IronOfferPartnerTrans_PartnerTrans_V1_8_A
 EXEC Monitor.ProcessLog_Insert 'WHB', 'IronOfferPartnerTrans_PartnerTrans_CardType_V1', 'Starting'
 
 Update pt
-Set PaymentMethodID =	Case
+Set [relational].[PartnerTrans].[PaymentMethodID] =	Case
 							When CardTypeID = 1 then 1 -- Credit Card
 							When CardTypeID = 2 then 0 -- Debit Card
 							Else 3
@@ -172,18 +172,18 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'IronOfferPartnerTrans_PartnerTrans_CardTy
 EXEC Monitor.ProcessLog_Insert 'WHB', 'IronOfferPartnerTrans_Corrections_V1_7', 'Starting'
 
 UPDATE c
-	SET MarketableByEmail = 1 -----------Update MarketableByEmail which makes it selectable for campaigns
+	SET [c].[MarketableByEmail] = 1 -----------Update MarketableByEmail which makes it selectable for campaigns
 FROM Derived.Customer as c
 WHERE c.LaunchGroup in ('Init','STF1','STF2') 
 	and c.[Status] = 1  ----------------Customer is still active on the scheme
 	and c.EmailStructureValid = 1  ---Email address is valid
-	and MarketableByEmail = 0 -----------Check they are currently not emailable
+	and [c].[MarketableByEmail] = 0 -----------Check they are currently not emailable
 
 
 --Update Staging.PartnerTrans with corrections---------------------------
 --Updates Staging.PartnerTrans by changing the Added Date to that of the File imported date
 UPDATE pt
-SET AddedDate = a.AddedDate
+SET [pt].[AddedDate] = a.AddedDate
 FROM Derived.PartnerTrans as pt
 INNER JOIN Warehouse.Staging.Correction_Cineworld as a
 	ON pt.matchid = a.matchid
@@ -192,19 +192,19 @@ INNER JOIN Warehouse.Staging.Correction_Cineworld as a
 --Declare @RecordCount int
 --Set @RecordCount = (Select Count(*) from Relational.Customer as c where c.MarketableByEmail = 1 and c.SourceUID in (Select SourceUID  from Staging.Customer_DuplicateSourceUID))
 UPDATE Derived.Customer
-Set   MarketableByEmail = 0
-Where MarketableByEmail = 1 
-and SourceUID in (Select SourceUID  from Staging.Customer_DuplicateSourceUID)
+Set   [Derived].[Customer].[MarketableByEmail] = 0
+Where [Derived].[Customer].[MarketableByEmail] = 1 
+and [Derived].[Customer].[SourceUID] in (Select [Derived].[Customer].[SourceUID]  from Staging.Customer_DuplicateSourceUID)
 
 
 --Populate PartnerTrans AboveBase field----------------------------------
 UPDATE Derived.Partnertrans
-	SET AboveBase = 0
-WHERE AboveBase is null 
-	AND Cast(CashbackEarned as real) / TransactionAmount Between -.0125 and .0125
+	SET [Derived].[Partnertrans].[AboveBase] = 0
+WHERE [Derived].[Partnertrans].[AboveBase] is null 
+	AND Cast([Derived].[Partnertrans].[CashbackEarned] as real) / [Derived].[Partnertrans].[TransactionAmount] Between -.0125 and .0125
 
 UPDATE pt
-	SET AboveBase = 0
+	SET [pt].[AboveBase] = 0
 FROM Derived.PartnerTrans as pt
 INNER JOIN [Derived].[Partner_NonCoreBaseOffer] as n
 	on pt.IronOfferID = n.IronOfferID
@@ -222,38 +222,38 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'IronOfferPartnerTrans_PartnerCommissionRu
 --Reload PartnerCommissionRule Data----------
 TRUNCATE TABLE Derived.IronOffer_PartnerCommissionRule
 INSERT INTO Derived.IronOffer_PartnerCommissionRule
-SELECT ID as PCR_ID,
-	PartnerID,
-	TypeID,
-	CommissionRate,
-	Status,
-	Priority,
-	DeletionDate,
-	MaximumUsesPerFan as MaximumUsesPerFan,
-	RequiredNumberOfPriorTransactions as NumberofPriorTransactions,
-	RequiredMinimumBasketSize as MinimumBasketSize,
-	RequiredMaximumBasketSize as MaximumBasketSize,
-	RequiredChannel as Channel,
-	RequiredClubID as ClubID,
-	RequiredIronOfferID as IronOfferID,
-	RequiredRetailOutletID as OutletID,
-	RequiredCardholderPresence as CardHolderPresence
+SELECT [SLC_Report].[dbo].[PartnerCommissionRule].[ID] as PCR_ID,
+	[SLC_Report].[dbo].[PartnerCommissionRule].[PartnerID],
+	[SLC_Report].[dbo].[PartnerCommissionRule].[TypeID],
+	[SLC_Report].[dbo].[PartnerCommissionRule].[CommissionRate],
+	[SLC_Report].[dbo].[PartnerCommissionRule].[Status],
+	[SLC_Report].[dbo].[PartnerCommissionRule].[Priority],
+	[SLC_Report].[dbo].[PartnerCommissionRule].[DeletionDate],
+	[SLC_Report].[dbo].[PartnerCommissionRule].[MaximumUsesPerFan] as MaximumUsesPerFan,
+	[SLC_Report].[dbo].[PartnerCommissionRule].[RequiredNumberOfPriorTransactions] as NumberofPriorTransactions,
+	[SLC_Report].[dbo].[PartnerCommissionRule].[RequiredMinimumBasketSize] as MinimumBasketSize,
+	[SLC_Report].[dbo].[PartnerCommissionRule].[RequiredMaximumBasketSize] as MaximumBasketSize,
+	[SLC_Report].[dbo].[PartnerCommissionRule].[RequiredChannel] as Channel,
+	[SLC_Report].[dbo].[PartnerCommissionRule].[RequiredClubID] as ClubID,
+	[SLC_Report].[dbo].[PartnerCommissionRule].[RequiredIronOfferID] as IronOfferID,
+	[SLC_Report].[dbo].[PartnerCommissionRule].[RequiredRetailOutletID] as OutletID,
+	[SLC_Report].[dbo].[PartnerCommissionRule].[RequiredCardholderPresence] as CardHolderPresence
 FROM SLC_Report..PartnerCommissionRule
-WHERE RequiredIronOfferID IS NOT NULL
+WHERE [SLC_Report].[dbo].[PartnerCommissionRule].[RequiredIronOfferID] IS NOT NULL
 
 
 -- Insert PCR rules for MFDD
-INSERT INTO Derived.IronOffer_PartnerCommissionRule_MFDD (IronOfferID)
+INSERT INTO Derived.IronOffer_PartnerCommissionRule_MFDD ([Derived].[IronOffer_PartnerCommissionRule_MFDD].[IronOfferID])
 SELECT io.IronOfferID
 FROM derived.IronOffer io
 INNER JOIN (
 	SELECT 
-		IronOfferID,
-		PartnerID
+		[Derived].[IronOffer].[IronOfferID],
+		[Derived].[IronOffer].[PartnerID]
 	FROM Derived.IronOffer 
-	WHERE (EndDate IS NULL OR EndDate >= GETDATE())
-		AND IsTriggerOffer = 0
-		AND IronOfferName LIKE '%MFDD%'
+	WHERE ([Derived].[IronOffer].[EndDate] IS NULL OR [Derived].[IronOffer].[EndDate] >= GETDATE())
+		AND [Derived].[IronOffer].[IsTriggerOffer] = 0
+		AND [Derived].[IronOffer].[IronOfferName] LIKE '%MFDD%'
 ) p 
 	ON io.PartnerID = p.PartnerID
 WHERE io.IronOfferName like '%MFDD%'
@@ -273,24 +273,24 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'IronOfferPartnerTrans_Update_BaseAndNonCo
 
 -- Update PartnerOffers_Base Table**************
 UPDATE pob
-	SET StartDate = io.StartDate, 
-		EndDate = io.EndDate
+	SET [Derived].[PartnerOffers_Base].[StartDate] = io.StartDate, 
+		[Derived].[PartnerOffers_Base].[EndDate] = io.EndDate
 FROM Derived.PartnerOffers_Base pob
 INNER JOIN Derived.IronOffer io
 	ON pob.OfferID = io.IronOfferID
 
 --Update Partner_BaseOffer Table**************
 UPDATE pob
-	SET StartDate = io.StartDate,
-		EndDate = io.EndDate
+	SET [Derived].[Partner_BaseOffer].[StartDate] = io.StartDate,
+		[Derived].[Partner_BaseOffer].[EndDate] = io.EndDate
 FROM Derived.Partner_BaseOffer pob
 INNER JOIN Derived.IronOffer io
 	ON pob.OfferID = io.IronOfferID
 	
 --Update Partner_NonCoreBaseOffer**************
 UPDATE ncb
-	SET StartDate = io.StartDate,
-		EndDate = io.EndDate
+	SET [Derived].[Partner_NonCoreBaseOffer].[StartDate] = io.StartDate,
+		[Derived].[Partner_NonCoreBaseOffer].[EndDate] = io.EndDate
 FROM Derived.Partner_NonCoreBaseOffer ncb
 INNER JOIN Derived.IronOffer io
 	ON ncb.IronOfferID = io.IronOfferID

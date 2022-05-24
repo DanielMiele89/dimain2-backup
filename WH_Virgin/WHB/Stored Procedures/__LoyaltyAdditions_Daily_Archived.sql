@@ -28,12 +28,12 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'LoyaltyAdditions_Customer_MarketableByEma
 CREATE TABLE #Cust (FanID int, MarketableByEmail tinyint, Primary Key (FanID))
 
 INSERT INTO #Cust
-SELECT FanID,
+SELECT [c].[FanID],
 	Case
-		When CurrentlyActive = 0 then 3
-		When MarketableByEmail = 1 then 1
-		When Hardbounced = 1 then 3
-		When EmailStructureValid = 0 then 3
+		When [c].[CurrentlyActive] = 0 then 3
+		When [c].[MarketableByEmail] = 1 then 1
+		When [c].[Hardbounced] = 1 then 3
+		When [c].[EmailStructureValid] = 0 then 3
 	Else 2
 	End as MarketableByEmail
 FROM Derived.Customer as c
@@ -41,12 +41,12 @@ FROM Derived.Customer as c
 
 --End Date old Entries
 UPDATE m
-SET EndDate = dateadd(day,-1,Cast(getdate()as date))
+SET [Derived].[Customer_MarketableByEmailStatus_MI].[EndDate] = dateadd(day,-1,Cast(getdate()as date))
 FROM Derived.Customer_MarketableByEmailStatus_MI m
 INNER JOIN #Cust c
-	ON m.fanid = c.fanid 
-	and m.EndDate is null 
-	and m.MarketableID <> c.MarketableByEmail
+	ON #Cust.[m].fanid = c.fanid 
+	and #Cust.[m].EndDate is null 
+	and #Cust.[m].MarketableID <> c.MarketableByEmail
 
 
 --Create New Entries
@@ -57,9 +57,9 @@ SELECT	c.FanID,
 		EndDate = Cast(Null as date)
 FROM #Cust as c
 WHERE NOT EXISTS (SELECT 1 FROM Derived.Customer_MarketableByEmailStatus_MI m
-	WHERE c.fanid = m.fanid 
-	AND m.EndDate is null 
-	AND m.MarketableID = c.MarketableByEmail)
+	WHERE c.fanid = #Cust.[m].fanid 
+	AND #Cust.[m].EndDate is null 
+	AND #Cust.[m].MarketableID = c.MarketableByEmail)
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'LoyaltyAdditions_Customer_MarketableByEmailStatus_MI', 'Finished'
 
@@ -73,7 +73,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'LoyaltyAdditions_Customer_Registered_MI_V
 
 --End Date old Entries
 UPDATE m
-	SET EndDate = dateadd(day,-1,Cast(getdate()as date))
+	SET [Derived].[Customer_Registered].[EndDate] = dateadd(day,-1,Cast(getdate()as date))
 FROM Derived.Customer_Registered m	
 INNER JOIN Derived.Customer c	
 	ON c.fanid = m.fanid 
@@ -81,7 +81,7 @@ INNER JOIN Derived.Customer c
 	and m.Registered <> c.Registered
 
 --Create New Entries
-INSERT INTO Derived.Customer_Registered (FanID, Registered, StartDate, EndDate)
+INSERT INTO Derived.Customer_Registered ([Derived].[Customer_Registered].[FanID], [Derived].[Customer_Registered].[Registered], [Derived].[Customer_Registered].[StartDate], [Derived].[Customer_Registered].[EndDate])
 SELECT	c.FanID,
 		c.Registered,
 		StartDate = Cast(getdate()as date),
@@ -144,17 +144,17 @@ ALTER index ix_DirectDebit_OINs_OIN on Derived.DirectDebit_OINs REBUILD
 
 Truncate Table [Staging].[DirectDebit_EligibleOINs]
 Insert into [Staging].[DirectDebit_EligibleOINs]
-Select	OIN,
+Select	[Derived].[DirectDebit_OINs].[OIN],
 		Case
-			When RBSCategory1 = 'Household Bills' then 'Household'
-			Else RBSCategory1
+			When [Derived].[DirectDebit_OINs].[RBSCategory1] = 'Household Bills' then 'Household'
+			Else [Derived].[DirectDebit_OINs].[RBSCategory1]
 		end as RBSCategory1,
-		RBSCategory2,
-		SupplierName,
-		StartDate
+		[Derived].[DirectDebit_OINs].[RBSCategory2],
+		[Derived].[DirectDebit_OINs].[SupplierName],
+		[Derived].[DirectDebit_OINs].[StartDate]
 from Derived.DirectDebit_OINs as r 
-Where [Status_Description] = 'Accepted by RBSG' 
-and EndDate is NULL
+Where [Derived].[DirectDebit_OINs].[Status_Description] = 'Accepted by RBSG' 
+and [Derived].[DirectDebit_OINs].[EndDate] is NULL
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'LoyaltyAdditions_DirectDebit_OINs', 'Finished'
 
@@ -185,10 +185,10 @@ LEFT JOIN SLC_Report.dbo.DirectDebitCategory1 c1
 LEFT JOIN SLC_Report.dbo.DirectDebitCategory2 c2
 	on do.Category2ID = c2.ID
 LEFT JOIN (	
-	SELECT DISTINCT OIN
+	SELECT DISTINCT [Derived].[DirectDebit_OINs].[OIN]
 	FROM Derived.DirectDebit_OINs
-	WHERE InternalCategory2 = 'Utilities' 
-	and RBSCategory2 = 'Local Authority and Water'
+	WHERE [Derived].[DirectDebit_OINs].[InternalCategory2] = 'Utilities' 
+	and [Derived].[DirectDebit_OINs].[RBSCategory2] = 'Local Authority and Water'
 ) a
 	ON do.OIN = a.oin
 
@@ -251,33 +251,33 @@ FROM #CS c
 WHERE NOT EXISTS (
 	SELECT 1 
 	FROM Derived.Customer_RBSGSegments as cs
-	WHERE c.fanid = cs.fanid 
-	and cs.enddate is null 
+	WHERE c.fanid = #CS.[cs].fanid 
+	and #CS.[cs].enddate is null 
 	and (Case
 			When c.CustomerSegment <> 'V' or c.CustomerSegment is null then ''
 			Else c.CustomerSegment
 			End) =
 		(Case
-				When cs.CustomerSegment <> 'V' or cs.CustomerSegment is null then ''
-				Else cs.CustomerSegment
+				When #CS.[cs].CustomerSegment <> 'V' or #CS.[cs].CustomerSegment is null then ''
+				Else #CS.[cs].CustomerSegment
 			End)
 )
 
 
 --Update old segments----------------------------------------
 UPDATE cs
-SET EndDate = dateadd(day,-1,c.StartDate)
+SET [Derived].[Customer_RBSGSegments].[EndDate] = dateadd(day,-1,c.StartDate)
 FROM Derived.Customer_RBSGSegments cs
 INNER JOIN #CS as c
-	ON cs.fanid = c.fanid 
-	and cs.enddate is null 
+	ON #CS.[cs].fanid = c.fanid 
+	and #CS.[cs].enddate is null 
 	and (Case
 			When c.CustomerSegment <> 'V' or c.CustomerSegment is null then ''
 			Else c.CustomerSegment
 			End) <>
 		(Case
-				When cs.CustomerSegment <> 'V' or cs.CustomerSegment is null then ''
-				Else cs.CustomerSegment
+				When #CS.[cs].CustomerSegment <> 'V' or #CS.[cs].CustomerSegment is null then ''
+				Else #CS.[cs].CustomerSegment
 			End)
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'LoyaltyAdditions_Customer_RBSGSegments_V3', 'Finished'
@@ -305,7 +305,7 @@ Select	c.FanID,
 			Else null
 		End as SchemeMembershipTypeID,
 		ActivatedDate,
-		DeactivatedDate
+		[c].[DeactivatedDate]
 Into #SMT
 From Derived.Customer c
 inner join Derived.CustomerPaymentMethodsAvailable cp
@@ -318,7 +318,7 @@ CREATE CLUSTERED INDEX cs_Stuff ON #SMT (FanID)
 
 
 UPDATE b
-	SET SchemeMembershipTypeID = 
+	SET [b].[SchemeMembershipTypeID] = 
 			(Case
 				When b.SchemeMembershipTypeID in (1,2,5) then 6
 				When b.SchemeMembershipTypeID in (3,4) then 7
@@ -327,22 +327,22 @@ UPDATE b
 				
 FROM #SMT b
 INNER JOIN Staging.SLC_Report_DailyLoad_Phase2DataFields a
-	on b.FanID = a.FanID
-WHERE a.LoyaltyAccount = 1 
+	on b.FanID = #SMT.[a].FanID
+WHERE #SMT.[a].LoyaltyAccount = 1 
 	and b.SchemeMembershipTypeID in (1,2,3,4,5)
 
 
 --Close off existing records in Relational.Customer_SchemeMembership
 UPDATE cs
-	SET EndDate = Case
-					When DeactivatedDate = Cast(getdate() as date) then Dateadd(day,-1,CAST(getdate() as Date))
+	SET [Derived].[Customer_SchemeMembership].[EndDate] = Case
+					When [smt].[DeactivatedDate] = Cast(getdate() as date) then Dateadd(day,-1,CAST(getdate() as Date))
 					Else Dateadd(day,-2,CAST(getdate() as Date))
 				End
 FROM Derived.Customer_SchemeMembership as cs	
 INNER JOIN #SMT as smt	
-	on smt.FanID = cs.FanID
-WHERE smt.SchemeMembershipTypeID <> cs.SchemeMembershipTypeID 
-	and cs.EndDate is null
+	on smt.FanID = #SMT.[cs].FanID
+WHERE smt.SchemeMembershipTypeID <> #SMT.[cs].SchemeMembershipTypeID 
+	and #SMT.[cs].EndDate is null
 
 
 --Create new entries in Relational.Customer_SchemeMembership-----------------------
@@ -350,15 +350,15 @@ INSERT INTO Derived.Customer_SchemeMembership
 SELECT	smt.FanID,
 		smt.SchemeMembershipTypeID,
 		Case
-			When ActivatedDate = CAST(getdate() as Date) then CAST(getdate() as Date)
+			When [smt].[ActivatedDate] = CAST(getdate() as Date) then CAST(getdate() as Date)
 			Else dateadd(day,-1,CAST(getdate() as Date))
 		End as StartDate,
 		CAST(NULL as Date) as EndDate
 FROM #SMT as smt
 WHERE NOT EXISTS (SELECT 1 FROM Derived.Customer_SchemeMembership as cs
-	WHERE smt.FanID = cs.FanID 
-		and smt.SchemeMembershipTypeID = cs.SchemeMembershipTypeID 
-		and cs.EndDate is null)
+	WHERE smt.FanID = #SMT.[cs].FanID 
+		and smt.SchemeMembershipTypeID = #SMT.[cs].SchemeMembershipTypeID 
+		and #SMT.[cs].EndDate is null)
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'LoyaltyAdditions_Customer_SchemeMembership_V1_1', 'Finished'
 
@@ -397,28 +397,28 @@ INSERT INTO Derived.Customer_Loyalty_DD_Nominee
 SELECT	n.FanID,
 		n.Nominee,
 		Case
-			When ActivatedDate = Cast(getdate() as date) then Cast(getdate() as date)
+			When [n].[ActivatedDate] = Cast(getdate() as date) then Cast(getdate() as date)
 			Else Dateadd(day,-1,getdate())
 		End as StartDate,
 		CAST(NULL as DATE) as EndDate
 FROM #Nominee n
 WHERE NOT EXISTS (SELECT 1 FROM Derived.Customer_Loyalty_DD_Nominee d
-	WHERE n.FanID = d.FanID 
-	and n.Nominee = d.Nominee 
-	and d.EndDate is null)
+	WHERE n.FanID = #Nominee.[d].FanID 
+	and n.Nominee = #Nominee.[d].Nominee 
+	and #Nominee.[d].EndDate is null)
 
 	
 --Update old entries for Nominees	
 UPDATE d
-	SET EndDate = Case
-		When ActivatedDate = Cast(getdate() as date) then Dateadd(day,-1,Cast(getdate() as date))
+	SET [Derived].[Customer_Loyalty_DD_Nominee].[EndDate] = Case
+		When [n].[ActivatedDate] = Cast(getdate() as date) then Dateadd(day,-1,Cast(getdate() as date))
 		Else Dateadd(day,-2,Cast(GETDATE() as DATE))
 	End
 FROM Derived.Customer_Loyalty_DD_Nominee d
 INNER JOIN #Nominee n
-	on n.FanID = d.FanID 
-	and n.Nominee <> d.Nominee 
-	and EndDate is null
+	on n.FanID = #Nominee.[d].FanID 
+	and n.Nominee <> #Nominee.[d].Nominee 
+	and #Nominee.[EndDate] is null
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'LoyaltyAdditions_CustomerNominee', 'Finished'
 

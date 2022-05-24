@@ -4,19 +4,19 @@ BEGIN
 
 
 IF OBJECT_ID('tempdb..#FB') IS NOT NULL DROP TABLE #FB
-SELECT	CINID,FanID
+SELECT	[CL].[CINID],[C].[FanID]
 INTO	#FB
 FROM	Derived.Customer C
 JOIN	Derived.CINList CL ON CL.CIN = C.SourceUID
 WHERE	C.CurrentlyActive = 1
-AND		SourceUID NOT IN (SELECT SourceUID FROM Derived.Customer_DuplicateSourceUID) 
+AND		[C].[SourceUID] NOT IN (SELECT [Derived].[Customer_DuplicateSourceUID].[SourceUID] FROM Derived.Customer_DuplicateSourceUID) 
 CREATE CLUSTERED INDEX ix_CINID on #FB(CINID)
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-SELECT ConsumerCombinationID
+SELECT [CC].[ConsumerCombinationID]
 INTO	#CC
 FROM	Trans.ConsumerCombination CC
-WHERE	BrandID IN (1458)									-- Space NK
+WHERE	[CC].[BrandID] IN (1458)									-- Space NK
 
 
 IF OBJECT_ID('tempdb..#Trans_shoppers') IS NOT NULL DROP TABLE #Trans_shoppers
@@ -44,17 +44,17 @@ CREATE CLUSTERED INDEX ix_CINID on #Trans_lapsed(CINID)
 
 
 IF OBJECT_ID('Sandbox.RukanK.SpaceNK_Lapsed_Customers_Virgin') IS NOT NULL DROP TABLE Sandbox.RukanK.SpaceNK_Lapsed_Customers_Virgin
-SELECT CINID
+SELECT #Trans_lapsed.[CINID]
 INTO	Sandbox.RukanK.SpaceNK_Lapsed_Customers_Virgin
 FROM	#Trans_lapsed 
-WHERE	CINID NOT IN (SELECT CINID FROM #Trans_shoppers)
+WHERE	#Trans_lapsed.[CINID] NOT IN (SELECT #Trans_shoppers.[CINID] FROM #Trans_shoppers)
 
 If Object_ID('Selections.SP022_PreSelection') Is Not Null Drop Table Selections.SP022_PreSelection
-Select FanID
+Select [fb].[FanID]
 Into Selections.SP022_PreSelection
 from Sandbox.RukanK.SpaceNK_Lapsed_Customers_Virgin s
 join #FB fb
-on fb.CINID = s.CINID
+on fb.CINID = #FB.[s].CINID
 
 
 END;

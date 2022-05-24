@@ -166,23 +166,23 @@ ON ec.CampaignKey = s.campaignkey
 --	  , ec.EmailsDelivered = nbdelivered
 WHEN NOT MATCHED THEN
 	INSERT (
-	  CampaignKey
-	, CampaignName
-	, EmailKey
-	, SendDate
-	, Subject )
+	  [ec].[CampaignKey]
+	, [ec].[CampaignName]
+	, [ec].[EmailKey]
+	, [ec].[SendDate]
+	, [ec].[Subject] )
 	VALUES( CampaignKey --CampaignKey
 		 , CampaignName --CampaignName
-		 , MessageID
+		 , [s].[MessageId]
 		 , sendDate
 		 , NULL --Subject
 		 );
 	
 SELECT @ListOfCampaignKeys = ISNULL(STUFF 
 ((
-    SELECT ',' + CampaignKey
+    SELECT ',' + #DownloadCampaignData.[CampaignKey]
     FROM #DownloadCampaignData 
-    WHERE MessageID = '0'
+    WHERE #DownloadCampaignData.[MessageId] = '0'
     FOR XML PATH('')), 1, 1, '') , '')
 
 

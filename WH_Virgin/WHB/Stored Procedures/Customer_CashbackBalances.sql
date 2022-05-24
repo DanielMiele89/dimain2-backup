@@ -36,10 +36,10 @@ BEGIN
 			--DECLARE @RunDate DATE = GETDATE()
 
 			IF OBJECT_ID('tempdb..#CashbackBalances') IS NOT NULL DROP TABLE #CashbackBalances
-			SELECT	FanID
-				,	CashbackPending
-				,	CashbackAvailable
-				,	CashbackLTV
+			SELECT	[WHB].[Customer].[FanID]
+				,	[WHB].[Customer].[CashbackPending]
+				,	[WHB].[Customer].[CashbackAvailable]
+				,	[WHB].[Customer].[CashbackLTV]
 				,	@RunDate AS Date
 			INTO #CashbackBalances
 			FROM [WHB].[Customer]
@@ -55,25 +55,25 @@ BEGIN
 			FROM [Derived].[Customer_CashbackBalances] ccb
 			WHERE EXISTS (	SELECT 1
 							FROM #CashbackBalances cb
-							WHERE cb.FanID = ccb.FanID
-							AND cb.Date = ccb.Date)
+							WHERE cb.FanID = #CashbackBalances.[ccb].FanID
+							AND cb.Date = #CashbackBalances.[ccb].Date)
 		
-			INSERT INTO [Derived].[Customer_CashbackBalances] (	FanID
-															,	CashbackPending
-															,	CashbackAvailable
-															,	CashbackLTV
-															,	Date)
-			SELECT	FanID
-				,	CashbackPending
-				,	CashbackAvailable
-				,	CashbackLTV
-				,	Date
+			INSERT INTO [Derived].[Customer_CashbackBalances] (	[Derived].[Customer_CashbackBalances].[FanID]
+															,	[Derived].[Customer_CashbackBalances].[CashbackPending]
+															,	[Derived].[Customer_CashbackBalances].[CashbackAvailable]
+															,	[Derived].[Customer_CashbackBalances].[CashbackLTV]
+															,	[Derived].[Customer_CashbackBalances].[Date])
+			SELECT	[cb].[FanID]
+				,	[cb].[CashbackPending]
+				,	[cb].[CashbackAvailable]
+				,	[cb].[CashbackLTV]
+				,	[cb].[Date]
 			FROM #CashbackBalances cb
 			WHERE NOT EXISTS (	SELECT 1
 								FROM [Derived].[Customer_CashbackBalances] ccb
 								WHERE cb.FanID = ccb.FanID
 								AND cb.Date = ccb.Date)
-			ORDER BY CashbackAvailable DESC
+			ORDER BY [cb].[CashbackAvailable] DESC
 
 			EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Finished'
 
@@ -95,7 +95,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

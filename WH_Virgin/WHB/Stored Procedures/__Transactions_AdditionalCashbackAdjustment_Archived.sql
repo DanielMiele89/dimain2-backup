@@ -86,46 +86,46 @@ BEGIN TRY
 			a.ActivationDays,
 			Case
 				-- Amazon
-				When b.ItemID = 7236 and a.TypeID = 26 then 77 
-				When b.ItemID = 7238 and a.TypeID = 26 then 78
-				When b.ItemID = 7240 and a.TypeID = 26 then 79
-				When b.ItemID = 7236 and a.TypeID = 27 then 80
-				When b.ItemID = 7238 and a.TypeID = 27 then 81
-				When b.ItemID = 7240 and a.TypeID = 27 then 82
+				When #Trans.[b].ItemID = 7236 and a.TypeID = 26 then 77 
+				When #Trans.[b].ItemID = 7238 and a.TypeID = 26 then 78
+				When #Trans.[b].ItemID = 7240 and a.TypeID = 26 then 79
+				When #Trans.[b].ItemID = 7236 and a.TypeID = 27 then 80
+				When #Trans.[b].ItemID = 7238 and a.TypeID = 27 then 81
+				When #Trans.[b].ItemID = 7240 and a.TypeID = 27 then 82
 				-- M&S
-				When b.ItemID = 7242 and a.TypeID = 26 then 83
-				When b.ItemID = 7243 and a.TypeID = 26 then 84
-				When b.ItemID = 7244 and a.TypeID = 26 then 85
-				When b.ItemID = 7242 and a.TypeID = 27 then 86
-				When b.ItemID = 7243 and a.TypeID = 27 then 87
-				When b.ItemID = 7244 and a.TypeID = 27 then 88
+				When #Trans.[b].ItemID = 7242 and a.TypeID = 26 then 83
+				When #Trans.[b].ItemID = 7243 and a.TypeID = 26 then 84
+				When #Trans.[b].ItemID = 7244 and a.TypeID = 26 then 85
+				When #Trans.[b].ItemID = 7242 and a.TypeID = 27 then 86
+				When #Trans.[b].ItemID = 7243 and a.TypeID = 27 then 87
+				When #Trans.[b].ItemID = 7244 and a.TypeID = 27 then 88
 				-- B&Q
-				When b.ItemID = 7248 and a.TypeID = 26 then 95
-				When b.ItemID = 7249 and a.TypeID = 26 then 96
-				When b.ItemID = 7250 and a.TypeID = 26 then 97
-				When b.ItemID = 7248 and a.TypeID = 27 then 98
-				When b.ItemID = 7249 and a.TypeID = 27 then 99
-				When b.ItemID = 7250 and a.TypeID = 27 then 100
+				When #Trans.[b].ItemID = 7248 and a.TypeID = 26 then 95
+				When #Trans.[b].ItemID = 7249 and a.TypeID = 26 then 96
+				When #Trans.[b].ItemID = 7250 and a.TypeID = 26 then 97
+				When #Trans.[b].ItemID = 7248 and a.TypeID = 27 then 98
+				When #Trans.[b].ItemID = 7249 and a.TypeID = 27 then 99
+				When #Trans.[b].ItemID = 7250 and a.TypeID = 27 then 100
 				-- Argos
-				When b.ItemID = 7256 and a.TypeID = 26 then 101
-				When b.ItemID = 7257 and a.TypeID = 26 then 102
-				When b.ItemID = 7258 and a.TypeID = 26 then 103
-				When b.ItemID = 7256 and a.TypeID = 27 then 104
-				When b.ItemID = 7257 and a.TypeID = 27 then 105
-				When b.ItemID = 7258 and a.TypeID = 27 then 106
+				When #Trans.[b].ItemID = 7256 and a.TypeID = 26 then 101
+				When #Trans.[b].ItemID = 7257 and a.TypeID = 26 then 102
+				When #Trans.[b].ItemID = 7258 and a.TypeID = 26 then 103
+				When #Trans.[b].ItemID = 7256 and a.TypeID = 27 then 104
+				When #Trans.[b].ItemID = 7257 and a.TypeID = 27 then 105
+				When #Trans.[b].ItemID = 7258 and a.TypeID = 27 then 106
 				-- John Lewis
-				When b.ItemID = 7260 and a.TypeID = 26 then 107
-				When b.ItemID = 7261 and a.TypeID = 26 then 108
-				When b.ItemID = 7262 and a.TypeID = 26 then 109
-				When b.ItemID = 7260 and a.TypeID = 27 then 110
-				When b.ItemID = 7261 and a.TypeID = 27 then 111
-				When b.ItemID = 7262 and a.TypeID = 27 then 112
+				When #Trans.[b].ItemID = 7260 and a.TypeID = 26 then 107
+				When #Trans.[b].ItemID = 7261 and a.TypeID = 26 then 108
+				When #Trans.[b].ItemID = 7262 and a.TypeID = 26 then 109
+				When #Trans.[b].ItemID = 7260 and a.TypeID = 27 then 110
+				When #Trans.[b].ItemID = 7261 and a.TypeID = 27 then 111
+				When #Trans.[b].ItemID = 7262 and a.TypeID = 27 then 112
 
 				Else 0
 			End as [AdditionalCashbackAdjustmentTypeID]
 		FROM #Trans as a
 		INNER JOIN SLC_report.dbo.Trans as b 
-			on a.ItemID = b.ID
+			on a.ItemID = #Trans.[b].ID
 		-- (104991 rows affected) / 00:00:01
 
 	EXEC [Monitor].[ProcessLog_Insert] 'Transactions_AdditionalCashbackAdjustment', 'Finished'
@@ -149,7 +149,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

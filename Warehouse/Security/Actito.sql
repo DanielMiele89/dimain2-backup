@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [Actito]
+    AUTHORIZATION [dbo];
+

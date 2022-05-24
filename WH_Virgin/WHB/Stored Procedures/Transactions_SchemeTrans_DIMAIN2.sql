@@ -149,19 +149,19 @@ BEGIN
 		INTO #SchemeTrans_Temp
 		FROM #PANless_Transaction pt
 		INNER JOIN OPENQUERY([DIMAIN_TR],'SELECT * FROM [SLC_REPL].[dbo].[RetailOutlet]') ro -- OutletID in [Staging].[SchemeTrans] does not accept NULLs
-			ON pt.MerchantNumber = ro.MerchantID	
+			ON pt.MerchantNumber = #PANless_Transaction.[ro].MerchantID	
 		--LEFT JOIN [Warehouse].[iron].[PrimaryRetailerIdentification] pri
 		INNER JOIN [Warehouse].[iron].[PrimaryRetailerIdentification] pri -- RetailerID in [Staging].[SchemeTrans] does not accept NULLs
-			ON pt.PartnerID = pri.PartnerID
+			ON pt.PartnerID = #PANless_Transaction.[pri].PartnerID
 		--LEFT JOIN [Warehouse].[Relational].[nFI_Partner_Deals] pd
 		--	ON COALESCE(pri.PrimaryPartnerID, pri.PartnerID) = pd.PartnerID
 		--	AND pt.ClubID = pd.ClubID		
 		OUTER APPLY ( -- CJM 17/09/2021 dupes in here
-			SELECT TOP(1) pd.Publisher, pd.Reward, pd.[Override]
+			SELECT TOP(1) #PANless_Transaction.[pd].Publisher, #PANless_Transaction.[pd].Reward, #PANless_Transaction.[pd].[Override]
 			FROM [Warehouse].[Relational].[nFI_Partner_Deals] pd
-			WHERE COALESCE(pri.PrimaryPartnerID, pri.PartnerID) = pd.PartnerID
-				AND pt.ClubID = pd.ClubID
-			ORDER BY EndDate
+			WHERE COALESCE(#PANless_Transaction.[pri].PrimaryPartnerID, #PANless_Transaction.[pri].PartnerID) = #PANless_Transaction.[pd].PartnerID
+				AND pt.ClubID = #PANless_Transaction.[pd].ClubID
+			ORDER BY #PANless_Transaction.[EndDate]
 		) pd
 		LEFT JOIN [Derived].[IronOffer] iof
 			ON pt.RewardOfferID = iof.IronOfferID
@@ -180,7 +180,7 @@ BEGIN
 
 		INSERT INTO [Staging].[SchemeTrans]
 		SELECT	ID = stt.ID
-			,	SchemeTransID = (ROW_NUMBER() OVER (ORDER BY stt.ID) + (SELECT COALESCE(MAX(SchemeTransID), 0) FROM [Staging].[SchemeTrans] WHERE SchemeTransID > 0))
+			,	SchemeTransID = (ROW_NUMBER() OVER (ORDER BY stt.ID) + (SELECT COALESCE(MAX([Staging].[SchemeTrans].[SchemeTransID]), 0) FROM [Staging].[SchemeTrans] WHERE [Staging].[SchemeTrans].[SchemeTransID] > 0))
 			,	stt.Spend
 			,	stt.RetailerCashback
 			,	stt.TranDate
@@ -212,7 +212,7 @@ BEGIN
 			,	stt.GrossCommission
 			,	CONVERT(TIME, stt.TranDate) AS TranTime
 			,	0 AS Imported
-			,	MaskedCardNumber
+			,	[stt].[MaskedCardNumber]
 		FROM #SchemeTrans_Temp stt
 		WHERE NOT EXISTS (	SELECT 1
 							FROM [Staging].[SchemeTrans] st
@@ -241,7 +241,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

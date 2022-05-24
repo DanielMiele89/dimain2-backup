@@ -37,7 +37,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 		WHERE pa.BrandID IS NOT NULL
 		AND EXISTS (SELECT 1
 					FROM #OfferPrioritisatiON op
-					WHERE pa.PartnerID = op.PartnerID)
+					WHERE #OfferPrioritisatiON.[pa].PartnerID = op.PartnerID)
 					
 
 	/*******************************************************************************************************************************************
@@ -111,14 +111,14 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 			IF OBJECT_ID('tempdb..#HM_2') IS NOT NULL DROP TABLE #HM_2;
 			WITH
 			HM AS (	SELECT	DISTINCT
-							CAMEO
-						,	Age_Group
-						,	Gender
+							#HM_1.[CAMEO]
+						,	#HM_1.[Age_Group]
+						,	#HM_1.[Gender]
 					FROM #HM_1)
 					
-			SELECT	CAMEO
-				,	Age_Group
-				,	Gender
+			SELECT	[h].[CAMEO]
+				,	[h].[Age_Group]
+				,	[h].[Gender]
 				,	ROW_NUMBER() OVER (ORDER BY NEWID()) AS HeatmapID
 			INTO #HM_2
 			FROM HM h
@@ -138,8 +138,8 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 		INTO #MyRewardsCustomers
 		FROM [Warehouse].[Relational].[Customer] cu
 		INNER JOIN #HM_1 h
-			ON h.FanID = cu.FanID
-			AND cu.ClubID = h.ClubID
+			ON h.FanID = #HM_1.[cu].FanID
+			AND #HM_1.[cu].ClubID = h.ClubID
 		INNER JOIN #HM_2 h2
 			ON h2.Age_Group = h.Age_Group
 			AND h2.Gender = h.Gender
@@ -212,8 +212,8 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 			FROM [Trans].[ConsumerCombination] cc
 			WHERE EXISTS (	SELECT 1
 							FROM #Brands b
-							WHERE b.BrandID = cc.BrandID
-							AND MFDD = 0)
+							WHERE b.BrandID = #Brands.[cc].BrandID
+							AND [b].[MFDD] = 0)
 
 			CREATE NONCLUSTERED INDEX INX ON #CC_CL (ConsumerCombinationID) INCLUDE (BrandID)
 
@@ -224,8 +224,8 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 			FROM [Warehouse].[Relational].[ConsumerCombination] cc
 			WHERE EXISTS (	SELECT 1
 							FROM #Brands b
-							WHERE b.BrandID = cc.BrandID
-							AND MFDD = 0)
+							WHERE b.BrandID = #Brands.[cc].BrandID
+							AND [b].[MFDD] = 0)
 
 			CREATE NONCLUSTERED INDEX INX ON #CC_CL_MyRewards (ConsumerCombinationID) INCLUDE (BrandID)
 
@@ -261,7 +261,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 				,	c.HeatmapID
 			FROM [Warehouse].[Relational].[ConsumerTransaction_MyRewards] ct
 			INNER JOIN #CC_CL_MyRewards cc
-				ON cc.ConsumerCombinationID = ct.ConsumerCombinationID
+				ON cc.ConsumerCombinationID = #CC_CL_MyRewards.[ct].ConsumerCombinationID
 			INNER JOIN #MyRewardsCustomers c
 				ON c.CINID = ct.CINID
 			WHERE ct.TranDate BETWEEN @StartDate AND @EndDate
@@ -295,9 +295,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 				,	COUNT(1) AS OverallCustomers
 			INTO #Heatmap_Brand
 			FROM #Customers cu
-			CROSS JOIN (SELECT BrandID
+			CROSS JOIN (SELECT #Brands.[BrandID]
 						FROM #Brands
-						WHERE MFDD = 0) br
+						WHERE #Brands.[MFDD] = 0) br
 			GROUP BY	cu.HeatmapID
 					,	br.BrandID
 
@@ -378,8 +378,8 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 			FROM [Warehouse].[Relational].[ConsumerCombination_DD] cc
 			WHERE EXISTS (	SELECT 1
 							FROM #Brands b
-							WHERE b.BrandID = cc.BrandID
-							AND MFDD = 1)
+							WHERE b.BrandID = #Brands.[cc].BrandID
+							AND [b].[MFDD] = 1)
 
 			CREATE NONCLUSTERED INDEX INX ON #CC_MFDD(ConsumerCombinationID_DD) INCLUDE (BrandID)
 
@@ -398,7 +398,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 			INTO #Spenders_FanID
 			FROM [Warehouse].[Relational].[ConsumerTransaction_DD] ct
 			INNER JOIN #CC_MFDD cc
-				ON cc.ConsumerCombinationID_DD = ct.ConsumerCombinationID_DD
+				ON cc.ConsumerCombinationID_DD = #CC_MFDD.[ct].ConsumerCombinationID_DD
 			INNER JOIN #MyRewardsCustomers cu
 				ON cu.FanID = ct.FanID
 			WHERE ct.TranDate BETWEEN @StartDate_MFDD AND @EndDate_MFDD
@@ -430,9 +430,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 				,	COUNT(1) AS OverallCustomers
 			INTO #Heatmap_Brand_MFDD
 			FROM #MyRewardsCustomers c
-			CROSS JOIN (SELECT BrandID
+			CROSS JOIN (SELECT #Brands.[BrandID]
 						FROM #Brands
-						WHERE MFDD = 1) b
+						WHERE #Brands.[MFDD] = 1) b
 			GROUP BY	c.HeatmapID
 					,	b.BrandID
 
@@ -503,14 +503,14 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	*******************************************************************************************************************************************/
 
 		IF OBJECT_ID('tempdb..#Spenders_FaniD2') IS NOT NULL DROP TABLE #Spenders_FaniD2
-		SELECT	FanID
+		SELECT	[s].[FanID]
 			,	p.BrandID
 		INTO #Spenders_FaniD2
 		FROM [Segmentation].[Roc_Shopper_Segment_Members] s
 		INNER JOIN [Warehouse].[Relational].[Partner] p
 			ON p.PartnerID = s.PartnerID
-		WHERE EndDate IS NULL
-		AND ShopperSegmentTypeID = 9
+		WHERE [s].[EndDate] IS NULL
+		AND [s].[ShopperSegmentTypeID] = 9
 
 		CREATE CLUSTERED INDEX ix_Stuff ON #Spenders_FaniD2 (FanID, BrandID) 
 				
@@ -555,10 +555,10 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	*******************************************************************************************************************************************/
 
 		UPDATE #CustomerBrand_Frame
-		SET Propensity = 0
+		SET #CustomerBrand_Frame.[Propensity] = 0
 		FROM #CustomerBrand_Frame
-		WHERE BrandID = 331
-		AND Type = 'Acquire'
+		WHERE #CustomerBrand_Frame.[BrandID] = 331
+		AND #CustomerBrand_Frame.[Type] = 'Acquire'
 
 		
 		IF OBJECT_ID('tempdb..#BudgetRetailers') IS NOT NULL DROP TABLE #BudgetRetailers
@@ -575,16 +575,16 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
 		DECLARE @MaxPropensity numeric(25, 13)
 		
-		SELECT	@MaxPropensity = MAX(Propensity)
+		SELECT	@MaxPropensity = MAX(#CustomerBrand_Frame.[Propensity])
 		FROM #CustomerBrand_Frame
 
 		update #CustomerBrand_Frame
-		set Propensity = Propensity - @MaxPropensity
+		set [C].[Propensity] = [C].[Propensity] - @MaxPropensity
 		from #CustomerBrand_Frame C
-		WHERE PremiumCustomer = 1
+		WHERE [C].[PremiumCustomer] = 1
 		AND EXISTS (	SELECT 1
 						FROM #BudgetRetailers br
-						WHERE c.PartnerID = br.PartnerID)
+						WHERE #BudgetRetailers.[c].PartnerID = br.PartnerID)
 
 
 	/*******************************************************************************************************************************************

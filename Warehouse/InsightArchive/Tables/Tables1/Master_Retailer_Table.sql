@@ -1,0 +1,28 @@
+﻿CREATE TABLE [InsightArchive].[Master_Retailer_Table] (
+    [PartnerID]                      INT            NOT NULL,
+    [Tier]                           INT            NULL,
+    [Margin]                         FLOAT (53)     NULL,
+    [CS_Lead_ID]                     INT            NULL,
+    [CS_Support_ID]                  INT            NULL,
+    [D_I_Lead_ID]                    INT            NULL,
+    [D_I_Support_ID]                 INT            NULL,
+    [Core]                           CHAR (1)       NULL,
+    [Override_Pct_of_CBP]            FLOAT (53)     NULL,
+    [Term]                           NVARCHAR (255) NULL,
+    [Advertised_Launch_Date]         DATETIME       NULL,
+    [Date_of_Last_Signature]         DATETIME       NULL,
+    [Last_Date_Notice_Can_Be_Served] DATETIME       NULL,
+    [Next_Termination_Date]          DATETIME       NULL,
+    [Exclusivity_Agreed]             NVARCHAR (255) NULL,
+    [ROI_Type]                       NVARCHAR (255) NULL,
+    [Contractual_ROI]                NVARCHAR (255) NULL,
+    [Contractual_Sales_Uplift]       NVARCHAR (255) NULL,
+    [Target_Sales_Uplift]            NVARCHAR (255) NULL,
+    [Annual_Num_of_Tactical_WOWs]    INT            NULL,
+    [Annual_Num_of_Strategic_WOWs]   INT            NULL,
+    [Avg_Offer_Rate]                 FLOAT (53)     NULL,
+    [Overall_Blended_Rate]           FLOAT (53)     NULL,
+    [Annual_Insight_Budget]          MONEY          NULL,
+    [Reporting_Start_MonthID]        INT            NULL
+);
+

@@ -26,7 +26,7 @@ BEGIN
 	--------------------------------------------------------------------------------------------------------------------------
 	-- Change the date check constraint on the shadow table to match this partition
 	--------------------------------------------------------------------------------------------------------------------------
-	IF EXISTS(SELECT 1 FROM SYS.TABLES WHERE [Name] = 'ConsumerTransaction_shadow')
+	IF EXISTS(SELECT 1 FROM SYS.TABLES WHERE [SYS].[TABLES].[Name] = 'ConsumerTransaction_shadow')
 	BEGIN -- check if the table has any content 
 		DECLARE @RowCount INT; 
 		SELECT @RowCount = COUNT(*) FROM Trans.ConsumerTransaction_shadow; 
@@ -63,12 +63,12 @@ BEGIN
 	-- Load the switch table with new data from the transaction holding table 
 	--------------------------------------------------------------------------------------------------------------------------
 	INSERT INTO Trans.ConsumerTransaction_shadow WITH (TABLOCKX) (
-		[FileID], [RowNum], [ConsumerCombinationID], [SecondaryCombinationID], [BankID], [LocationID], [CardholderPresentData], 
-		[TranDate], [CINID], [Amount], [IsRefund], [IsOnline], [InputModeID], [PostStatusID], [PaymentTypeID])
-	SELECT [FileID], [RowNum], [ConsumerCombinationID], [SecondaryCombinationID], [BankID], [LocationID], [CardholderPresentData], 
-		[TranDate], [CINID], [Amount], [IsRefund], [IsOnline], [InputModeID], [PostStatusID], [PaymentTypeID] 
+		[Trans].[ConsumerTransaction_shadow].[FileID], [Trans].[ConsumerTransaction_shadow].[RowNum], [Trans].[ConsumerTransaction_shadow].[ConsumerCombinationID], [Trans].[ConsumerTransaction_shadow].[SecondaryCombinationID], [Trans].[ConsumerTransaction_shadow].[BankID], [Trans].[ConsumerTransaction_shadow].[LocationID], [Trans].[ConsumerTransaction_shadow].[CardholderPresentData], 
+		[Trans].[ConsumerTransaction_shadow].[TranDate], [Trans].[ConsumerTransaction_shadow].[CINID], [Trans].[ConsumerTransaction_shadow].[Amount], [Trans].[ConsumerTransaction_shadow].[IsRefund], [Trans].[ConsumerTransaction_shadow].[IsOnline], [Trans].[ConsumerTransaction_shadow].[InputModeID], [Trans].[ConsumerTransaction_shadow].[PostStatusID], [Trans].[ConsumerTransaction_shadow].[PaymentTypeID])
+	SELECT [MIDI].[ConsumerTransactionHolding].[FileID], [MIDI].[ConsumerTransactionHolding].[RowNum], [MIDI].[ConsumerTransactionHolding].[ConsumerCombinationID], [MIDI].[ConsumerTransactionHolding].[SecondaryCombinationID], [MIDI].[ConsumerTransactionHolding].[BankID], [MIDI].[ConsumerTransactionHolding].[LocationID], [MIDI].[ConsumerTransactionHolding].[CardholderPresentData], 
+		[MIDI].[ConsumerTransactionHolding].[TranDate], [MIDI].[ConsumerTransactionHolding].[CINID], [MIDI].[ConsumerTransactionHolding].[Amount], [MIDI].[ConsumerTransactionHolding].[IsRefund], [MIDI].[ConsumerTransactionHolding].[IsOnline], [MIDI].[ConsumerTransactionHolding].[InputModeID], [MIDI].[ConsumerTransactionHolding].[PostStatusID], [MIDI].[ConsumerTransactionHolding].[PaymentTypeID] 
 	FROM [MIDI].[ConsumerTransactionHolding] 
-	WHERE [TranDate] >= @strThisPartitionStartDate AND [TranDate] <  @strNextPartitionStartDate 
+	WHERE [MIDI].[ConsumerTransactionHolding].[TranDate] >= @strThisPartitionStartDate AND [MIDI].[ConsumerTransactionHolding].[TranDate] <  @strNextPartitionStartDate 
 
 
 	--------------------------------------------------------------------------------------------------------------------------

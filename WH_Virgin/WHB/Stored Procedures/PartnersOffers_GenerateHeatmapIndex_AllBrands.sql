@@ -32,8 +32,8 @@ BEGIN
 	
 			IF OBJECT_ID('tempdb..#CAMEO') IS NOT NULL DROP TABLE #CAMEO
 			SELECT	DISTINCT
-					CAMEO_CODE
-				,	CAMEO_CODE_GROUP
+					[Warehouse].[Relational].[CAMEO].[CAMEO_CODE]
+				,	[Warehouse].[Relational].[CAMEO].[CAMEO_CODE_GROUP]
 			INTO #CAMEO
 			FROM [Warehouse].[Relational].[CAMEO]
 			
@@ -50,13 +50,13 @@ BEGIN
 						WHEN cu.AgeCurrent BETWEEN 55 AND 64 THEN '05. 55 to 64'
 						WHEN cu.AgeCurrent >= 65 THEN '06. 65+'
 					END AS HeatmapAgeGroup
-				,	ISNULL((cam.CAMEO_CODE_GROUP + '-' + camg.CAMEO_CODE_GROUP_Category), '99. Unknown') AS HeatmapCameoGroup
+				,	ISNULL((cam.CAMEO_CODE_GROUP + '-' + #CAMEO.[camg].CAMEO_CODE_GROUP_Category), '99. Unknown') AS HeatmapCameoGroup
 			INTO #Customer
 			FROM [Derived].[Customer] cu
 			LEFT JOIN #CAMEO cam
 				ON cu.CAMEOCode = cam.CAMEO_CODE
 			LEFT JOIN [Warehouse].[Relational].[CAMEO_CODE_GROUP] camg
-				ON cam.CAMEO_CODE_GROUP = camg.CAMEO_CODE_GROUP
+				ON cam.CAMEO_CODE_GROUP = #CAMEO.[camg].CAMEO_CODE_GROUP
 
 
 
@@ -70,9 +70,9 @@ BEGIN
 
 			IF OBJECT_ID('tempdb..#CustomerCombinations') IS NOT NULL DROP TABLE #CustomerCombinations
 			SELECT	DISTINCT
-					Gender
-				,	HeatmapAgeGroup
-				,	HeatmapCameoGroup
+					#Customer.[Gender]
+				,	#Customer.[HeatmapAgeGroup]
+				,	#Customer.[HeatmapCameoGroup]
 			INTO #CustomerCombinations
 			FROM #Customer
 
@@ -153,11 +153,11 @@ BEGIN
 		***********************************************************************************************************************/
 
 			IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-			SELECT	BrandID
-				,	ConsumerCombinationID
+			SELECT	[Trans].[ConsumerCombination].[BrandID]
+				,	[Trans].[ConsumerCombination].[ConsumerCombinationID]
 			INTO #CC
 			FROM [Trans].[ConsumerCombination]
-			WHERE BrandID != 944
+			WHERE [Trans].[ConsumerCombination].[BrandID] != 944
 
 			-- (3671428 rows affected) / 00:00:04
 
@@ -187,7 +187,7 @@ BEGIN
 
 		DECLARE @Today DATETIME = GETDATE()
 
-		DECLARE @Population_POS INT = (SELECT COUNT(DISTINCT CINID) FROM #Customers)
+		DECLARE @Population_POS INT = (SELECT COUNT(DISTINCT #Customers.[CINID]) FROM #Customers)
 			  , @EndDate DATE = DATEADD(DAY, -DAY(@Today) + 1, @Today)
 
 		DECLARE @StartDate DATE = DATEADD(YEAR, -1, @EndDate)
@@ -221,7 +221,7 @@ BEGIN
 			***********************************************************************************************************************/
 
 				UPDATE #BrandShopperCounts_POS
-				SET BrandRR = BrandShoppers / @Population_POS
+				SET #BrandShopperCounts_POS.[BrandRR] = #BrandShopperCounts_POS.[BrandShoppers] / @Population_POS
 				-- (2391 rows affected) / 00:00:01
 
 			CREATE CLUSTERED INDEX CIX_BrandID ON #BrandShopperCounts_POS (BrandID)
@@ -311,7 +311,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

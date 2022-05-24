@@ -18,7 +18,7 @@ IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
 SELECT      CC.ConsumerCombinationID AS ConsumerCombinationID
 INTO    #CC 
 FROM    Trans.ConsumerCombination CC
-WHERE    BrandID IN (325)                                -- Competitors: Pandora 
+WHERE    [CC].[BrandID] IN (325)                                -- Competitors: Pandora 
 
  
 
@@ -38,18 +38,18 @@ GROUP BY CT.CINID
  
 
 IF OBJECT_ID('Sandbox.RukanK.HSamuel_CompSteal02072021') IS NOT NULL DROP TABLE Sandbox.RukanK.HSamuel_CompSteal02072021
-SELECT    CINID
+SELECT    #Trans.[CINID]
 INTO Sandbox.RukanK.HSamuel_CompSteal02072021
 FROM  #Trans
 
 
 If Object_ID('Selections.HS123_PreSelection') Is Not Null Drop Table Selections.HS123_PreSelection
-Select FanID
+Select [fb].[FanID]
 Into Selections.HS123_PreSelection
 From #FB fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.RukanK.HSamuel_CompSteal02072021 cs
-				WHERE fb.CINID = cs.CINID)
+				WHERE fb.CINID = #FB.[cs].CINID)
 
 
 

@@ -43,7 +43,7 @@ BEGIN
 			FROM [WHB].[Customer] cu
 			LEFT JOIN [WHB].[Inbound_Accounts] acc
 				ON cu.FanID = acc.CashbackNomineeID
-				AND AccountStatus = 'open'
+				AND [acc].[AccountStatus] = 'open'
 			GROUP BY cu.FanID
 
 			CREATE CLUSTERED INDEX CIX_FanID ON #Nominee (FanID, IsNominee)
@@ -57,13 +57,13 @@ BEGIN
 			DECLARE @EndDate DATE = DATEADD(DAY, -1, @RunDate)
 
 			UPDATE an
-			SET EndDate = @EndDate
+			SET [an].[EndDate] = @EndDate
 			FROM [Derived].[Customer_AccountNominee] an
 			WHERE an.EndDate IS NULL 
 			AND NOT EXISTS (SELECT 1
 							FROM #Nominee n
-							WHERE an.FanID = n.FanID
-							AND an.IsNominee = n.IsNominee)
+							WHERE #Nominee.[an].FanID = n.FanID
+							AND #Nominee.[an].IsNominee = n.IsNominee)
 
 
 		/*******************************************************************************************************************************************
@@ -72,12 +72,12 @@ BEGIN
 			
 			--DECLARE @RunDate DATE = GETDATE()
 
-			INSERT INTO [Derived].[Customer_AccountNominee] (	FanID
-															,	IsNominee
-															,	StartDate
-															,	EndDate)
-			SELECT FanID
-				 , IsNominee
+			INSERT INTO [Derived].[Customer_AccountNominee] (	[Derived].[Customer_AccountNominee].[FanID]
+															,	[Derived].[Customer_AccountNominee].[IsNominee]
+															,	[Derived].[Customer_AccountNominee].[StartDate]
+															,	[Derived].[Customer_AccountNominee].[EndDate])
+			SELECT [n].[FanID]
+				 , [n].[IsNominee]
 				 , @RunDate AS StartDate
 				 , NULL AS EndDate
 			FROM #Nominee n
@@ -106,7 +106,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

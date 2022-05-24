@@ -52,7 +52,7 @@ BEGIN TRY
 	CREATE TABLE #Digits 
 		(Digit INT NOT NULL PRIMARY KEY);
 
-	INSERT INTO #Digits(Digit)
+	INSERT INTO #Digits(#Digits.[Digit])
 	VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9);
 
 	IF OBJECT_ID('tempdb..#Numbers') IS NOT NULL DROP TABLE #Numbers;
@@ -105,10 +105,10 @@ BEGIN TRY
 		UNION ALL
 		SELECT DISTINCT
 			@Today AS ReportDate
-			, DATEADD(dd, -(DATEPART(dw, CalendarDate)-1), CalendarDate) AS WeekStart -- For each calendar date in #Dates, minus days since the most recent Monday  
-			, DATEADD(dd, -(DATEPART(dw, CalendarDate)-1)+6, CalendarDate)AS WeekEnd -- For each calendar date in #Dates, minus days since the most recent Sunday
+			, DATEADD(dd, -(DATEPART(dw, #Dates.[CalendarDate])-1), #Dates.[CalendarDate]) AS WeekStart -- For each calendar date in #Dates, minus days since the most recent Monday  
+			, DATEADD(dd, -(DATEPART(dw, #Dates.[CalendarDate])-1)+6, #Dates.[CalendarDate])AS WeekEnd -- For each calendar date in #Dates, minus days since the most recent Sunday
 		FROM #Dates
-		WHERE CalendarDate BETWEEN DATEADD(week, -@WholeWeeksToDisplay, @WeekEnd) AND @WeekEnd
+		WHERE #Dates.[CalendarDate] BETWEEN DATEADD(week, -@WholeWeeksToDisplay, @WeekEnd) AND @WeekEnd
 		) calbase;
 
 	/**************************************************************************
@@ -127,30 +127,30 @@ BEGIN TRY
 	INSERT INTO #CalendarMonth
 		SELECT DISTINCT
 		@Today AS ReportDate
-		, DATEADD(day, -(DATEPART(day, CalendarDate))+1, CalendarDate) AS MonthStart -- For each calendar date in #Dates, minus days since the start of the month  
-		, DATEADD(day, -1, DATEADD(month, 1, DATEADD(day, 1 - day(CalendarDate), CalendarDate))) AS MonthEnd -- For each calendar date in #Dates, add days to the end of the month
+		, DATEADD(day, -(DATEPART(day, #Dates.[CalendarDate]))+1, #Dates.[CalendarDate]) AS MonthStart -- For each calendar date in #Dates, minus days since the start of the month  
+		, DATEADD(day, -1, DATEADD(month, 1, DATEADD(day, 1 - day(#Dates.[CalendarDate]), #Dates.[CalendarDate]))) AS MonthEnd -- For each calendar date in #Dates, add days to the end of the month
 	FROM #Dates
 	WHERE 
-		CalendarDate BETWEEN DATEADD(day, -(DATEPART(day, (DATEADD(MONTH, -3, @Today))))+1, (DATEADD(MONTH, -3, @Today))) AND DATEADD(day, -(DATEPART(day, @Today)), @Today);
+		#Dates.[CalendarDate] BETWEEN DATEADD(day, -(DATEPART(day, (DATEADD(MONTH, -3, @Today))))+1, (DATEADD(MONTH, -3, @Today))) AND DATEADD(day, -(DATEPART(day, @Today)), @Today);
 	
 
 	;WITH 
 		E1 AS (SELECT n = 0 FROM (VALUES (0),(0),(0),(0),(0),(0),(0),(0),(0),(0)) d (n)),
 		Numbers AS (SELECT TOP(20) n = ROW_NUMBER() OVER(ORDER BY (SELECT NULL)) FROM E1 a, E1 b),
-		Calendar AS (SELECT ID = n, Weekstart = DATEADD(WEEK,DATEDIFF(WEEK,0,GETDATE())-(n-1),0) FROM Numbers)
+		Calendar AS (SELECT ID = [Numbers].[n], Weekstart = DATEADD(WEEK,DATEDIFF(WEEK,0,GETDATE())-([Numbers].[n]-1),0) FROM Numbers)
 	SELECT 
-		ID, 
-		Weekstart, 
-		WeekEnd,
+		[x].[ID], 
+		[x].[Weekstart], 
+		[x].[WeekEnd],
 		WeekID = CASE
-			WHEN WeekEnd = DATEADD(day, -1, @Today) THEN 1
-			WHEN WeekEnd BETWEEN DATEADD(week, -3, @RecentSunday) AND @RecentSunday THEN 2
+			WHEN [x].[WeekEnd] = DATEADD(day, -1, @Today) THEN 1
+			WHEN [x].[WeekEnd] BETWEEN DATEADD(week, -3, @RecentSunday) AND @RecentSunday THEN 2
 			ELSE 3 END  
 	FROM Calendar
 	CROSS APPLY (
 		SELECT WeekEnd = CASE WHEN DATEADD(DAY,6,Weekstart) >= @Today THEN @Today ELSE DATEADD(DAY,6,Weekstart) END
 	) x
-	ORDER BY Weekstart DESC
+	ORDER BY [x].[Weekstart] DESC
 	--WHERE Weekstart BETWEEN DATEADD(day, -(DATEPART(day, (DATEADD(MONTH, -3, @Today))))+1, (DATEADD(MONTH, -3, @Today))) AND DATEADD(day, -(DATEPART(day, @Today)), @Today)
 
 
@@ -205,9 +205,9 @@ BEGIN TRY
 	INTO #eRedems
 	FROM #Calendar cal
 	INNER JOIN Derived.Redemptions r WITH(NOLOCK)
-		ON CAST(r.RedeemDate AS date) BETWEEN cal.WeekStart AND cal.WeekEnd
+		ON CAST(#Calendar.[r].RedeemDate AS date) BETWEEN cal.WeekStart AND cal.WeekEnd
 	INNER JOIN SLC_Report.dbo.Trans t
-		ON r.TranID = t.ID
+		ON #Calendar.[r].TranID = #Calendar.[t].ID
 	INNER JOIN #RedeemItems items
 		ON t.ItemID = items.ItemID
 	WHERE r.RedeemType = 'Trade Up'
@@ -233,22 +233,22 @@ BEGIN TRY
 		, r.Description
 		, r.PartnerID
 		, r.ValidityDays
-		, COUNT(DISTINCT ec.ID) AS eCodes_InStock
+		, COUNT(DISTINCT #RedeemItems.[ec].ID) AS eCodes_InStock
 	INTO #StockLevels
 	FROM #RedeemItems r
 	LEFT JOIN SLC_Report.Redemption.ECodeBatch b -- Links the RedeemID to the btach of codes loaded
-		ON r.ItemID = b.RedeemID
+		ON r.ItemID = #RedeemItems.[b].RedeemID
 	LEFT JOIN SLC_Report.Redemption.ECode ec -- Holds the references to the codes (not the actual codes)
-		ON b.ID = ec.BatchID
+		ON #RedeemItems.[b].ID = #RedeemItems.[ec].BatchID
 	WHERE 
-		ec.Status = 0 -- Means codes uploaded
+		#RedeemItems.[ec].Status = 0 -- Means codes uploaded
 	GROUP BY
 		r.ItemID
 		, r.Description
 		, r.PartnerID
 		, r.ValidityDays
 	HAVING 
-		(COUNT(DISTINCT ec.ID) > 0 OR SUM(ValidityDays) > 0); -- This helps to remove odd items from being displayed in error
+		(COUNT(DISTINCT #RedeemItems.[ec].ID) > 0 OR SUM([r].[ValidityDays]) > 0); -- This helps to remove odd items from being displayed in error
 	
 	/**************************************************************************
 	Create table of average monthly E-voucher redemptions for the last 3 full calendar months
@@ -273,9 +273,9 @@ BEGIN TRY
 		, COUNT(*) AS eVouchRedemptions
 		FROM #CalendarMonth cal
 		INNER JOIN Derived.Redemptions r WITH(NOLOCK)
-			ON CAST(r.RedeemDate AS date) BETWEEN cal.MonthStart AND cal.MonthEnd
+			ON CAST(#CalendarMonth.[r].RedeemDate AS date) BETWEEN cal.MonthStart AND cal.MonthEnd
 		INNER JOIN SLC_Report.dbo.Trans t
-			ON r.TranID = t.ID
+			ON #CalendarMonth.[r].TranID = #CalendarMonth.[t].ID
 		INNER JOIN #RedeemItems items
 			ON t.ItemID = items.ItemID
 		WHERE r.RedeemType = 'Trade Up'
@@ -353,7 +353,7 @@ BEGIN TRY
 	***************************************************************************/
 
 	TRUNCATE TABLE #Digits
-	INSERT INTO #Digits(Digit)
+	INSERT INTO #Digits(#Digits.[Digit])
 	 VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9);
 
 	TRUNCATE TABLE #Numbers
@@ -393,10 +393,10 @@ BEGIN TRY
 		UNION ALL
 		SELECT DISTINCT
 			@Today AS ReportDate
-			, DATEADD(dd, -(DATEPART(dw, CalendarDate)-1), CalendarDate) AS WeekStart -- For each calendar date in #Dates, minus days since the most recent Monday  
-			, DATEADD(dd, -(DATEPART(dw, CalendarDate)-1)+6, CalendarDate)AS WeekEnd -- For each calendar date in #Dates, minus days since the most recent Sunday
+			, DATEADD(dd, -(DATEPART(dw, #Dates.[CalendarDate])-1), #Dates.[CalendarDate]) AS WeekStart -- For each calendar date in #Dates, minus days since the most recent Monday  
+			, DATEADD(dd, -(DATEPART(dw, #Dates.[CalendarDate])-1)+6, #Dates.[CalendarDate])AS WeekEnd -- For each calendar date in #Dates, minus days since the most recent Sunday
 		FROM #Dates
-		WHERE CalendarDate BETWEEN DATEADD(week, -@WholeWeeksToDisplay, @WeekEnd) AND @WeekEnd
+		WHERE #Dates.[CalendarDate] BETWEEN DATEADD(week, -@WholeWeeksToDisplay, @WeekEnd) AND @WeekEnd
 		) calbase;
 
 
@@ -444,9 +444,9 @@ BEGIN TRY
 	INTO #Redems
 	FROM #Calendar cal
 	INNER JOIN Derived.Redemptions r WITH(NOLOCK)
-		ON CAST(r.RedeemDate AS DATE) BETWEEN cal.WeekStart AND cal.WeekEnd
+		ON CAST(#Calendar.[r].RedeemDate AS DATE) BETWEEN cal.WeekStart AND cal.WeekEnd
 	INNER JOIN SLC_Report.dbo.trans t
-		ON r.TranID = t.ID
+		ON #Calendar.[r].TranID = #Calendar.[t].ID
 	INNER JOIN #RedeemItems2 items
 		ON t.ItemID = items.ItemID
 	WHERE r.RedeemType = 'Trade Up'
@@ -489,14 +489,14 @@ BEGIN TRY
 		, i.Description
 		)
 	INSERT INTO Report.Weekly_Card_Redemptions
-		(ReportDate
-		, WeekStart
-		, WeekEnd
-		, WeekID
-		, PartnerID
-		, RedemptionDescription
-		, Redemptions
-		, CurrentStockLevel
+		([Report].[Weekly_Card_Redemptions].[ReportDate]
+		, [Report].[Weekly_Card_Redemptions].[WeekStart]
+		, [Report].[Weekly_Card_Redemptions].[WeekEnd]
+		, [Report].[Weekly_Card_Redemptions].[WeekID]
+		, [Report].[Weekly_Card_Redemptions].[PartnerID]
+		, [Report].[Weekly_Card_Redemptions].[RedemptionDescription]
+		, [Report].[Weekly_Card_Redemptions].[Redemptions]
+		, [Report].[Weekly_Card_Redemptions].[CurrentStockLevel]
 		)
 	SELECT
 		r.ReportDate
@@ -506,19 +506,19 @@ BEGIN TRY
 		, r.PartnerID
 		, r.[Description] AS RedemptionDescription
 		, r.Redemptions
-		, s.CurrentStockLevel
+		, #Redems.[s].CurrentStockLevel
 	FROM #Redems r
 	LEFT JOIN OfferStock s
 		ON r.PartnerID = s.PartnerID
 		AND r.[Description] = s.[Description]
 	WHERE NOT EXISTS
 		(SELECT * FROM Report.Weekly_Card_Redemptions d
-		WHERE r.ReportDate = d.ReportDate
-			AND r.WeekStart = d.WeekStart 
-			AND r.WeekEnd = d.WeekEnd 
-			AND r.WeekID = d.WeekID 
-			AND r.PartnerID = d.PartnerID
-			AND r.[Description] = d.RedemptionDescription
+		WHERE r.ReportDate = #Redems.[d].ReportDate
+			AND r.WeekStart = #Redems.[d].WeekStart 
+			AND r.WeekEnd = #Redems.[d].WeekEnd 
+			AND r.WeekID = #Redems.[d].WeekID 
+			AND r.PartnerID = #Redems.[d].PartnerID
+			AND r.[Description] = #Redems.[d].RedemptionDescription
 		);
 
 
@@ -574,9 +574,9 @@ BEGIN TRY
 		FROM Derived.IronOffer io
 		OUTER APPLY ( -- Get cashback rates
 			SELECT 
-				MIN(CommissionRate) BaseRate
-				, MAX(CommissionRate) SpendStretchRate
-				, MAX(MinimumBasketSize) SpendStretch                           
+				MIN([pcr].[CommissionRate]) BaseRate
+				, MAX([pcr].[CommissionRate]) SpendStretchRate
+				, MAX([pcr].[MinimumBasketSize]) SpendStretch                           
 			FROM Derived.IronOffer_PartnerCommissionRule pcr
 			WHERE pcr.TypeID = 1
 				AND pcr.Status = 1
@@ -586,7 +586,7 @@ BEGIN TRY
 		LEFT JOIN Derived.IronOffer_Campaign_HTM camp
 			ON io.IronOfferID = camp.IronOfferID
 		LEFT JOIN 
-			(SELECT DISTINCT OfferID FROM Derived.PartnerOffers_Base) base
+			(SELECT DISTINCT [Derived].[PartnerOffers_Base].[OfferID] FROM Derived.PartnerOffers_Base) base
 				ON io.IronOfferID = base.OfferID
 		WHERE 
 			io.IsSignedOff = 1 -- Offers signed off
@@ -638,10 +638,10 @@ BEGIN TRY
 	INTO #Cardholders
 	FROM #Members m
 	INNER JOIN SLC_Report.dbo.Pan pan
-		ON m.CompositeID = pan.CompositeID
+		ON m.CompositeID = #Members.[pan].CompositeID
 		AND (	
-				pan.RemovalDate IS NULL -- Card not removed before offer-cycle overlap (card assumed to have already been added as of the day the report is run)
-				OR CAST(pan.RemovalDate AS date) >= @CycleStart 
+				#Members.[pan].RemovalDate IS NULL -- Card not removed before offer-cycle overlap (card assumed to have already been added as of the day the report is run)
+				OR CAST(#Members.[pan].RemovalDate AS date) >= @CycleStart 
 			)
 		--AND (
 				--pan.DuplicationDate IS NULL -- Card not duplicated before offer-cycle overlap
@@ -692,21 +692,21 @@ BEGIN TRY
 	-- Union results and populate Warehouse.MI.Cycle_Live_OffersCardholders table
 	TRUNCATE TABLE Report.Cycle_Live_OffersCardholders;
  	INSERT INTO Report.Cycle_Live_OffersCardholders
-		(ReportDate
-		, CycleStart
-		, CycleEnd
-		, ClubID
-		, PartnerID
-		, IronOfferID
-		, IronOfferName
-		, OfferStartDate
-		, OfferEndDate
-		, BaseRate
-		, SpendStretch
-		, SpendStretchRate
-		, IsBaseOffer
-		, CampaignCode
-		, Cardholders
+		([Report].[Cycle_Live_OffersCardholders].[ReportDate]
+		, [Report].[Cycle_Live_OffersCardholders].[CycleStart]
+		, [Report].[Cycle_Live_OffersCardholders].[CycleEnd]
+		, [Report].[Cycle_Live_OffersCardholders].[ClubID]
+		, [Report].[Cycle_Live_OffersCardholders].[PartnerID]
+		, [Report].[Cycle_Live_OffersCardholders].[IronOfferID]
+		, [Report].[Cycle_Live_OffersCardholders].[IronOfferName]
+		, [Report].[Cycle_Live_OffersCardholders].[OfferStartDate]
+		, [Report].[Cycle_Live_OffersCardholders].[OfferEndDate]
+		, [Report].[Cycle_Live_OffersCardholders].[BaseRate]
+		, [Report].[Cycle_Live_OffersCardholders].[SpendStretch]
+		, [Report].[Cycle_Live_OffersCardholders].[SpendStretchRate]
+		, [Report].[Cycle_Live_OffersCardholders].[IsBaseOffer]
+		, [Report].[Cycle_Live_OffersCardholders].[CampaignCode]
+		, [Report].[Cycle_Live_OffersCardholders].[Cardholders]
 		)
 
 	SELECT 
@@ -755,7 +755,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

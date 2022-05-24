@@ -34,10 +34,10 @@ BEGIN
 		*******************************************************************************************************************************************/
 			   
 			IF OBJECT_ID('tempdb..#Customer') IS NOT NULL DROP TABLE #Customer
-			SELECT	FanID
-				,	RegistrationDate
-				,	DeactivatedDate
-				,	ClosedDate
+			SELECT	[cu].[FanID]
+				,	[cu].[RegistrationDate]
+				,	[cu].[DeactivatedDate]
+				,	[cu].[ClosedDate]
 			INTO #Customer
 			FROM [WHB].[Customer] cu
 
@@ -48,11 +48,11 @@ BEGIN
 			2.	Update Registration Dates of all accounts in [Derived].[Customer_ActivationHistory]
 		*******************************************************************************************************************************************/
 
-			INSERT INTO [Derived].[Customer_ActivationHistory] (FanID
-															  ,	ActionDate
-															  , ActionType)
-			SELECT	FanID
-				,	RegistrationDate
+			INSERT INTO [Derived].[Customer_ActivationHistory] ([Derived].[Customer_ActivationHistory].[FanID]
+															  ,	[Derived].[Customer_ActivationHistory].[ActionDate]
+															  , [Derived].[Customer_ActivationHistory].[ActionType])
+			SELECT	[cu].[FanID]
+				,	[cu].[RegistrationDate]
 				,	'Registration' AS ActionType
 			FROM #Customer cu
 			WHERE NOT EXISTS (	SELECT 1
@@ -65,47 +65,47 @@ BEGIN
 			3.	Update Deactivated Dates of all accounts in [Derived].[Customer_ActivationHistory]
 		*******************************************************************************************************************************************/
 
-			INSERT INTO [Derived].[Customer_ActivationHistory] (FanID
-															  ,	ActionDate
-															  , ActionType)
-			SELECT	FanID
-				,	DeactivatedDate
+			INSERT INTO [Derived].[Customer_ActivationHistory] ([Derived].[Customer_ActivationHistory].[FanID]
+															  ,	[Derived].[Customer_ActivationHistory].[ActionDate]
+															  , [Derived].[Customer_ActivationHistory].[ActionType])
+			SELECT	[cu].[FanID]
+				,	[cu].[DeactivatedDate]
 				,	'Deactivated' AS ActionType
 			FROM #Customer cu
 			WHERE NOT EXISTS (	SELECT 1
 								FROM [Derived].[Customer_ActivationHistory] ah
 								WHERE cu.FanID = ah.FanID
 								AND cu.DeactivatedDate = ah.ActionDate)
-			AND DeactivatedDate IS NOT NULL
+			AND [cu].[DeactivatedDate] IS NOT NULL
 
 
 		/*******************************************************************************************************************************************
 			4.	Update Closed Dates of all accounts in [Derived].[Customer_ActivationHistory]
 		*******************************************************************************************************************************************/
 
-			INSERT INTO [Derived].[Customer_ActivationHistory] (FanID
-															  ,	ActionDate
-															  , ActionType)
-			SELECT	FanID
-				,	ClosedDate
+			INSERT INTO [Derived].[Customer_ActivationHistory] ([Derived].[Customer_ActivationHistory].[FanID]
+															  ,	[Derived].[Customer_ActivationHistory].[ActionDate]
+															  , [Derived].[Customer_ActivationHistory].[ActionType])
+			SELECT	[cu].[FanID]
+				,	[cu].[ClosedDate]
 				,	'Closed' AS ActionType
 			FROM #Customer cu
 			WHERE NOT EXISTS (	SELECT 1
 								FROM [Derived].[Customer_ActivationHistory] ah
 								WHERE cu.FanID = ah.FanID
 								AND cu.ClosedDate = ah.ActionDate)
-			AND ClosedDate IS NOT NULL
+			AND [cu].[ClosedDate] IS NOT NULL
 
 
 		/*******************************************************************************************************************************************
 			5.	Update Reactivation Dates of all accounts in [Derived].[Customer_ActivationHistory]
 		*******************************************************************************************************************************************/
 
-			INSERT INTO [Derived].[Customer_ActivationHistory] (FanID
-															  ,	ActionDate
-															  , ActionType)
-			SELECT	FanID
-				,	RegistrationDate
+			INSERT INTO [Derived].[Customer_ActivationHistory] ([Derived].[Customer_ActivationHistory].[FanID]
+															  ,	[Derived].[Customer_ActivationHistory].[ActionDate]
+															  , [Derived].[Customer_ActivationHistory].[ActionType])
+			SELECT	[cu].[FanID]
+				,	[cu].[RegistrationDate]
 				,	'Reactivation' AS ActionType
 			FROM #Customer cu
 			WHERE NOT EXISTS (	SELECT 1
@@ -120,42 +120,42 @@ BEGIN
 
 			
 			IF OBJECT_ID('tempdb..#Customer_ActivationHistory') IS NOT NULL DROP TABLE #Customer_ActivationHistory
-			SELECT	FanID
-				,	ActionType
-				,	ActionDate
-				,	ROW_NUMBER() OVER (PARTITION BY FanID ORDER BY ActionDate DESC) AS ActionRank
+			SELECT	[Derived].[Customer_ActivationHistory].[FanID]
+				,	[Derived].[Customer_ActivationHistory].[ActionType]
+				,	[Derived].[Customer_ActivationHistory].[ActionDate]
+				,	ROW_NUMBER() OVER (PARTITION BY [Derived].[Customer_ActivationHistory].[FanID] ORDER BY [Derived].[Customer_ActivationHistory].[ActionDate] DESC) AS ActionRank
 			INTO #Customer_ActivationHistory
 			FROM [Derived].[Customer_ActivationHistory]
 			
 			--DECLARE @RunDate DATE = GETDATE()
 
-			INSERT INTO [Derived].[Customer_ActivationHistory] (FanID
-															  ,	ActionDate
-															  , ActionType)
-			SELECT	FanID
+			INSERT INTO [Derived].[Customer_ActivationHistory] ([Derived].[Customer_ActivationHistory].[FanID]
+															  ,	[Derived].[Customer_ActivationHistory].[ActionDate]
+															  , [Derived].[Customer_ActivationHistory].[ActionType])
+			SELECT	[cu].[FanID]
 				,	@RunDate
 				,	'Reactivation' AS ActionType
 			FROM #Customer cu
 			WHERE EXISTS (	SELECT 1
 							FROM #Customer_ActivationHistory ah
-							WHERE cu.FanID = ah.FanID
+							WHERE #Customer_ActivationHistory.[cu].FanID = ah.FanID
 							AND ah.ActionRank = 1
 							AND ah.ActionType IN ('Deactivated'))
-			AND DeactivatedDate IS NULL
+			AND [cu].[DeactivatedDate] IS NULL
 
-			INSERT INTO [Derived].[Customer_ActivationHistory] (FanID
-															  ,	ActionDate
-															  , ActionType)
-			SELECT	FanID
+			INSERT INTO [Derived].[Customer_ActivationHistory] ([Derived].[Customer_ActivationHistory].[FanID]
+															  ,	[Derived].[Customer_ActivationHistory].[ActionDate]
+															  , [Derived].[Customer_ActivationHistory].[ActionType])
+			SELECT	[cu].[FanID]
 				,	@RunDate
 				,	'Reactivation' AS ActionType
 			FROM #Customer cu
 			WHERE EXISTS (	SELECT 1
 							FROM #Customer_ActivationHistory ah
-							WHERE cu.FanID = ah.FanID
+							WHERE #Customer_ActivationHistory.[cu].FanID = ah.FanID
 							AND ah.ActionRank = 1
 							AND ah.ActionType IN ('Closed'))
-			AND ClosedDate IS NULL
+			AND [cu].[ClosedDate] IS NULL
 	
 			EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Finished'
 
@@ -177,7 +177,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

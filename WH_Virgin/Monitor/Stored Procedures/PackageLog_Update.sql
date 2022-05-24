@@ -38,18 +38,18 @@ BEGIN
 		SELECT TOP 1
 			*
 		FROM Monitor.Package_Log pls
-		WHERE RunID = @RunID
-			AND SourceID = @SourceID
+		WHERE [pls].[RunID] = @RunID
+			AND [pls].[SourceID] = @SourceID
 			AND pls.PackageID = @PackageID
 		ORDER BY pls.RunStartDateTime DESC
 	)
 	UPDATE LatestLog
-	SET RunEndDateTime = GETDATE()
-	  , RowCnt = NULLIF(@RowCnt, -1)
-	WHERE RunID = @RunID
-		AND SourceID = @SourceID
-		AND PackageID = @PackageID
-		AND RunEndDateTime IS NULL
+	SET [Monitor].[Package_Log].[RunEndDateTime] = GETDATE()
+	  , [Monitor].[Package_Log].[RowCnt] = NULLIF(@RowCnt, -1)
+	WHERE [Monitor].[Package_Log].[RunID] = @RunID
+		AND [Monitor].[Package_Log].[SourceID] = @SourceID
+		AND [Monitor].[Package_Log].[PackageID] = @PackageID
+		AND [Monitor].[Package_Log].[RunEndDateTime] IS NULL
 
 	RETURN -1 -- Sets logging rowcount to -1 so that steps that do not require rowcount logging are set to NULL rather than 0
 

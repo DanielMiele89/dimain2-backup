@@ -66,8 +66,8 @@ Begin
 
 			Delete
 			From [Email].[Newsletter_OfferPrioritisation_Import]
-			Where IronOfferID Is Null
-			And PartnerName Is Null
+			Where [Email].[Newsletter_OfferPrioritisation_Import].[IronOfferID] Is Null
+			And [Email].[Newsletter_OfferPrioritisation_Import].[PartnerName] Is Null
 													 
 
 		/***********************************************************************************************************************
@@ -75,10 +75,10 @@ Begin
 		***********************************************************************************************************************/
 
 			IF Object_ID('tempdb..#OfferDetailsFromOPE') Is Not Null Drop Table #OfferDetailsFromOPE
-			Select IronOfferID as OfferID
+			Select [eo].[IronOfferID] as OfferID
 				 , 1001 - ROW_NUMBER() over (order by (select null)) as Weighting
 				 , Case
-						When IronOfferName like 'Core %' or BaseOffer like 'Core %' then 1
+						When [eo].[IronOfferName] like 'Core %' or [eo].[BaseOffer] like 'Core %' then 1
 						Else 0
 				   End as Base
 			Into #OfferDetailsFromOPE
@@ -95,14 +95,14 @@ Begin
 		
 			If Object_ID('tempdb..#CampaignSetup') Is Not Null Drop Table #CampaignSetup
 			SELECT @EmailDate AS EmailDate
-				 , ClientServicesRef
+				 , [cs].[ClientServicesRef]
 				 , iof.Item AS IronOfferID
 			INTO #CampaignSetup
-			FROM (SELECT ClientServicesRef
-				  	   , OfferID
+			FROM (SELECT [Selections].[CampaignSetup_POS].[ClientServicesRef]
+				  	   , [Selections].[CampaignSetup_POS].[OfferID]
 				  FROM [Selections].[CampaignSetup_POS]
-				  WHERE @EmailDate BETWEEN StartDate And EndDate) cs
-				  CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (OfferID, ',') iof
+				  WHERE @EmailDate BETWEEN [Selections].[CampaignSetup_POS].[StartDate] And [Selections].[CampaignSetup_POS].[EndDate]) cs
+				  CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] ([cs].[OfferID], ',') iof
 			WHERE iof.Item > 0
 
 
@@ -116,19 +116,19 @@ Begin
 
 			IF Object_ID('tempdb..#OffersDuplicatedInOPE') Is Not Null Drop Table #OffersDuplicatedInOPE
 			Select ope.OfferID as IronOfferID
-				 , Min(Weighting) as MinWeighting
+				 , Min([ope].[Weighting]) as MinWeighting
 			Into #OffersDuplicatedInOPE
 			From #OfferDetailsFromOPE ope
 			Group by ope.OfferID
 			Having Count(1) > 1
 
-			Insert Into #Newsletter_OfferPrioritisation_Errors (IronOfferID
-														, IronOfferName
-														, StartDate
-														, EndDate
-														, PartnerID
-														, NewOffer
-														, Duplicated)
+			Insert Into #Newsletter_OfferPrioritisation_Errors (#Newsletter_OfferPrioritisation_Errors.[IronOfferID]
+														, #Newsletter_OfferPrioritisation_Errors.[IronOfferName]
+														, #Newsletter_OfferPrioritisation_Errors.[StartDate]
+														, #Newsletter_OfferPrioritisation_Errors.[EndDate]
+														, #Newsletter_OfferPrioritisation_Errors.[PartnerID]
+														, #Newsletter_OfferPrioritisation_Errors.[NewOffer]
+														, #Newsletter_OfferPrioritisation_Errors.[Duplicated])
 			Select i.ID as IronOfferID
 				 , i.Name as IronOfferName
 				 , i.StartDate
@@ -148,13 +148,13 @@ Begin
 			3.2. Offers going live that are not in the OPE
 		***********************************************************************************************************************/
 
-			Insert Into #Newsletter_OfferPrioritisation_Errors (IronOfferID
-														, IronOfferName
-														, StartDate
-														, EndDate
-														, PartnerID
-														, NewOffer
-														, OfferMissingFromOPE)
+			Insert Into #Newsletter_OfferPrioritisation_Errors (#Newsletter_OfferPrioritisation_Errors.[IronOfferID]
+														, #Newsletter_OfferPrioritisation_Errors.[IronOfferName]
+														, #Newsletter_OfferPrioritisation_Errors.[StartDate]
+														, #Newsletter_OfferPrioritisation_Errors.[EndDate]
+														, #Newsletter_OfferPrioritisation_Errors.[PartnerID]
+														, #Newsletter_OfferPrioritisation_Errors.[NewOffer]
+														, #Newsletter_OfferPrioritisation_Errors.[OfferMissingFromOPE])
 			Select Distinct 
 				   i.ID as IronOfferID
 				 , i.Name as IronOfferName
@@ -173,11 +173,11 @@ Begin
 			and i.IsDefaultCollateral = 0
 			and not exists (Select 1
 							From #OfferDetailsFromOPE op
-							Where i.ID = op.OfferID)
+							Where #OfferDetailsFromOPE.[i].ID = op.OfferID)
 			------ Constant Exclusions
 			and i.PartnerID not in (4498,4497,4642)											-- Credit Cards
 			and i.PartnerID not in (4648)													-- Direct Debit
-			and i.PartnerID not in (Select PartnerID from Warehouse.APW.PartnerAlternate)	-- Secondary Partner Recorda
+			and i.PartnerID not in (Select #IronOffer.[PartnerID] from Warehouse.APW.PartnerAlternate)	-- Secondary Partner Recorda
 			and i.ID not in (315,371,372,373,379,380,381,382,383,384,385,386,387,	-- Thomson & First Choice offers with last OfferMember date 2013-07-24
 							  388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,
 							  403,404,405,406,407,408,409,410,426,427,428,429,430,431,432,
@@ -194,13 +194,13 @@ Begin
 			3.3. Offers in the OPE that are not in IronOffer
 		***********************************************************************************************************************/
 
-			Insert Into #Newsletter_OfferPrioritisation_Errors (IronOfferID
-														, IronOfferName
-														, StartDate
-														, EndDate
-														, PartnerID
-														, NewOffer
-														, OfferInOPENotInIronOffer)
+			Insert Into #Newsletter_OfferPrioritisation_Errors (#Newsletter_OfferPrioritisation_Errors.[IronOfferID]
+														, #Newsletter_OfferPrioritisation_Errors.[IronOfferName]
+														, #Newsletter_OfferPrioritisation_Errors.[StartDate]
+														, #Newsletter_OfferPrioritisation_Errors.[EndDate]
+														, #Newsletter_OfferPrioritisation_Errors.[PartnerID]
+														, #Newsletter_OfferPrioritisation_Errors.[NewOffer]
+														, #Newsletter_OfferPrioritisation_Errors.[OfferInOPENotInIronOffer])
 			Select op.OfferID as IronOfferID
 				 , 'Offer not found in IronOffer table' as IronOfferName
 				 , Null as StartDate
@@ -211,20 +211,20 @@ Begin
 			From #OfferDetailsFromOPE op
 			Where Not Exists (Select 1
 							  From #IronOffer iof
-							  Where op.OfferID = iof.ID)
+							  Where #IronOffer.[op].OfferID = iof.ID)
 			
 
 		/***********************************************************************************************************************
 			3.4. Offers ending before the cycle end date
 		***********************************************************************************************************************/
 
-			Insert Into #Newsletter_OfferPrioritisation_Errors (IronOfferID
-														, IronOfferName
-														, StartDate
-														, EndDate
-														, PartnerID
-														, NewOffer
-														, EndBeforeCycleEnds)
+			Insert Into #Newsletter_OfferPrioritisation_Errors (#Newsletter_OfferPrioritisation_Errors.[IronOfferID]
+														, #Newsletter_OfferPrioritisation_Errors.[IronOfferName]
+														, #Newsletter_OfferPrioritisation_Errors.[StartDate]
+														, #Newsletter_OfferPrioritisation_Errors.[EndDate]
+														, #Newsletter_OfferPrioritisation_Errors.[PartnerID]
+														, #Newsletter_OfferPrioritisation_Errors.[NewOffer]
+														, #Newsletter_OfferPrioritisation_Errors.[EndBeforeCycleEnds])
 			Select iof.ID as IronOfferID
 				 , iof.Name as IronOfferName
 				 , iof.StartDate as StartDate
@@ -245,13 +245,13 @@ Begin
 			3.5. Offers starting after the cycle start date
 		***********************************************************************************************************************/
 
-			Insert Into #Newsletter_OfferPrioritisation_Errors (IronOfferID
-														, IronOfferName
-														, StartDate
-														, EndDate
-														, PartnerID
-														, NewOffer
-														, StartAfterCycleStart)
+			Insert Into #Newsletter_OfferPrioritisation_Errors (#Newsletter_OfferPrioritisation_Errors.[IronOfferID]
+														, #Newsletter_OfferPrioritisation_Errors.[IronOfferName]
+														, #Newsletter_OfferPrioritisation_Errors.[StartDate]
+														, #Newsletter_OfferPrioritisation_Errors.[EndDate]
+														, #Newsletter_OfferPrioritisation_Errors.[PartnerID]
+														, #Newsletter_OfferPrioritisation_Errors.[NewOffer]
+														, #Newsletter_OfferPrioritisation_Errors.[StartAfterCycleStart])
 			Select iof.ID as IronOfferID
 				 , iof.Name as IronOfferName
 				 , iof.StartDate as StartDate
@@ -272,13 +272,13 @@ Begin
 			3.6. Offers that are in the OPE but are not in the CampaignSetup_POS table 
 		***********************************************************************************************************************/
 
-			Insert Into #Newsletter_OfferPrioritisation_Errors (IronOfferID
-														, IronOfferName
-														, StartDate
-														, EndDate
-														, PartnerID
-														, NewOffer
-														, OfferInOPEMissingFromSelections)
+			Insert Into #Newsletter_OfferPrioritisation_Errors (#Newsletter_OfferPrioritisation_Errors.[IronOfferID]
+														, #Newsletter_OfferPrioritisation_Errors.[IronOfferName]
+														, #Newsletter_OfferPrioritisation_Errors.[StartDate]
+														, #Newsletter_OfferPrioritisation_Errors.[EndDate]
+														, #Newsletter_OfferPrioritisation_Errors.[PartnerID]
+														, #Newsletter_OfferPrioritisation_Errors.[NewOffer]
+														, #Newsletter_OfferPrioritisation_Errors.[OfferInOPEMissingFromSelections])
 			Select op.OfferID as IronOfferID
 				 , iof.Name as IronOfferName
 				 , iof.StartDate as StartDate
@@ -294,22 +294,22 @@ Begin
 				on op.OfferID = iof.ID
 			Where Not Exists (Select 1
 							  From #CampaignSetup cs
-							  Where op.OfferID = cs.IronOfferID
-							  Or op.Base = 1
-							  Or op.OfferID = 14011)
+							  Where #CampaignSetup.[op].OfferID = cs.IronOfferID
+							  Or #CampaignSetup.[op].Base = 1
+							  Or #CampaignSetup.[op].OfferID = 14011)
 			
 
 		/***********************************************************************************************************************
 			3.7. Offers that are in the CampaignSetup_POS table but are not in the OPE
 		***********************************************************************************************************************/
 
-			Insert Into #Newsletter_OfferPrioritisation_Errors (IronOfferID
-														, IronOfferName
-														, StartDate
-														, EndDate
-														, PartnerID
-														, NewOffer
-														, OfferInSelectionsMissingFromOPE)
+			Insert Into #Newsletter_OfferPrioritisation_Errors (#Newsletter_OfferPrioritisation_Errors.[IronOfferID]
+														, #Newsletter_OfferPrioritisation_Errors.[IronOfferName]
+														, #Newsletter_OfferPrioritisation_Errors.[StartDate]
+														, #Newsletter_OfferPrioritisation_Errors.[EndDate]
+														, #Newsletter_OfferPrioritisation_Errors.[PartnerID]
+														, #Newsletter_OfferPrioritisation_Errors.[NewOffer]
+														, #Newsletter_OfferPrioritisation_Errors.[OfferInSelectionsMissingFromOPE])
 			Select als.IronOfferID
 				 , iof.Name as IronOfferName
 				 , iof.StartDate as StartDate
@@ -325,7 +325,7 @@ Begin
 				on als.IronOfferID = iof.ID
 			Where Not Exists (Select 1
 							  From #OfferDetailsFromOPE op
-							  Where op.OfferID = als.IronOfferID)
+							  Where op.OfferID = #OfferDetailsFromOPE.[als].IronOfferID)
 
 
 	/*******************************************************************************************************************************************
@@ -333,44 +333,44 @@ Begin
 	*******************************************************************************************************************************************/
 	
 		If Object_ID('tempdb..##Newsletter_OfferPrioritisation_Errors') Is Not Null Drop Table ##Newsletter_OfferPrioritisation_Errors
-		Select IronOfferID
-			 , IronOfferName
-			 , StartDate
-			 , EndDate
-			 , PartnerID
-			 , NewOffer
-			 , Replace(Left(Status, Len(Status) - 1), ', Offer', ',') as Status
+		Select [owe].[IronOfferID]
+			 , [owe].[IronOfferName]
+			 , [owe].[StartDate]
+			 , [owe].[EndDate]
+			 , [owe].[PartnerID]
+			 , [owe].[NewOffer]
+			 , Replace(Left([owe].[Status], Len([owe].[Status]) - 1), ', Offer', ',') as Status
 		INTO ##Newsletter_OfferPrioritisation_Errors
-		From (Select IronOfferID
-	  			   , IronOfferName
-	  			   , StartDate
-	  			   , EndDate
-	  			   , PartnerID
-	  			   , NewOffer
-	  			   , Case When Max(Duplicated) = 1 Then 'Offer duplicated in OPE, ' Else '' End
+		From (Select #Newsletter_OfferPrioritisation_Errors.[IronOfferID]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[IronOfferName]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[StartDate]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[EndDate]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[PartnerID]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[NewOffer]
+	  			   , Case When Max(#Newsletter_OfferPrioritisation_Errors.[Duplicated]) = 1 Then 'Offer duplicated in OPE, ' Else '' End
 	  				 +
-	  				 Case When Max(EndBeforeCycleEnds) = 1 Then 'Offer ends before cycle ends, ' Else '' End
+	  				 Case When Max(#Newsletter_OfferPrioritisation_Errors.[EndBeforeCycleEnds]) = 1 Then 'Offer ends before cycle ends, ' Else '' End
 	  				 +
-	  				 Case When Max(StartAfterCycleStart) = 1 Then 'Offer starts after cycle starts, ' Else '' End
+	  				 Case When Max(#Newsletter_OfferPrioritisation_Errors.[StartAfterCycleStart]) = 1 Then 'Offer starts after cycle starts, ' Else '' End
 	  				 +
-	  				 Case When Max(OfferMissingFromOPE) = 1 Then 'Offer not listed in the OPE, ' Else '' End
+	  				 Case When Max(#Newsletter_OfferPrioritisation_Errors.[OfferMissingFromOPE]) = 1 Then 'Offer not listed in the OPE, ' Else '' End
 	  				 +
-	  				 Case When Max(OfferInOPENotInIronOffer) = 1 Then 'Offer in the OPE but not found in IronOffer table, ' Else '' End
+	  				 Case When Max(#Newsletter_OfferPrioritisation_Errors.[OfferInOPENotInIronOffer]) = 1 Then 'Offer in the OPE but not found in IronOffer table, ' Else '' End
 	  				 +
-	  				 Case When Max(OfferInOPEMissingFromSelections) = 1 Then 'Offer in the OPE but not set up for selection, ' Else '' End
+	  				 Case When Max(#Newsletter_OfferPrioritisation_Errors.[OfferInOPEMissingFromSelections]) = 1 Then 'Offer in the OPE but not set up for selection, ' Else '' End
 	  				 +
-	  				 Case When Max(OfferInSelectionsMissingFromOPE) = 1 Then 'Offer set up for selection but not in the OPE, ' Else '' End as Status
+	  				 Case When Max(#Newsletter_OfferPrioritisation_Errors.[OfferInSelectionsMissingFromOPE]) = 1 Then 'Offer set up for selection but not in the OPE, ' Else '' End as Status
 			  From #Newsletter_OfferPrioritisation_Errors
-			  Group by IronOfferID
-	  			   , IronOfferName
-	  			   , StartDate
-	  			   , EndDate
-	  			   , PartnerID
-	  			   , NewOffer) owe
+			  Group by #Newsletter_OfferPrioritisation_Errors.[IronOfferID]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[IronOfferName]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[StartDate]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[EndDate]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[PartnerID]
+	  			   , #Newsletter_OfferPrioritisation_Errors.[NewOffer]) owe
 
 		UPDATE ##Newsletter_OfferPrioritisation_Errors
-		SET Status = 'Offer not listed in the OPE'
-		WHERE Status = 'Offer not listed in the OPE, set up for selection but not in the OPE'
+		SET ##Newsletter_OfferPrioritisation_Errors.[Status] = 'Offer not listed in the OPE'
+		WHERE ##Newsletter_OfferPrioritisation_Errors.[Status] = 'Offer not listed in the OPE, set up for selection but not in the OPE'
 				   
 
 	/*******************************************************************************************************************************************
@@ -382,8 +382,8 @@ Begin
 		Into #nFI_Offers
 		From #IronOffer iof
 		Inner join [DIMAIN_TR].[SLC_REPL].[dbo].[IronOfferClub] ioc
-			on iof.ID = ioc.IronOfferID
-		Where ClubID Not In (166)
+			on iof.ID = #IronOffer.[ioc].IronOfferID
+		Where #IronOffer.[ClubID] Not In (166)
 				   
 
 	/*******************************************************************************************************************************************
@@ -440,21 +440,21 @@ Begin
 
 		Delete
 		From [Email].[Newsletter_OfferPrioritisation]
-		Where EmailDate = @EmailDate
+		Where [Email].[Newsletter_OfferPrioritisation].[EmailDate] = @EmailDate
 
 		INSERT INTO [Email].[Newsletter_OfferPrioritisation]
-		Select iof.PartnerID
+		Select #OfferDetailsFromOPE.[iof].PartnerID
 			 , op.OfferID
 			 , op.Weighting
 			 , op.Base
 			 , Case
-					When StartDate >= GetDate() Or StartDate Is Null Then 1
+					When #OfferDetailsFromOPE.[StartDate] >= GetDate() Or #OfferDetailsFromOPE.[StartDate] Is Null Then 1
 					Else 0
 			   End as NewOffer
 			 , @EmailDate as EmailDate
 		From #OfferDetailsFromOPE op
 		Left join [DIMAIN_TR].[SLC_REPL].[dbo].[IronOffer] iof
-			on op.OfferID = iof.ID
+			on op.OfferID = #OfferDetailsFromOPE.[iof].ID
 
 	/*******************************************************************************************************************************************
 		9. Insert all entries of OPE to a reviewd table, listing errors where applicable

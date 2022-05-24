@@ -56,5 +56,5 @@ CREATE TRIGGER [Trans].[Trigger_ConsumerCombination_ModifiedDate]
 ON [WH_Virgin].[Trans].[ConsumerCombination]
 AFTER UPDATE AS
 	UPDATE [WH_Virgin].[Trans].[ConsumerCombination]
-	SET ModifiedDate = GETDATE()
-	WHERE ConsumerCombinationID IN (SELECT ConsumerCombinationID FROM inserted);
+	SET [WH_Virgin].[Trans].[ConsumerCombination].[ModifiedDate] = GETDATE()
+	WHERE [WH_Virgin].[Trans].[ConsumerCombination].[ConsumerCombinationID] IN (SELECT [WH_Virgin].[Trans].[ConsumerCombination].[ConsumerCombinationID] FROM inserted);

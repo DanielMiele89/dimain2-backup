@@ -50,23 +50,23 @@ BEGIN TRY
 	-------------------------------------------------------------------------------
 	--Find the change of email address entry in the change log
 	if object_id('tempdb..#NewEmail_Fans') is not null drop table #NewEmail_Fans
-	Select Distinct iad.FanID
+	Select Distinct #HBDate.[iad].FanID
 	Into #NewEmail_Fans
 	from Staging.InsightArchiveData as iad
 	inner join #HBDate as h
-		on	iad.FanID = h.FanID and
-			typeID = 2
-	Where	iad.[Date] > h.HB_Date and -- changelog entry must be after HardBounce
-			hb_Date >= 'Mar 01, 2014' /* This is so we don;t start emailing 
+		on	#HBDate.[iad].FanID = h.FanID and
+			#HBDate.[typeID] = 2
+	Where	#HBDate.[iad].[Date] > h.HB_Date and -- changelog entry must be after HardBounce
+			[h].[HB_Date] >= 'Mar 01, 2014' /* This is so we don;t start emailing 
 										 someone from to long ago*/
 	-------------------------------------------------------------------------------
 	----------------Change HardBounce Value then Marketablebyemail-----------------
 	-------------------------------------------------------------------------------
 	--Update Hardbounce and MarketbleByEmail for all those in the previously created list
 	Update Derived.Customer
-	Set Hardbounced = 0,
-		MarketableByEmail = 1
-	Where FanID in (Select Fanid from #NewEmail_Fans)
+	Set [Derived].[Customer].[Hardbounced] = 0,
+		[Derived].[Customer].[MarketableByEmail] = 1
+	Where [Derived].[Customer].[FanID] in (Select #NewEmail_Fans.[FanID] from #NewEmail_Fans)
 
 	/****************************************************************************************************/
 	-------------------------------------------------------------------------------
@@ -120,9 +120,9 @@ BEGIN TRY
 	-------------------------------------------------------------------------------
 	--Update Hardbounce and MarketbleByEmail for all those in the previously created list
 	Update Derived.Customer
-	Set Hardbounced = 0,
-		MarketableByEmail = 1
-	Where FanID in (Select Fanid from #ReEngaged)
+	Set [Derived].[Customer].[Hardbounced] = 0,
+		[Derived].[Customer].[MarketableByEmail] = 1
+	Where [Derived].[Customer].[FanID] in (Select #ReEngaged.[FanID] from #ReEngaged)
 
 
 
@@ -145,7 +145,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

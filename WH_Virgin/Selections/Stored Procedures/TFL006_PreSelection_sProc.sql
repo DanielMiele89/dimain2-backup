@@ -138,10 +138,10 @@ and AccountType IS NOT NULL
 
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-SELECT ConsumerCombinationID
+SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
 INTO #CC
 FROM	WH_Virgin.trans.ConsumerCombination  CC
-WHERE	BrandID IN (1488,1872,1753,1078,2204,326,3301)					
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN (1488,1872,1753,1078,2204,326,3301)					
 
 
 
@@ -149,7 +149,7 @@ IF OBJECT_ID('tempdb..#compshopper') IS NOT NULL DROP TABLE #compshopper
 SELECT	F.CINID
 INTO	#compshopper
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB F ON F.CINID = CT.CINID
+JOIN	#FB F ON F.CINID = #FB.[CT].CINID
 JOIN	#CC C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	TranDate > DATEADD(MONTH, -6, GETDATE())
 		AND Amount > 0
@@ -159,27 +159,27 @@ IF OBJECT_ID('tempdb..#brandshopper') IS NOT NULL DROP TABLE #brandshopper
 SELECT	F.CINID
 INTO	#brandshopper
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB F ON F.CINID = CT.CINID
-JOIN	(SELECT ConsumerCombinationID
+JOIN	#FB F ON F.CINID = #FB.[CT].CINID
+JOIN	(SELECT [WH_Virgin].[Trans].[ConsumerCombination].[ConsumerCombinationID]
 FROM	WH_Virgin.Trans.ConsumerCombination  CC
-WHERE	BrandID IN (3325)) CC 	ON CC.ConsumerCombinationID = CT.ConsumerCombinationID
-WHERE	TranDate > DATEADD(MONTH, -13, GETDATE())
-		AND Amount > 0
+WHERE	[WH_Virgin].[Trans].[ConsumerCombination].[BrandID] IN (3325)) CC 	ON #FB.[CC].ConsumerCombinationID = #FB.[CT].ConsumerCombinationID
+WHERE	#FB.[TranDate] > DATEADD(MONTH, -13, GETDATE())
+		AND #FB.[Amount] > 0
 GROUP BY F.CINID
 
 
 IF OBJECT_ID('tempdb..#exclude') IS NOT NULL DROP TABLE #exclude
-SELECT	CINID
+SELECT	#brandshopper.[CINID]
 INTO	#exclude
 FROM	#brandshopper
-where cinid not in (select cinid from #compshopper)
+where #brandshopper.[CINID] not in (select #compshopper.[CINID] from #compshopper)
 
 
 IF OBJECT_ID('Sandbox.bastienc.Virgin_thortful') IS NOT NULL DROP TABLE Sandbox.bastienc.Virgin_thortful
-SELECT	distinct CINID
+SELECT	distinct #fb.[CINID]
 INTO Sandbox.bastienc.Virgin_thortful
 FROM  #fb 
-where cinid not in (select cinid from #exclude)
+where #fb.[CINID] not in (select #exclude.[CINID] from #exclude)
 
 
 
@@ -190,11 +190,11 @@ where cinid not in (select cinid from #exclude)
 
 
 IF OBJECT_ID('[WH_Virgin].[Selections].[TFL006_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[TFL006_PreSelection]
-SELECT	FanID
+SELECT	[fb].[FanID]
 INTO [WH_Virgin].[Selections].[TFL006_PreSelection]
 FROM #FB fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.bastienc.Virgin_thortful t
-				WHERE fb.CINID = t.CINID)
+				WHERE fb.CINID = #FB.[t].CINID)
 
 END;

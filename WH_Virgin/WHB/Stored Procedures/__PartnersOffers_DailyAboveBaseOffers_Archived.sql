@@ -28,7 +28,7 @@ BEGIN TRY
 			E1 AS (SELECT n = 0 FROM (VALUES (0),(0),(0),(0),(0),(0),(0),(0),(0),(0)) d (n)),
 			E2 AS (SELECT n = 0 FROM E1 a, E1 b),
 			Numbers AS (SELECT TOP(@OutputCount) n = CAST(ROW_NUMBER() OVER(ORDER BY (SELECT NULL)) AS INT) FROM E2 a, E2 b)
-		SELECT ID = n, StartDate = DATEADD(DAY,1-n,CAST(GETDATE() AS DATE)) 
+		SELECT ID = [Numbers].[n], StartDate = DATEADD(DAY,1-[Numbers].[n],CAST(GETDATE() AS DATE)) 
 		INTO #Calendar 
 		FROM Numbers
 		OPTION (OPTIMIZE FOR (@OutputCount = 2559));
@@ -37,7 +37,7 @@ BEGIN TRY
 
 
 		TRUNCATE TABLE Derived.Partner_AboveBaseOffers_PerDay
-		INSERT INTO Derived.Partner_AboveBaseOffers_PerDay (DayDate, PartnerID, AboveBaseOffer)
+		INSERT INTO Derived.Partner_AboveBaseOffers_PerDay ([Derived].[Partner_AboveBaseOffers_PerDay].[DayDate], [Derived].[Partner_AboveBaseOffers_PerDay].[PartnerID], [Derived].[Partner_AboveBaseOffers_PerDay].[AboveBaseOffer])
 		SELECT 
 			DayDate = cp.StartDate,
 			cp.PartnerID,
@@ -79,7 +79,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

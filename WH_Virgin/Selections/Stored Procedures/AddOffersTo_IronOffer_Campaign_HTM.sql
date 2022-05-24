@@ -17,17 +17,17 @@ BEGIN
 
 DECLARE @Qry NVARCHAR(MAX)
 
-DECLARE	@TableID INT = (SELECT MIN(TableID) FROM [Selections].[CampaignExecution_TableNames])
-	,	@TableIDMax INT = (SELECT MAX(TableID) FROM [Selections].[CampaignExecution_TableNames])
+DECLARE	@TableID INT = (SELECT MIN([Selections].[CampaignExecution_TableNames].[TableID]) FROM [Selections].[CampaignExecution_TableNames])
+	,	@TableIDMax INT = (SELECT MAX([Selections].[CampaignExecution_TableNames].[TableID]) FROM [Selections].[CampaignExecution_TableNames])
 	,	@TableName VARCHAR(MAX)
 
 
 WHILE @TableID <= @TableIDMax
 	BEGIN
 		
-		SELECT @TableName = TableName
+		SELECT @TableName = [Selections].[CampaignExecution_TableNames].[TableName]
 		FROM [Selections].[CampaignExecution_TableNames]
-		WHERE TableID = @TableID
+		WHERE [Selections].[CampaignExecution_TableNames].[TableID] = @TableID
 
 		SET @Qry =	'IF OBJECT_ID(''tempdb..#Offers'') IS NOT NULL DROP TABLE #Offers
 				SELECT	DISTINCT
@@ -57,9 +57,9 @@ WHILE @TableID <= @TableIDMax
 		--SELECT @Qry
 		exec sp_executesql @Qry
 		
-		SELECT @TableID = MIN(TableID)
+		SELECT @TableID = MIN([Selections].[CampaignExecution_TableNames].[TableID])
 		FROM [Selections].[CampaignExecution_TableNames]
-		WHERE @TableID < TableID
+		WHERE @TableID < [Selections].[CampaignExecution_TableNames].[TableID]
 
 	END
 
@@ -96,40 +96,40 @@ WHILE @TableID <= @TableIDMax
 
 	--Update CashbackRates
 	UPDATE [WH_Virgin].[Derived].[IronOffer_Campaign_HTM]
-	SET	CashbackRate =
+	SET	[WH_Virgin].[Derived].[IronOffer_Campaign_HTM].[CashbackRate] =
 		os.CashbackRate
 	FROM #offerstats os
 	INNER JOIN [WH_Virgin].[Derived].[IronOffer_Campaign_HTM] ht
-		on os.IronOfferID = ht.IronOfferID
-	WHERE ht.CashbackRate IS NULL
+		on os.IronOfferID = #offerstats.[ht].IronOfferID
+	WHERE #offerstats.[ht].CashbackRate IS NULL
 
 
 	--Update CommissionRates
 	UPDATE [WH_Virgin].[Derived].[IronOffer_Campaign_HTM]
-	SET	CommissionRate =
+	SET	[WH_Virgin].[Derived].[IronOffer_Campaign_HTM].[CommissionRate] =
 		os.CommissionRate
 	FROM #offerstats os
 	INNER JOIN [WH_Virgin].[Derived].[IronOffer_Campaign_HTM] ht
-		on os.IronOfferID = ht.IronOfferID
-	WHERE ht.CommissionRate IS NULL
+		on os.IronOfferID = #offerstats.[ht].IronOfferID
+	WHERE #offerstats.[ht].CommissionRate IS NULL
 
 
 
 	--Update AboveBase
 	UPDATE [WH_Virgin].[Derived].[IronOffer_Campaign_HTM]
-	SET	AboveBase =
+	SET	[WH_Virgin].[Derived].[IronOffer_Campaign_HTM].[AboveBase] =
 		CASE	
-			WHEN Base_CashbackRate IS NULL THEN 1
-			WHEN CashbackRate > Base_CashbackRate THEN 1
+			WHEN [WH_Virgin].[Derived].[IronOffer_Campaign_HTM].[Base_CashbackRate] IS NULL THEN 1
+			WHEN [WH_Virgin].[Derived].[IronOffer_Campaign_HTM].[CashbackRate] > [WH_Virgin].[Derived].[IronOffer_Campaign_HTM].[Base_CashbackRate] THEN 1
 			ELSE 0
 		END
 	FROM [WH_Virgin].[Derived].[IronOffer_Campaign_HTM] 
-	WHERE AboveBase IS NULL
+	WHERE [WH_Virgin].[Derived].[IronOffer_Campaign_HTM].[AboveBase] IS NULL
 
 
 	--Updating isConditionalOffer
 	UPDATE [WH_Virgin].[Derived].[IronOffer_Campaign_HTM]
-	SET	isConditionalOffer = 1
+	SET	[WH_Virgin].[Derived].[IronOffer_Campaign_HTM].[isConditionalOffer] = 1
 	FROM [DIMAIN_TR].[SLC_REPL].dbo.PartnerCommissionRule pcr
 	INNER JOIN [WH_Virgin].[Derived].[IronOffer_Campaign_HTM] ht
 		on pcr.RequiredIronOfferID = ht.IronOfferID

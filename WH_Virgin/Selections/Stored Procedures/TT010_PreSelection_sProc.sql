@@ -13,17 +13,17 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 			 , @Lapsed INT
 			 , @Lapsing INT
 
-		SELECT	@BrandID = BrandID
+		SELECT	@BrandID = [Warehouse].[Relational].[Partner].[BrandID]
 		FROM [Warehouse].[Relational].[Partner]
-		WHERE PartnerID = @PartnerID
+		WHERE [Warehouse].[Relational].[Partner].[PartnerID] = @PartnerID
 
 
-		SELECT @Acquire = Acquire 
-			 , @Lapsed = Lapsed
-			 , @Lapsing = Lapsed - 6
+		SELECT @Acquire = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Acquire] 
+			 , @Lapsed = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Lapsed]
+			 , @Lapsing = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Lapsed] - 6
 		FROM [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ]
-		WHERE PartnerID = @PartnerID
-		AND EndDate IS NULL
+		WHERE [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[PartnerID] = @PartnerID
+		AND [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[EndDate] IS NULL
 	
 	/*******************************************************************************************************************************************
 		2. Run segmentation for spenders
@@ -54,10 +54,10 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 		***********************************************************************************************************************/
 	
 			IF OBJECT_ID('tempdb..#CCIDs') IS NOT NULL DROP TABLE #CCIDs
-			SELECT ConsumerCombinationID 
+			SELECT [cc].[ConsumerCombinationID] 
 			INTO #CCIDs
 			FROM Trans.ConsumerCombination cc WITH (NOLOCK)
-			WHERE BrandID = @BrandID
+			WHERE [cc].[BrandID] = @BrandID
 		
 			CREATE CLUSTERED INDEX CIX_CCID_CCID ON #CCIDs (ConsumerCombinationID)
 
@@ -140,8 +140,8 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 		IF OBJECT_ID('Sandbox.Rory.Telegraph_Lapsing_20210701') IS NOT NULL DROP TABLE Sandbox.Rory.Telegraph_Lapsing_20210701
 		SELECT *
 		INTO Sandbox.Rory.Telegraph_Lapsing_20210701
-		FROM (	SELECT	FanID
-					,	TranDate
-					,	Segment
+		FROM (	SELECT	[ac].[FanID]
+					,	[ac].[TranDate]
+					,	[ac].[Segment]
 				FROM #AllCustomers ac
-				WHERE Segment IN ('Lapsing')) acIf Object_ID('WH_Virgin.Selections.TT010_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.TT010_PreSelectionSelect FanIDInto WH_Virgin.Selections.TT010_PreSelectionFROM  SANDBOX.RORY.Telegraph_Lapsing_20210701END
+				WHERE [ac].[Segment] IN ('Lapsing')) acIf Object_ID('WH_Virgin.Selections.TT010_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.TT010_PreSelectionSelect [SANDBOX].[RORY].[Telegraph_Lapsing_20210701].[FanID]Into WH_Virgin.Selections.TT010_PreSelectionFROM  SANDBOX.RORY.Telegraph_Lapsing_20210701END

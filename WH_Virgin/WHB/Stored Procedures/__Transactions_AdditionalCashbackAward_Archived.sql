@@ -33,8 +33,8 @@ BEGIN TRY
 
 	--Find Last record Imported (Find the last processed date so that we only import rows after this day)
 	SELECT 
-		@AddedDate = Max(AddedDate), 
-		@ACA_ID = Max(AdditionalCashbackAwardID)
+		@AddedDate = Max([Derived].[AdditionalCashbackAward].[AddedDate]), 
+		@ACA_ID = Max([Derived].[AdditionalCashbackAward].[AdditionalCashbackAwardID])
 	FROM Derived.AdditionalCashbackAward as aca				
 
 	Set @AddedDate = Dateadd(day,1,@AddedDate)
@@ -89,7 +89,7 @@ BEGIN TRY
 
 	-- Remove those records with a MatchID and no TRANS record ---------------------
 	UPDATE aca
-		Set MatchID = m.ID
+		Set [Derived].[AdditionalCashbackAward].[MatchID] = m.ID
 	FROM Derived.AdditionalCashbackAward as aca
 	INNER JOIN SLC_Report..match as m with (nolock)
 		on	aca.FileID = m.VectorMajorID and
@@ -122,8 +122,8 @@ BEGIN TRY
 		DECLARE @MaxApplePayTran int, @HighestRowNo int
 
 		SELECT 
-			@MaxApplePayTran = ISNULL(Max(TranID),0),
-			@HighestRowNo = ISNULL(Max(RowNum),0)
+			@MaxApplePayTran = ISNULL(Max([Staging].[AdditionalCashbackAward_ApplePay].[TranID]),0),
+			@HighestRowNo = ISNULL(Max([Staging].[AdditionalCashbackAward_ApplePay].[RowNum]),0)
 		FROM Staging.AdditionalCashbackAward_ApplePay
 
 
@@ -139,30 +139,30 @@ BEGIN TRY
 
 		INSERT INTO Staging.AdditionalCashbackAward_ApplePay
 		SELECT 
-			t.ID as TranID,
+			#Types.[t].ID as TranID,
 			0 as FileID,
-			ROW_NUMBER() OVER (ORDER BY t.ID) + @HighestRowNo AS RowNum
+			ROW_NUMBER() OVER (ORDER BY #Types.[t].ID) + @HighestRowNo AS RowNum
 		FROM SLC_Report.DBO.Trans t	
 		INNER JOIN #Types tt 
-			ON tt.ItemID = t.ItemID 
-			AND tt.TransactionTypeID = t.TypeID
+			ON tt.ItemID = #Types.[t].ItemID 
+			AND tt.TransactionTypeID = #Types.[t].TypeID
 		INNER JOIN Derived.Customer c 
-			ON t.FanID = c.FanID
-		WHERE NOT EXISTS (SELECT 1 FROM Staging.AdditionalCashbackAward_ApplePay a WHERE t.ID = a.TranID)
+			ON #Types.[t].FanID = c.FanID
+		WHERE NOT EXISTS (SELECT 1 FROM Staging.AdditionalCashbackAward_ApplePay a WHERE #Types.[t].ID = #Types.[a].TranID)
 
  
 		--Find final customers
 		INSERT INTO Derived.AdditionalCashbackAward
 		SELECT	   
 			NULL as MatchID,
-			a.FileID as FileID,
-			a.RowNum as RowNum,
-			t.FanID,
-			Cast(t.[Date] as date) as TranDate,
-			Cast(t.ProcessDate as date) as AddedDate,
-			t.Price as Amount,
-			t.ClubCash*tt.Multiplier as CashbackEarned,
-			t.ActivationDays,
+			#Types.[a].FileID as FileID,
+			#Types.[a].RowNum as RowNum,
+			#Types.[t].FanID,
+			Cast(#Types.[t].[Date] as date) as TranDate,
+			Cast(#Types.[t].ProcessDate as date) as AddedDate,
+			#Types.[t].Price as Amount,
+			#Types.[t].ClubCash*tt.Multiplier as CashbackEarned,
+			#Types.[t].ActivationDays,
 			tt.AdditionalCashbackAwardTypeID,
 			1 as PaymentMethodID,
 			NULL as DirectDebitOriginatorID
@@ -170,9 +170,9 @@ BEGIN TRY
 		INNER LOOP JOIN SLC_Report..Trans t 
 			on a.TranID = t.ID
 		INNER JOIN #Types as tt
-			on tt.ItemID = t.ItemID 
-			and tt.TransactionTypeID = t.TypeID
-		WHERE TranID > @MaxApplePayTran ---******INCREMENTAL LOAD ONLY
+			on tt.ItemID = #Types.[t].ItemID 
+			and tt.TransactionTypeID = #Types.[t].TypeID
+		WHERE #Types.[TranID] > @MaxApplePayTran ---******INCREMENTAL LOAD ONLY
 
 
 
@@ -192,7 +192,7 @@ BEGIN TRY
 		-------------------------------------------------------------------------------
 
 		UPDATE b
-		SET AdditionalCashbackAwardTypeID = a.AdditionalCashbackAwardTypeID_New
+		SET [Derived].[AdditionalCashbackAward].[AdditionalCashbackAwardTypeID] = a.AdditionalCashbackAwardTypeID_New
 		FROM Warehouse.[Relational].[AdditionalCashbackAwardTypeAdjustments] as a
 		INNER JOIN Derived.AdditionalCashbackAward as b
 			on a.AdditionalCashbackAwardTypeID_Original = b.AdditionalCashbackAwardTypeID
@@ -220,7 +220,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

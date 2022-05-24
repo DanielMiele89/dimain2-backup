@@ -64,26 +64,26 @@ BEGIN TRY
 				Else NULL
 			End as Clubs,
 			Case
-				When i.StartDate <= 'Aug 01, 2013' then (Select [Description] from [Staging].[IronOffer_Campaign_Type_Lookup] Where CampaignTypeID = 2)
-				When pbo.OfferID IS NOT NULL or pob.OfferID is not null then (Select [Description] from [Staging].[IronOffer_Campaign_Type_Lookup] Where CampaignTypeID = 1)
-				Else (Select [Description] from [Staging].[IronOffer_Campaign_Type_Lookup] Where CampaignTypeID = 5)
+				When i.StartDate <= 'Aug 01, 2013' then (Select [Staging].[IronOffer_Campaign_Type_Lookup].[Description] from [Staging].[IronOffer_Campaign_Type_Lookup] Where [Staging].[IronOffer_Campaign_Type_Lookup].[CampaignTypeID] = 2)
+				When pbo.OfferID IS NOT NULL or pob.OfferID is not null then (Select [Staging].[IronOffer_Campaign_Type_Lookup].[Description] from [Staging].[IronOffer_Campaign_Type_Lookup] Where [Staging].[IronOffer_Campaign_Type_Lookup].[CampaignTypeID] = 1)
+				Else (Select [Staging].[IronOffer_Campaign_Type_Lookup].[Description] from [Staging].[IronOffer_Campaign_Type_Lookup] Where [Staging].[IronOffer_Campaign_Type_Lookup].[CampaignTypeID] = 5)
 			End as CampaignType
 	FROM [SLC_Report].[dbo].[IronOffer] as I 
 	Left Join Derived.Partner_BaseOffer as pbo
 		on I.ID = pbo.OfferID
-	Left join (select Distinct OfferID, CashbackRateNumeric From Derived.PartnerOffers_Base) as pob
+	Left join (select Distinct [Derived].[PartnerOffers_Base].[OfferID], [Derived].[PartnerOffers_Base].[CashbackRateNumeric] From Derived.PartnerOffers_Base) as pob
 		on i.id = pob.OfferID
 	Left Join (
-		Select IronOfferID, Max(Case When ClubID in (132) then 1 else 0 End)+Max(Case When ClubID in (138) then 1 else 0 End) as Clubs, Max(ClubID)as ClubID
+		Select [slc_report].[dbo].[IronOfferClub].[IronOfferID], Max(Case When [slc_report].[dbo].[IronOfferClub].[ClubID] in (132) then 1 else 0 End)+Max(Case When [slc_report].[dbo].[IronOfferClub].[ClubID] in (138) then 1 else 0 End) as Clubs, Max([slc_report].[dbo].[IronOfferClub].[ClubID])as ClubID
 		from slc_report.dbo.IronOfferClub
-		Group by IronOfferID
+		Group by [slc_report].[dbo].[IronOfferClub].[IronOfferID]
 	) as Club
 			on i.ID = Club.IronOfferID
 
 
 	--Fetch Cashback Rate ---------------------------------------
 	UPDATE i
-		SET TopCashbackRate = TCBR
+		SET [i].[TopCashBackRate] = TCBR
 	FROM Derived.ironoffer as i
 	CROSS APPLY (
 		SELECT MAX(CommissionRate) as TCBR
@@ -97,7 +97,7 @@ BEGIN TRY
 
 	--Work out if cashback rate above base---------------------------------
 	UPDATE i 
-		SET AboveBase = Case
+		SET [i].[AboveBase] = Case
 				When i.IronOfferName in ('Above the line','Above the line Collateral','Default','Default Collateral') then 0
 				When i.IronOfferName Like '%MaterCard%' then 0
 				When i.IronOfferName Like '%Test%' And i.IronOfferName Not like '20%' then 0
@@ -111,7 +111,7 @@ BEGIN TRY
 	FROM Derived.IronOffer as i
 	LEFT JOIN Staging.IronOffer_Campaign_HTM_PreLaunch pbo
 		on i.IronOfferID = pbo.IronOfferID
-	LEFT JOIN (SELECT Distinct PartnerID, CashbackRateNumeric, StartDate, EndDate FROM Derived.PartnerOffers_Base) pob
+	LEFT JOIN (SELECT Distinct [Derived].[PartnerOffers_Base].[PartnerID], [Derived].[PartnerOffers_Base].[CashbackRateNumeric], [Derived].[PartnerOffers_Base].[StartDate], [Derived].[PartnerOffers_Base].[EndDate] FROM Derived.PartnerOffers_Base) pob
 		ON	i.PartnerID = pob.PartnerID 
 		AND pob.StartDate <= i.StartDate 
 		AND (pob.EndDate >= i.StartDate OR pob.EndDate IS NULL) 
@@ -120,7 +120,7 @@ BEGIN TRY
 
 	--Work Out Campaign Type-------------------------------------
 	UPDATE i
-	SET CampaignType = ctl.[Description]
+	SET [i].[CampaignType] = ctl.[Description]
 	FROM Derived.ironoffer as i
 	INNER JOIN Derived.IronOffer_Campaign_HTM htm
 		on i.IronOfferID = htm.IronOfferID
@@ -132,7 +132,7 @@ BEGIN TRY
 
 	--Set Above Base Offers for non-core base offers--------------------------
 	UPDATE i
-		SET AboveBase = 0
+		SET [i].[AboveBase] = 0
 	FROM Derived.ironoffer as i
 	INNER JOIN [Derived].[Partner_NonCoreBaseOffer] as n
 		on i.IronOfferID = n.IronOfferID
@@ -176,7 +176,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

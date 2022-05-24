@@ -8,7 +8,7 @@ EmailDate AS (	SELECT EmailDate = '2022-04-12'),
 Customers AS (	SELECT	cu.[FanID]
 					,	cu.[CompositeID]
 					,	CASE
-							WHEN [MarketableByEmail] = 0 OR [CurrentlyActive] = 0 THEN 0
+							WHEN [cu].[MarketableByEmail] = 0 OR [cu].[CurrentlyActive] = 0 THEN 0
 							WHEN se.FanID IS NULL THEN 0
 							WHEN se.ControlFlag = 1 THEN 0
 							ELSE 1

@@ -40,7 +40,7 @@ BEGIN
 				***********************************************************************************************************************/
 
 					IF OBJECT_ID('tempdb..#Deactivated_POS') IS NOT NULL DROP TABLE #Deactivated_POS
-					SELECT FanID
+					SELECT [cu].[FanID]
 					INTO #Deactivated_POS
 					FROM [Derived].[Customer] cu
 					WHERE cu.CurrentlyActive = 0
@@ -59,7 +59,7 @@ BEGIN
 					WHERE ssm.EndDate IS NULL
 					AND EXISTS (SELECT 1
 								FROM #Deactivated_POS d
-								WHERE d.FanID = ssm.FanID)
+								WHERE d.FanID = #Deactivated_POS.[ssm].FanID)
 
 					SET @RowCount = @@ROWCOUNT
 
@@ -84,16 +84,16 @@ BEGIN
 					DECLARE @MinID INT
 						,	@MaxID INT
 
-					SELECT	@MinID = MIN(ID)
-						,	@MaxID = MAX(ID)
+					SELECT	@MinID = MIN(#Updates_POS.[ID])
+						,	@MaxID = MAX(#Updates_POS.[ID])
 					FROM #Updates_POS
 					
 					UPDATE ssm
-					SET EndDate = @EndDate
+					SET [ssm].[EndDate] = @EndDate
 					FROM [Segmentation].[Roc_Shopper_Segment_Members] ssm
 					WHERE EXISTS (SELECT 1
 								  FROM #Updates_POS up
-								  WHERE ssm.ID = up.ID)
+								  WHERE #Updates_POS.[ssm].ID = up.ID)
 					AND ssm.ID BETWEEN @MinID AND @MaxID
 
 

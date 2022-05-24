@@ -59,8 +59,8 @@ BEGIN
 			 , lso.TypeID
 		INTO #LionSend_Offers
 		FROM [Email].[Newsletter_Offers] lso
-		GROUP BY ItemID
-			   , TypeID
+		GROUP BY [lso].[ItemID]
+			   , [lso].[TypeID]
 
 		IF OBJECT_ID('tempdb..#OfferCombinations') IS NOT NULL DROP TABLE #OfferCombinations
 		SELECT	csi.LionSendID
@@ -81,7 +81,7 @@ BEGIN
 			,	oc.ItemID
 			,	oc.Customers
 			,	CASE
-					WHEN EXISTS (SELECT 1 FROM #LionSend_Offers lso WHERE oc.ItemID = lso.ItemID AND oc.TypeID = lso.TypeID) THEN 0
+					WHEN EXISTS (SELECT 1 FROM #LionSend_Offers lso WHERE #LionSend_Offers.[oc].ItemID = lso.ItemID AND #LionSend_Offers.[oc].TypeID = lso.TypeID) THEN 0
 					ELSE 1
 				END AS NewOffer
 			,	0 AS Sample
@@ -117,17 +117,17 @@ BEGIN
 		
 			DECLARE @CompositeID BIGINT
 
-			WHILE (SELECT ISNULL(COUNT(*), 0) FROM #OfferDetails WHERE Sample = 0) > 0
+			WHILE (SELECT ISNULL(COUNT(*), 0) FROM #OfferDetails WHERE #OfferDetails.[Sample] = 0) > 0
 				BEGIN
 
 					IF OBJECT_ID('tempdb..#NotInSample') IS NOT NULL DROP TABLE #NotInSample
-					SELECT	TypeID
-						,	ItemID
-						,	NewOffer
-						,	Customers
+					SELECT	#OfferDetails.[TypeID]
+						,	#OfferDetails.[ItemID]
+						,	#OfferDetails.[NewOffer]
+						,	#OfferDetails.[Customers]
 					INTO #NotInSample
 					FROM #OfferDetails
-					WHERE Sample = 0
+					WHERE #OfferDetails.[Sample] = 0
 
 					CREATE NONCLUSTERED COLUMNSTORE INDEX CSI_All ON #NotInSample (TypeID, ItemID, NewOffer)
 
@@ -140,32 +140,32 @@ BEGIN
 					ORDER BY SUM(NewOffer) DESC, COUNT(1) DESC
 			
 					IF OBJECT_ID('tempdb..#NewSampleCustomer') IS NOT NULL DROP TABLE #NewSampleCustomer
-					SELECT	LionSendID
-						,	ClubID
-						,	CompositeID
-						,	TypeID
-						,	ItemID
-						,	ItemRank
-						,	StartDate
-						,	EndDate
+					SELECT	[ovs].[LionSendID]
+						,	[ovs].[ClubID]
+						,	[ovs].[CompositeID]
+						,	[ovs].[TypeID]
+						,	[ovs].[ItemID]
+						,	[ovs].[ItemRank]
+						,	[ovs].[StartDate]
+						,	[ovs].[EndDate]
 					INTO #NewSampleCustomer
 					FROM #CustomerSampleInput ovs
-					WHERE CompositeID = @CompositeID
+					WHERE [ovs].[CompositeID] = @CompositeID
 
 					INSERT INTO #Sample
-					SELECT	LionSendID
-						,	ClubID
-						,	CompositeID
-						,	TypeID
-						,	ItemRank
-						,	ItemID
-						,	StartDate
-						,	EndDate
+					SELECT	#NewSampleCustomer.[LionSendID]
+						,	#NewSampleCustomer.[ClubID]
+						,	#NewSampleCustomer.[CompositeID]
+						,	#NewSampleCustomer.[TypeID]
+						,	#NewSampleCustomer.[ItemRank]
+						,	#NewSampleCustomer.[ItemID]
+						,	#NewSampleCustomer.[StartDate]
+						,	#NewSampleCustomer.[EndDate]
 						,	GETDATE() AS Date	--	@Today AS Date
 					FROM #NewSampleCustomer
 
 					UPDATE od
-					SET Sample = 1
+					SET [od].[Sample] = 1
 					FROM #OfferDetails od
 					INNER JOIN #NewSampleCustomer nsc
 						ON od.TypeID = nsc.TypeID
@@ -180,7 +180,7 @@ BEGIN
 	
 		DECLARE @LionSendID INT
 
-		SELECT @LionSendID = MIN(LionSendID) - 1
+		SELECT @LionSendID = MIN(#CustomerSampleInput.[LionSendID]) - 1
 		FROM #CustomerSampleInput
 
 		IF OBJECT_ID('tempdb..#NominatedLionSendComponent_Sample') IS NOT NULL DROP TABLE #NominatedLionSendComponent_Sample
@@ -215,11 +215,11 @@ BEGIN
 	*******************************************************************************************************************************************/
 
 		IF OBJECT_ID('tempdb..#LionSendIDs') IS NOT NULL DROP TABLE #LionSendIDs
-		SELECT DISTINCT LionSendID
+		SELECT DISTINCT #NominatedLionSendComponent_Sample.[LionSendID]
 		INTO #LionSendIDs
 		FROM #NominatedLionSendComponent_Sample
 		UNION
-		SELECT DISTINCT LionSendID
+		SELECT DISTINCT #NominatedLionSendComponent_RedemptionOffers_Sample.[LionSendID]
 		FROM #NominatedLionSendComponent_RedemptionOffers_Sample
 
 		DELETE ls

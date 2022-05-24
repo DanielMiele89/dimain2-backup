@@ -28,7 +28,7 @@ BEGIN
 			2.		Find how many customers have opened an email since last updated
 	*******************************************************************************************************************************************/
 
-		SELECT @EmailsOpened = COUNT(FanID)
+		SELECT @EmailsOpened = COUNT([ls].[FanID])
 		FROM [Email].[Newsletter_Customers] ls
 		WHERE ls.EmailOpened = 0
 		AND EXISTS (SELECT 1
@@ -63,18 +63,18 @@ BEGIN
 
 				IF OBJECT_ID('tempdb..#EmailCampaign') IS NOT NULL DROP TABLE #EmailCampaign
 				SELECT	ec.CampaignKey
-					,	CampaignName
-					,	SendDate
+					,	[ec].[CampaignName]
+					,	[ec].[SendDate]
 					,	166 AS ClubID
 					 ,	NULL AS IsLoyalty
 					 ,	CASE
-							WHEN PATINDEX('%LSID%', CampaignName) > 0 THEN SUBSTRING(CampaignName, PATINDEX('%LSID%', CampaignName) + 4, 3)
+							WHEN PATINDEX('%LSID%', [ec].[CampaignName]) > 0 THEN SUBSTRING([ec].[CampaignName], PATINDEX('%LSID%', [ec].[CampaignName]) + 4, 3)
 							ELSE NULL
 						END AS LionSendID
 				INTO #EmailCampaign
 				FROM [Derived].[EmailCampaign] ec
-				WHERE CampaignName LIKE '%Newsletter_LSID[0-9][0-9][0-9]_[0-9]%'
-				AND CampaignName NOT LIKE 'TEST%'
+				WHERE [ec].[CampaignName] LIKE '%Newsletter_LSID[0-9][0-9][0-9]_[0-9]%'
+				AND [ec].[CampaignName] NOT LIKE 'TEST%'
 
 				UPDATE ls
 				SET ls.CampaignKey = ec.CampaignKey
@@ -111,7 +111,7 @@ BEGIN
 					AND ens.CampaignKey = ee.CampaignKey
 
 				UPDATE lsc
-				SET	EmailSent = 1
+				SET	[lsc].[EmailSent] = 1
 				FROM [Email].[Newsletter_Customers] lsc
 				INNER JOIN #EmailSent es
 					ON lsc.CampaignKey = es.CampaignKey
@@ -149,8 +149,8 @@ BEGIN
 					  , ee.FanID
 
 				UPDATE lsc
-				SET	EmailOpened = 1
-				,	EmailOpenedDate = EventDate
+				SET	[lsc].[EmailOpened] = 1
+				,	[lsc].[EmailOpenedDate] = [eo].[EventDate]
 				FROM [Email].[Newsletter_Customers] lsc
 				INNER JOIN #EmailOpens eo
 					ON lsc.CampaignKey = eo.CampaignKey
@@ -199,7 +199,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

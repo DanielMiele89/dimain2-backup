@@ -35,12 +35,12 @@ BEGIN
 	*******************************************************************************************************************************************/
 
 		IF OBJECT_ID('tempdb..#FilesToProcess') IS NOT NULL DROP TABLE #FilesToProcess
-		SELECT	ID AS FileID
-			,	LoadDate
-			,	FileName
+		SELECT	[f].[ID] AS FileID
+			,	[f].[LoadDate]
+			,	[f].[FileName]
 		INTO #FilesToProcess
 		FROM [WHB].[Inbound_Files] f
-		WHERE TableName = 'Transactions'
+		WHERE [f].[TableName] = 'Transactions'
 	
 		SET DATEFIRST 1; --set the first day of the week to Monday. This influences the return value of DATEPART()
 		
@@ -64,7 +64,7 @@ BEGIN
 		SELECT	*
 		INTO #Transactions
 		FROM [Inbound].[Transactions] tr
-		WHERE OfferID IS NOT NULL
+		WHERE [tr].[OfferID] IS NOT NULL
 		
 		CREATE CLUSTERED INDEX CIX_CardID ON #Transactions (CardID)
 		CREATE NONCLUSTERED INDEX IX_MerchantID ON #Transactions (MerchantID)
@@ -75,7 +75,7 @@ BEGIN
 		FROM [WHB].[Inbound_Cards] ca
 		WHERE EXISTS (	SELECT	1
 						FROM #Transactions tr
-						WHERE ca.CardID = tr.CardID)
+						WHERE #Transactions.[ca].CardID = tr.CardID)
 
 		CREATE CLUSTERED INDEX CIX_CardID ON #Inbound_Cards (CardID)
 
@@ -85,7 +85,7 @@ BEGIN
 		FROM OPENQUERY([DIMAIN_TR],'SELECT * FROM [SLC_REPL].[dbo].[RetailOutlet]') ro
 		WHERE EXISTS (	SELECT	1
 						FROM #Transactions tr
-						WHERE ro.MerchantID = tr.MerchantID)
+						WHERE #Transactions.[ro].MerchantID = tr.MerchantID)
 
 		CREATE CLUSTERED INDEX CIX_MerchantID ON #RetailOutlet (MerchantID)
 
@@ -164,10 +164,10 @@ BEGIN
 			,	pt.RowNum
 			,	pt.PartnerID
 			,	pt.TransactionAmount
-			,	ValuePercentile = NTILE(100) OVER (PARTITION BY PartnerID ORDER BY TransactionAmount)
+			,	ValuePercentile = NTILE(100) OVER (PARTITION BY [pt].[PartnerID] ORDER BY [pt].[TransactionAmount])
 		INTO #ExtremeValues
 		FROM #PartnerTrans pt
-		ORDER BY PartnerID;
+		ORDER BY [pt].[PartnerID];
 
 		UPDATE pt
 		SET pt.ExtremeValueFlag = 1
@@ -180,32 +180,32 @@ BEGIN
 		CREATE CLUSTERED INDEX CIX_FileIDRowNum ON #PartnerTrans (FileID, RowNum)
 	
 		INSERT INTO [Derived].[PartnerTrans]
-		SELECT	FileID
-			,	RowNum
-			,	FanID
-			,	PartnerID
-			,	OutletID
-			,	IsOnline
-			,	CardholderPresentData
-			,	TransactionAmount
-			,	ExtremeValueFlag
-			,	TransactionDate
-			,	TransactionWeekStarting
-			,	TransactionMonth
-			,	TransactionYear
-			,	TransactionWeekStartingCampaign
-			,	AddedDate
-			,	AddedWeekStarting
-			,	AddedMonth
-			,	AddedYear
-			,	AffiliateCommissionAmount
-			,	CommissionChargable
-			,	CashbackEarned
-			,	IronOfferID
-			,	ActivationDays
-			,	AboveBase
-			,	PaymentMethodID
-			,	UniqueTransactionID
+		SELECT	[pts].[FileID]
+			,	[pts].[RowNum]
+			,	[pts].[FanID]
+			,	[pts].[PartnerID]
+			,	[pts].[OutletID]
+			,	[pts].[IsOnline]
+			,	[pts].[CardholderPresentData]
+			,	[pts].[TransactionAmount]
+			,	[pts].[ExtremeValueFlag]
+			,	[pts].[TransactionDate]
+			,	[pts].[TransactionWeekStarting]
+			,	[pts].[TransactionMonth]
+			,	[pts].[TransactionYear]
+			,	[pts].[TransactionWeekStartingCampaign]
+			,	[pts].[AddedDate]
+			,	[pts].[AddedWeekStarting]
+			,	[pts].[AddedMonth]
+			,	[pts].[AddedYear]
+			,	[pts].[AffiliateCommissionAmount]
+			,	[pts].[CommissionChargable]
+			,	[pts].[CashbackEarned]
+			,	[pts].[IronOfferID]
+			,	[pts].[ActivationDays]
+			,	[pts].[AboveBase]
+			,	[pts].[PaymentMethodID]
+			,	[pts].[UniqueTransactionID]
 		FROM #PartnerTrans pts
 		WHERE NOT EXISTS (	SELECT 1
 							FROM [Derived].[PartnerTrans] ptd
@@ -236,7 +236,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

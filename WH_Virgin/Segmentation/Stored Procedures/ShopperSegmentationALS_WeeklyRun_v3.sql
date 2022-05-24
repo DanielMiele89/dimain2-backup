@@ -36,51 +36,51 @@ BEGIN
 	*******************************************************************************************************************************************/
 
 		IF OBJECT_ID('Tempdb..#PartnerSettings') IS NOT NULL DROP TABLE #PartnerSettings
-		SELECT PartnerID
-			 , MAX(IsPos) AS IsPos
-			 , MAX(IsDD) AS IsDD
+		SELECT [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings].[PartnerID]
+			 , MAX([ps].[IsPos]) AS IsPos
+			 , MAX([ps].[IsDD]) AS IsDD
 		INTO #PartnerSettings
-		FROM (SELECT PartnerID
+		FROM (SELECT [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings].[PartnerID]
 	  			   , 1 AS IsPos
 	  			   , 0 AS IsDD
 			  FROM [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings] ps
 			  WHERE ps.AutoRun = 1
 			  AND ps.StartDate <= @EDate
 			  AND (ps.EndDate IS NULL OR ps.EndDate > @EDate)) ps
-		GROUP BY PartnerID
+		GROUP BY [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings].[PartnerID]
 
 	/*******************************************************************************************************************************************
 		4. Find offers that will be live at the time (non Core Base)
 	*******************************************************************************************************************************************/
 
 		IF OBJECT_ID('Tempdb..#UpcomingCampaigns') IS NOT NULL DROP TABLE #UpcomingCampaigns
-		SELECT EmailDate
-			 , PartnerID
-			 , ClientServicesRef
+		SELECT [cs].[EmailDate]
+			 , [cs].[PartnerID]
+			 , [cs].[ClientServicesRef]
 			 , @FullCycle AS IsFullCycle
 			 , NULL AS SegmentationOverride
 			 , CASE
-					WHEN EmailDate = FirstEmailDate THEN 1
+					WHEN [cs].[EmailDate] = [cs].[FirstEmailDate] THEN 1
 					ELSE 0
 			   END AS FirstEmail
-			 , MAX(IsPOS) OVER (PARTITION BY PartnerID) AS IsPOS
-			 , MAX(IsDD) OVER (PARTITION BY PartnerID) AS IsDD
+			 , MAX([cs].[IsPOS]) OVER (PARTITION BY [cs].[PartnerID]) AS IsPOS
+			 , MAX([cs].[IsDD]) OVER (PARTITION BY [cs].[PartnerID]) AS IsDD
 		INTO #UpcomingCampaigns
-		FROM (SELECT EmailDate
-	  			   , PartnerID
-	  			   , ClientServicesRef
+		FROM (SELECT [Selections].[CampaignSetup_POS].[EmailDate]
+	  			   , [Selections].[CampaignSetup_POS].[PartnerID]
+	  			   , [Selections].[CampaignSetup_POS].[ClientServicesRef]
 				   , 1 AS IsPOS
 				   , 0 AS IsDD
-				   , MIN(EmailDate) OVER (PARTITION BY ClientServicesRef) AS FirstEmailDate
+				   , MIN([Selections].[CampaignSetup_POS].[EmailDate]) OVER (PARTITION BY [Selections].[CampaignSetup_POS].[ClientServicesRef]) AS FirstEmailDate
 			  FROM [Selections].[CampaignSetup_POS]) cs
-		WHERE EmailDate = @EDate
+		WHERE [cs].[EmailDate] = @EDate
 
 	/*******************************************************************************************************************************************
 		5. Run manual exceptions
 	*******************************************************************************************************************************************/
 	
 		UPDATE #UpcomingCampaigns
-		SET SegmentationOverride = 1
+		SET #UpcomingCampaigns.[SegmentationOverride] = 1
 	--	WHERE PartnerID IN (4729, 4788)
 		
 
@@ -89,12 +89,12 @@ BEGIN
 	*******************************************************************************************************************************************/
 
 		;WITH
-		UpcomingCampaigns AS (SELECT PartnerID
-							  	   , MAX(IsPOS) AS IsPOS
-							  	   , MAX(IsDD) AS IsDD
-							  	   , MAX(COALESCE(SegmentationOverride, IsFullCycle, FirstEmail)) AS SegmetationToRun
+		UpcomingCampaigns AS (SELECT #UpcomingCampaigns.[PartnerID]
+							  	   , MAX(#UpcomingCampaigns.[IsPOS]) AS IsPOS
+							  	   , MAX(#UpcomingCampaigns.[IsDD]) AS IsDD
+							  	   , MAX(COALESCE(#UpcomingCampaigns.[SegmentationOverride], #UpcomingCampaigns.[IsFullCycle], #UpcomingCampaigns.[FirstEmail])) AS SegmetationToRun
 							  FROM #UpcomingCampaigns
-							  GROUP BY PartnerID)
+							  GROUP BY #UpcomingCampaigns.[PartnerID])
 
 		INSERT INTO #SegmentsToRun
 		SELECT pa.PartnerID
@@ -104,7 +104,7 @@ BEGIN
 		FROM UpcomingCampaigns pa
 		INNER JOIN #PartnerSettings ps
 			ON pa.PartnerID = ps.PartnerID
-		WHERE SegmetationToRun = 1
+		WHERE #PartnerSettings.[SegmetationToRun] = 1
 
 
 	/*******************************************************************************************************************************************
@@ -112,7 +112,7 @@ BEGIN
 	*******************************************************************************************************************************************/
 
 		DECLARE @RowNo INT = 1
-			  , @RowNoMax INT = (SELECT COALESCE(MAX(RowNo), 0) FROM #SegmentsToRun)
+			  , @RowNoMax INT = (SELECT COALESCE(MAX(#SegmentsToRun.[RowNo]), 0) FROM #SegmentsToRun)
 			  , @PartnerID INT
 			  , @IsDD INT
 			  , @IsPOS INT
@@ -120,11 +120,11 @@ BEGIN
 		WHILE @RowNo <= @RowNoMax
 		BEGIN
 		  
-			SELECT @PartnerID = PartnerID
-				 , @IsDD = IsDD
-				 , @IsPOS = IsPOS
+			SELECT @PartnerID = #SegmentsToRun.[PartnerID]
+				 , @IsDD = #SegmentsToRun.[IsDD]
+				 , @IsPOS = #SegmentsToRun.[IsPOS]
 			FROM #SegmentsToRun
-			WHERE RowNo = @RowNo
+			WHERE #SegmentsToRun.[RowNo] = @RowNo
 		
 			IF @IsPOS = 1 EXEC [Segmentation].[Segmentation_IndividualPartner_POS] @PartnerID, 0, 1	--	PartnerID, ToBeRanked, WeekyRun
 

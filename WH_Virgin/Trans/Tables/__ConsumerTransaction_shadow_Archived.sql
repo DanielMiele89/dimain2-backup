@@ -13,7 +13,7 @@
     [InputModeID]            TINYINT       NOT NULL,
     [PaymentTypeID]          TINYINT       CONSTRAINT [DF_ConsumerTransaction_shadow_PaymentTypeID_Archived] DEFAULT ((2)) NOT NULL,
     CONSTRAINT [PK_ConsumerTrans_shadow_Archived] PRIMARY KEY CLUSTERED ([FileID] ASC, [RowNum] ASC, [TranDate] ASC) WITH (FILLFACTOR = 95, DATA_COMPRESSION = PAGE) ON [fg_ConsumerTrans],
-    CONSTRAINT [CheckTranDate_shadow_Archived] CHECK ([TranDate]>='20210301' AND [TranDate]<'20210401'),
+    CONSTRAINT [CheckTranDate_shadow_Archived] CHECK ([__ConsumerTransaction_shadow_Archived].[TranDate]>='20210301' AND [__ConsumerTransaction_shadow_Archived].[TranDate]<'20210401'),
     CONSTRAINT [FK_Relational_ConsumerTransaction_shadow_Combination_Archived] FOREIGN KEY ([ConsumerCombinationID]) REFERENCES [Trans].[ConsumerCombination] ([ConsumerCombinationID])
 ) ON [fg_ConsumerTrans];
 

@@ -36,8 +36,8 @@ BEGIN
 	SELECT
 		CAST(vpl.ID AS VARCHAR(10))							  AS ID
 	  , CAST(vpl.RunID AS VARCHAR(10))						  AS RunID
-	  , PackageID
-	  , SourceID
+	  , [vpl].[PackageID]
+	  , [vpl].[SourceID]
 	  , vpl.SourceName
 	  , FORMAT(vpl.RunStartDateTime, 'dd/MM/yyyy hh\:mm\:ss') AS RunStartDateTime
 	  , FORMAT(vpl.RunEndDateTime, 'dd/MM/yyyy hh\:mm\:ss')	  AS RunEndDateTime
@@ -49,11 +49,11 @@ BEGIN
 	  , vpl.ErrorDetails
 	INTO ##ToEmail_Perturbation
 	FROM [Monitor].vw_PackageLog_Latest vpl
-	WHERE PackageID = @PackageID
+	WHERE [vpl].[PackageID] = @PackageID
 
-	SELECT @Subject = COALESCE(@Subject, SourceName + ' Completed')
+	SELECT @Subject = COALESCE(@Subject, ##ToEmail_Perturbation.[SourceName] + ' Completed')
 	FROM ##ToEmail_Perturbation
-	WHERE SourceID = PackageID
+	WHERE ##ToEmail_Perturbation.[SourceID] = ##ToEmail_Perturbation.[PackageID]
 
 	----------------------------------------------------------------------
 	-- Build HTML Tables
@@ -64,15 +64,15 @@ BEGIN
 	(
 		SELECT
 			'<td>'
-			+ SourceType + '</td><td>'
-			+ SourceName + '</td><td>'
+			+ [vpl].[SourceType] + '</td><td>'
+			+ [vpl].[SourceName] + '</td><td>'
 			+ vpl.RunStartDateTime + '</td><td>'
 			+ vpl.RunEndDateTime + '</td><td>'
 			+ ISNULL(vpl.RowCnt, '') + '</td><td>'
 			+ vpl.[DD HH:MM:SS] + '</td>'
 		FROM ##ToEmail_Perturbation vpl
-		WHERE SourceTypeID IN (1, 2)
-		ORDER BY ID
+		WHERE [vpl].[SourceTypeID] IN (1, 2)
+		ORDER BY [vpl].[ID]
 		FOR XML PATH ('tr'), TYPE
 	)
 	AS VARCHAR(MAX)
@@ -82,14 +82,14 @@ BEGIN
 	(
 		SELECT
 			'<td>'
-			+ SourceType + '</td><td>'
-			+ SourceName + '</td><td>'
+			+ [vpl].[SourceType] + '</td><td>'
+			+ [vpl].[SourceName] + '</td><td>'
 			+ vpl.RunStartDateTime + '</td><td>'
 			+ vpl.RunEndDateTime + '</td><td>'
 			+ ISNULL(vpl.RowCnt, '') + '</td><td>'
 			+ vpl.[DD HH:MM:SS] + '</td>'
 		FROM ##ToEmail_Perturbation vpl
-		ORDER BY ID
+		ORDER BY [vpl].[ID]
 		FOR XML PATH ('tr'), TYPE
 	)
 	AS VARCHAR(MAX)

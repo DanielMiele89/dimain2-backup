@@ -15,7 +15,7 @@ CREATE CLUSTERED INDEX ix_CINID on #FB(CINID)
 
 
 IF OBJECT_ID('Sandbox.RukanK.VM_Boohoo_Male_17112021') IS NOT NULL DROP TABLE Sandbox.RukanK.VM_Boohoo_Male_17112021
-SELECT	CINID
+SELECT	#FB.[CINID]
 INTO	Sandbox.RukanK.VM_Boohoo_Male_17112021
 FROM	#FB
 
@@ -26,7 +26,7 @@ INTO [WH_Virgin].[Selections].[BHO013_PreSelection]
 FROM #FB fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.RukanK.VM_Boohoo_Male_17112021 sb
-				WHERE fb.CINID = sb.CINID)
+				WHERE fb.CINID = #FB.[sb].CINID)
 
 END;
 

@@ -58,7 +58,7 @@ BEGIN
 		WHERE ls.EndDate IS NULL
 		AND EXISTS (SELECT 1
 					FROM #Customer cu
-					WHERE ls.FanID = cu.FanID)
+					WHERE #Customer.[ls].FanID = cu.FanID)
 
 		CREATE CLUSTERED INDEX CIX_FanID ON #CustomerSegment (FanID)
 		
@@ -123,7 +123,7 @@ BEGIN
 			INTO #FirstEarnTransTemp
 			FROM [Inbound].[Transactions] tr
 			WHERE 0 < tr.CashbackAmount
-			ORDER BY LoadDate DESC
+			ORDER BY [tr].[LoadDate] DESC
 
 			CREATE CLUSTERED INDEX CIX_CardID ON #FirstEarnTransTemp (CardID)
 	
@@ -170,7 +170,7 @@ BEGIN
 				,	fet.TransactionNumber
 			INTO #FirstEarnTrans
 			FROM FirstEarnTrans fet
-			WHERE TransactionNumber = 1
+			WHERE [fet].[TransactionNumber] = 1
 			--AND CONVERT(DATE, fet.LoadDate) = @Today_FirstEarn
 
 
@@ -178,13 +178,13 @@ BEGIN
 			4.2.	Load new First Earn customers to permanent table
 		***************************************************************************************************************************************/
 
-			INSERT INTO [Derived].[Customer_FirstEarnDate] (FanID
-														,	CardID
-														,	TranDate
-														,	LoadDate
-														,	PartnerID
-														,	PartnerName
-														,	CashbackAmount)
+			INSERT INTO [Derived].[Customer_FirstEarnDate] ([Derived].[Customer_FirstEarnDate].[FanID]
+														,	[Derived].[Customer_FirstEarnDate].[CardID]
+														,	[Derived].[Customer_FirstEarnDate].[TranDate]
+														,	[Derived].[Customer_FirstEarnDate].[LoadDate]
+														,	[Derived].[Customer_FirstEarnDate].[PartnerID]
+														,	[Derived].[Customer_FirstEarnDate].[PartnerName]
+														,	[Derived].[Customer_FirstEarnDate].[CashbackAmount])
 			SELECT	FanID = fet.FanID
 				,	CardID = fet.CardID
 				,	TranDate = fet.TranDate
@@ -247,10 +247,10 @@ BEGIN
 			5.2.	Load new £5 Balance customers to permanent table
 		***************************************************************************************************************************************/
 
-			INSERT INTO [Derived].[Customer_Reach5GBPDate] (FanID
-														,	CashbackAvailable
-														,	PreviousCashbackAvailable
-														,	Reach5GBPDate)
+			INSERT INTO [Derived].[Customer_Reach5GBPDate] ([Derived].[Customer_Reach5GBPDate].[FanID]
+														,	[Derived].[Customer_Reach5GBPDate].[CashbackAvailable]
+														,	[Derived].[Customer_Reach5GBPDate].[PreviousCashbackAvailable]
+														,	[Derived].[Customer_Reach5GBPDate].[Reach5GBPDate])
 			SELECT	FanID = cb.FanID
 				,	CashbackAvailable = cb.CurrentCashbackAvailable
 				,	PreviousCashbackAvailable = cb.PreviousCashbackAvailable
@@ -270,7 +270,7 @@ BEGIN
 				,	r5.Reach5GBPDate
 			INTO #5PoundBalanceEmailCustomers
 			FROM [Derived].[Customer_Reach5GBPDate] r5
-			WHERE Reach5GBPDate = @Today_FivePoundBalance
+			WHERE [r5].[Reach5GBPDate] = @Today_FivePoundBalance
 		
 
 	/*******************************************************************************************************************************************
@@ -403,7 +403,7 @@ BEGIN
 			FROM [Inbound].[Redemptions] re
 			WHERE EXISTS (	SELECT 1
 							FROM #RedemptionReminder_DaysEmailCustomers rrdc
-							WHERE re.CustomerID = rrdc.SourceUID)
+							WHERE #RedemptionReminder_DaysEmailCustomers.[re].CustomerID = rrdc.SourceUID)
 			GROUP BY re.CustomerID
 
 			CREATE CLUSTERED INDEX CIX_SourceUID ON #RedemptionReminder_DaysRedemptions (CustomerID)
@@ -434,7 +434,7 @@ BEGIN
 
 			SELECT @DailyDataLogEntriesForToday = COUNT(*)
 			FROM [Email].[EmailDailyDataLog]
-			WHERE CONVERT(DATE, CompletionDate) = @Today_DailyDataLog
+			WHERE CONVERT(DATE, [Email].[EmailDailyDataLog].[CompletionDate]) = @Today_DailyDataLog
 
 			--IF @DailyDataLogEntriesForToday = 0
 			--	BEGIN
@@ -466,30 +466,30 @@ BEGIN
 
 			TRUNCATE TABLE [Email].[DailyData]
 
-			INSERT INTO [Email].[DailyData] (FanID
-										   , Email
-										   , PublisherID
-										   , CustomerSegment
-										   , Title
-										   , FirstName
-										   , LastName
-										   , DOB
-										   , CashbackAvailable
-										   , CashbackPending
-										   , CashbackLTV
-										   , PartialPostCode
-										   , Marketable
-										   , Birthday_Flag
-										   , Birthday_Code
-										   , Birthday_CodeExpiryDate
-										   , FirstEarn_Date
-										   , FirstEarn_Amount
-										   , FirstEarn_RetailerName
-										   , FirstEarn_Type
-										   , Reached5GBP_Date
-										   , RedeemReminder_Amount
-										   , RedeemReminder_Day
-										   , EarnConfirmation_Date)
+			INSERT INTO [Email].[DailyData] ([Email].[DailyData].[FanID]
+										   , [Email].[DailyData].[Email]
+										   , [Email].[DailyData].[PublisherID]
+										   , [Email].[DailyData].[CustomerSegment]
+										   , [Email].[DailyData].[Title]
+										   , [Email].[DailyData].[FirstName]
+										   , [Email].[DailyData].[LastName]
+										   , [Email].[DailyData].[DOB]
+										   , [Email].[DailyData].[CashbackAvailable]
+										   , [Email].[DailyData].[CashbackPending]
+										   , [Email].[DailyData].[CashbackLTV]
+										   , [Email].[DailyData].[PartialPostCode]
+										   , [Email].[DailyData].[Marketable]
+										   , [Email].[DailyData].[Birthday_Flag]
+										   , [Email].[DailyData].[Birthday_Code]
+										   , [Email].[DailyData].[Birthday_CodeExpiryDate]
+										   , [Email].[DailyData].[FirstEarn_Date]
+										   , [Email].[DailyData].[FirstEarn_Amount]
+										   , [Email].[DailyData].[FirstEarn_RetailerName]
+										   , [Email].[DailyData].[FirstEarn_Type]
+										   , [Email].[DailyData].[Reached5GBP_Date]
+										   , [Email].[DailyData].[RedeemReminder_Amount]
+										   , [Email].[DailyData].[RedeemReminder_Day]
+										   , [Email].[DailyData].[EarnConfirmation_Date])
 			SELECT cu.FanID
 				 , cu.Email
 				 , cu.ClubID AS PublisherID
@@ -580,7 +580,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

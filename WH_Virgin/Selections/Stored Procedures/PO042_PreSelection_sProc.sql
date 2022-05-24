@@ -71,7 +71,7 @@ select ct.cinid
 	,sum(case when trandate < '2020-03-23' then amount else 0 end) as before_lockdown
 INTO #Trans
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB F ON F.CINID = CT.CINID
+JOIN	#FB F ON F.CINID = #FB.[CT].CINID
 JOIN	#CC C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 where trandate between '2019-03-23' and '2021-03-23'
 and amount > 0
@@ -79,20 +79,20 @@ GROUP BY ct.CINID
 
 
 IF OBJECT_ID('Sandbox.BastienC.p_oferries_wfh_virgin') IS NOT NULL DROP TABLE Sandbox.BastienC.p_oferries_wfh_virgin
-SELECT	CINID
+SELECT	#Trans.[cinid]
 INTO Sandbox.BastienC.p_oferries_wfh_virgin
 from #Trans
-where cinid not in (select cinid from Sandbox.RukanK.po_ferries_compsteal_virgin)
-and cinid not in (select cinid from Sandbox.bastienc.po_ferries_airlines_virgin)
-GROUP BY CINID
+where #Trans.[cinid] not in (select #Trans.[cinid] from Sandbox.RukanK.po_ferries_compsteal_virgin)
+and #Trans.[cinid] not in (select #Trans.[cinid] from Sandbox.bastienc.po_ferries_airlines_virgin)
+GROUP BY #Trans.[cinid]
 
 
 IF OBJECT_ID('[WH_Virgin].[Selections].[PO042_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[PO042_PreSelection]
-SELECT	FanID
+SELECT	[fb].[FanID]
 INTO [WH_Virgin].[Selections].[PO042_PreSelection]
 FROM #FB fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.BastienC.p_oferries_wfh_virgin sb
-				WHERE fb.CINID = sb.CINID)
+				WHERE fb.CINID = #FB.[sb].CINID)
 
 END

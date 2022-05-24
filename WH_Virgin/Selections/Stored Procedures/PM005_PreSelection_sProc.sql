@@ -19,17 +19,17 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 			 , @Lapsed INT
 			 , @Lapsing INT
 
-		SELECT	@BrandID = BrandID
+		SELECT	@BrandID = [Warehouse].[Relational].[Partner].[BrandID]
 		FROM [Warehouse].[Relational].[Partner]
-		WHERE PartnerID = @PartnerID
+		WHERE [Warehouse].[Relational].[Partner].[PartnerID] = @PartnerID
 
 
-		SELECT @Acquire = Acquire 
-			 , @Lapsed = Lapsed
-			 , @Lapsing = Lapsed - 4
+		SELECT @Acquire = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Acquire] 
+			 , @Lapsed = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Lapsed]
+			 , @Lapsing = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Lapsed] - 4
 		FROM [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ]
-		WHERE PartnerID = @PartnerID
-		AND EndDate IS NULL
+		WHERE [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[PartnerID] = @PartnerID
+		AND [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[EndDate] IS NULL
 	
 	/*******************************************************************************************************************************************
 		2. Run segmentation for spenders
@@ -65,18 +65,18 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 								,	Virgin BIT)
 
 			INSERT INTO #CCIDs
-			SELECT	ConsumerCombinationID
+			SELECT	[Warehouse].[Relational].[ConsumerCombination].[ConsumerCombinationID]
 				,	1 AS MyRewards
 				,	0 AS Virgin
 			FROM Warehouse.Relational.ConsumerCombination cc WITH (NOLOCK)
-			WHERE BrandID = @BrandID
+			WHERE [Warehouse].[Relational].[ConsumerCombination].[BrandID] = @BrandID
 	
 			INSERT INTO #CCIDs
-			SELECT	ConsumerCombinationID
+			SELECT	[WH_Virgin].[Trans].[ConsumerCombination].[ConsumerCombinationID]
 				,	0 AS MyRewards
 				,	1 AS Virgin
 			FROM WH_Virgin.Trans.ConsumerCombination cc WITH (NOLOCK)
-			WHERE BrandID = @BrandID
+			WHERE [WH_Virgin].[Trans].[ConsumerCombination].[BrandID] = @BrandID
 		
 			CREATE CLUSTERED INDEX CIX_CCID_CCID ON #CCIDs (ConsumerCombinationID)
 
@@ -110,7 +110,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 				 END AS Segment
 			FROM #CCIDs CCs
 			INNER JOIN Warehouse.Relational.ConsumerTransaction_MyRewards ct WITH (NOLOCK)
-				ON CCs.ConsumerCombinationID = ct.ConsumerCombinationID
+				ON CCs.ConsumerCombinationID = #CCIDs.[ct].ConsumerCombinationID
 				AND CCs.MyRewards = 1
 			INNER JOIN #Customers cu
 				ON	ct.CINID = cu.CINID
@@ -130,7 +130,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 				 END AS Segment
 			FROM #CCIDs CCs
 			INNER JOIN WH_Virgin.Trans.ConsumerTransaction ct
-				ON CCs.ConsumerCombinationID = ct.ConsumerCombinationID
+				ON CCs.ConsumerCombinationID = #CCIDs.[ct].ConsumerCombinationID
 				AND CCs.Virgin = 1
 			INNER JOIN #Customers cu
 				ON	ct.CINID = cu.CINID
@@ -191,4 +191,4 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 		SELECT *
 		INTO Sandbox.Rory.PoochMuttLapsing_20210617
 		FROM #AllCustomers
-		WHERE Segment = 'Lapsing'If Object_ID('WH_Virgin.Selections.PM005_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.PM005_PreSelectionSelect FanIDInto WH_Virgin.Selections.PM005_PreSelectionFROM  SANDBOX.RORY.POOCHMUTTLAPSING_20210617END
+		WHERE #AllCustomers.[Segment] = 'Lapsing'If Object_ID('WH_Virgin.Selections.PM005_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.PM005_PreSelectionSelect [SANDBOX].[RORY].[POOCHMUTTLAPSING_20210617].[FanID]Into WH_Virgin.Selections.PM005_PreSelectionFROM  SANDBOX.RORY.POOCHMUTTLAPSING_20210617END

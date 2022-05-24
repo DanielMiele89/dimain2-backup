@@ -54,17 +54,17 @@ and AccountType IS NOT NULL
 
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-SELECT ConsumerCombinationID
+SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
 INTO	#CC
 FROM	WH_Virgin.trans.ConsumerCombination  CC
-WHERE	BrandID IN (665,374,66,137,686,680,617,901,2615,583)
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN (665,374,66,137,686,680,617,901,2615,583)
 
 
 IF OBJECT_ID('tempdb..#Trans') IS NOT NULL DROP TABLE #Trans
 SELECT	F.CINID
 INTO #Trans
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB F ON F.CINID = CT.CINID
+JOIN	#FB F ON F.CINID = #FB.[CT].CINID
 JOIN	#CC C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	TranDate > DATEADD(MONTH, -24, GETDATE())
 		AND Amount > 0
@@ -72,18 +72,18 @@ GROUP BY F.CINID
 
 
 IF OBJECT_ID('Sandbox.bastienc.po_ferries_airlines_virgin') IS NOT NULL DROP TABLE Sandbox.BastienC.po_ferries_airlines_virgin
-SELECT	CINID
+SELECT	#Trans.[CINID]
 INTO Sandbox.bastienc.po_ferries_airlines_virgin
 FROM	#Trans 
-where cinid not in (select cinid from Sandbox.RukanK.po_ferries_compsteal_virgin)
-GROUP BY CINID
+where #Trans.[CINID] not in (select #Trans.[cinid] from Sandbox.RukanK.po_ferries_compsteal_virgin)
+GROUP BY #Trans.[CINID]
 
 IF OBJECT_ID('[WH_Virgin].[Selections].[PO041_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[PO041_PreSelection]
-SELECT	FanID
+SELECT	[fb].[FanID]
 INTO [WH_Virgin].[Selections].[PO041_PreSelection]
 FROM #FB fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.BastienC.po_ferries_airlines_virgin sb
-				WHERE fb.CINID = sb.CINID)
+				WHERE fb.CINID = #FB.[sb].CINID)
 
 END

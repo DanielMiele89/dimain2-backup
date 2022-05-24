@@ -34,12 +34,12 @@ BEGIN
 		*******************************************************************************************************************************************/
 		
 			IF OBJECT_ID('tempdb..#Customer') IS NOT NULL DROP TABLE #Customer
-			SELECT	FanID
-				,	CurrentlyActive
-				,	Hardbounced
-				,	Unsubscribed
-				,	MarketableByEmail
-				,	MarketableByPush
+			SELECT	[cus].[FanID]
+				,	[cus].[CurrentlyActive]
+				,	[cus].[Hardbounced]
+				,	[cus].[Unsubscribed]
+				,	[cus].[MarketableByEmail]
+				,	[cus].[MarketableByPush]
 			INTO #Customer
 			FROM [WHB].[Customer] cus
 			WHERE NOT EXISTS (	SELECT 1
@@ -67,15 +67,15 @@ BEGIN
 			WHERE mesd.EndDate IS NULL
 			AND EXISTS (SELECT 1
 						FROM #Customer cu
-						WHERE mesd.FanID = cu.FanID)
+						WHERE #Customer.[mesd].FanID = cu.FanID)
 			AND NOT EXISTS (SELECT 1
 							FROM #Customer cu
-							WHERE mesd.FanID = cu.FanID
-							AND cu.Unsubscribed = mesd.Unsubscribed
-							AND cu.CurrentlyActive = mesd.CurrentlyActive
-							AND cu.Hardbounced = mesd.Hardbounced
-							AND cu.MarketableByEmail = mesd.MarketableByEmail
-							AND cu.MarketableByPush = mesd.MarketableByPush)
+							WHERE #Customer.[mesd].FanID = cu.FanID
+							AND cu.Unsubscribed = #Customer.[mesd].Unsubscribed
+							AND cu.CurrentlyActive = #Customer.[mesd].CurrentlyActive
+							AND cu.Hardbounced = #Customer.[mesd].Hardbounced
+							AND cu.MarketableByEmail = #Customer.[mesd].MarketableByEmail
+							AND cu.MarketableByPush = #Customer.[mesd].MarketableByPush)
 
 
 		/*******************************************************************************************************************************************
@@ -84,27 +84,27 @@ BEGIN
 
 			--DECLARE @RunDate DATE = GETDATE()
 
-			INSERT INTO [Derived].[Customer_MarketableStatus] (	FanID
-															,	CurrentlyActive
-															,	Hardbounced
-															,	Unsubscribed
-															,	MarketableByEmail
-															,	MarketableByPush
-															,	StartDate
-															,	EndDate)
-			SELECT	FanID
-				,	CurrentlyActive
-				,	Hardbounced
-				,	Unsubscribed
-				,	MarketableByEmail
-				,	MarketableByPush
+			INSERT INTO [Derived].[Customer_MarketableStatus] (	[Derived].[Customer_MarketableStatus].[FanID]
+															,	[Derived].[Customer_MarketableStatus].[CurrentlyActive]
+															,	[Derived].[Customer_MarketableStatus].[Hardbounced]
+															,	[Derived].[Customer_MarketableStatus].[Unsubscribed]
+															,	[Derived].[Customer_MarketableStatus].[MarketableByEmail]
+															,	[Derived].[Customer_MarketableStatus].[MarketableByPush]
+															,	[Derived].[Customer_MarketableStatus].[StartDate]
+															,	[Derived].[Customer_MarketableStatus].[EndDate])
+			SELECT	[cu].[FanID]
+				,	[cu].[CurrentlyActive]
+				,	[cu].[Hardbounced]
+				,	[cu].[Unsubscribed]
+				,	[cu].[MarketableByEmail]
+				,	[cu].[MarketableByPush]
 				,	@RunDate AS StartDate
 				,	NULL AS EndDate
 			FROM #Customer cu
 			WHERE NOT EXISTS (	SELECT 1
 								FROM [Derived].[Customer_MarketableStatus] mesd
-								WHERE cu.FanID = mesd.FanID
-								AND mesd.EndDate IS NULL)
+								WHERE cu.FanID = #Customer.[mesd].FanID
+								AND #Customer.[mesd].EndDate IS NULL)
 
 			EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Finished'
 
@@ -126,7 +126,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

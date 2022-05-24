@@ -41,7 +41,7 @@ BEGIN
 	-- are compatible with the destination partition. 
 	--------------------------------------------------------------------------------------------------------------------------
 	IF @NewPartition = '1' 
-		ALTER TABLE [Trans].[ConsumerTransaction_p_Stage] ADD CONSTRAINT CheckTranDate_p CHECK (TranDate < '20110701')
+		ALTER TABLE [Trans].[ConsumerTransaction_p_Stage] ADD CONSTRAINT CheckTranDate_p CHECK ([ConsumerTransaction_p_Stage].[TranDate] < '20110701')
 
 	IF @NewPartition > '1' 
 		EXEC('ALTER TABLE [Trans].[ConsumerTransaction_p_Stage] ADD CONSTRAINT CheckTranDate_p CHECK (TranDate >= ''' + @ThisPartitionStartDate + ''' AND TranDate < ''' + @NextPartitionStartDate + ''')')

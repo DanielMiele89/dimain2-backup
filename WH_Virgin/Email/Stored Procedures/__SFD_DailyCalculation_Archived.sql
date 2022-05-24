@@ -49,7 +49,7 @@ BEGIN TRY
 		WHERE ls.EndDate IS NULL
 		AND EXISTS (SELECT 1
 					FROM #Customer cu
-					WHERE ls.FanID = cu.FanID)
+					WHERE #Customer.[ls].FanID = cu.FanID)
 
 		CREATE CLUSTERED INDEX CIX_FanID ON #CustomerSegment (FanID)
 
@@ -87,7 +87,7 @@ BEGIN TRY
 			SELECT TOP 10000000 *
 			INTO #TransTemp
 			FROM [Inbound].[Transactions] tr
-			ORDER BY LoadDate DESC
+			ORDER BY [tr].[LoadDate] DESC
 
 			IF OBJECT_ID('tempdb..#Trans') IS NOT NULL DROP TABLE #Trans
 			SELECT	tr.*
@@ -100,7 +100,7 @@ BEGIN TRY
 				ON cu.SourceUID = ca.PrimaryCustomerID
 			WHERE CONVERT(DATE, tr.LoadDate) = @Yesterday
 			AND 0 < tr.CashbackAmount
-			ORDER BY LoadDate DESC
+			ORDER BY [tr].[LoadDate] DESC
 		
 			DROP TABLE WH_Virgin.Derived.Customer_FirstEarnDate
 			CREATE TABLE WH_Virgin.Derived.Customer_FirstEarnDate (	ID INT IDENTITY
@@ -135,17 +135,17 @@ BEGIN TRY
 					,	CONVERT(DATETIME, tr.TransactionDate) + CONVERT(DATETIME, tr.TransactionTime) AS TranDate
 					,	tr.LoadDate
 					,	tr.CashbackAmount
-					,	pa.ID AS PartnerID
-					,	pa.Name AS PartnerName
+					,	#Trans.[pa].ID AS PartnerID
+					,	#Trans.[pa].Name AS PartnerName
 					,	ROW_NUMBER() OVER (PARTITION BY tr.FanID ORDER BY tr.LoadDate, CONVERT(DATETIME, tr.TransactionDate) + CONVERT(DATETIME, tr.TransactionTime), tr.CardID, tr.CashbackAmount) AS TransactionNumber
 				INTO #FirstTrans
 				FROM #Trans tr
 				INNER JOIN [SLC_REPL].[dbo].[IronOffer] iof
-					ON tr.OfferID = iof.ID
+					ON tr.OfferID = #Trans.[iof].ID
 				INNER JOIN [Warehouse].[iron].[PrimaryRetailerIdentification] pri
-					ON iof.PartnerID = pri.PartnerID
+					ON #Trans.[iof].PartnerID = #Trans.[pri].PartnerID
 				INNER JOIN [SLC_REPL].[dbo].[Partner] pa
-					ON COALESCE(pri.PrimaryPartnerID, pri.PartnerID) = pa.ID
+					ON COALESCE(#Trans.[pri].PrimaryPartnerID, #Trans.[pri].PartnerID) = #Trans.[pa].ID
 				WHERE NOT EXISTS (	SELECT 1
 									FROM [Derived].[Customer_FirstEarnDate] fed
 									WHERE tr.FanID = fed.FanID)
@@ -162,7 +162,7 @@ BEGIN TRY
 					,	ft.PartnerID
 					,	ft.PartnerName
 				FROM #FirstTrans ft
-				WHERE TransactionNumber = 1
+				WHERE [ft].[TransactionNumber] = 1
 
 
 			--	Fetch the first transaction per customer and details of that transaction
@@ -175,7 +175,7 @@ BEGIN TRY
 					,	'POS' AS FirstEarn_Type
 				INTO #FirstEarnPOS
 				FROM #FirstTrans ft
-				WHERE TransactionNumber = 1
+				WHERE [ft].[TransactionNumber] = 1
 
 	--	Fetch customers who have reached a £5 total cashback lifetime value for the first time, where they haven't already received an email
 
@@ -250,7 +250,7 @@ BEGIN TRY
 			CREATE CLUSTERED INDEX CIX_CashbackAvailable ON #CashbackAvailable (FanID, CashbackAvailable)
 
 			UPDATE #CashbackAvailable
-			SET CashbackAvailable = CASE WHEN CashbackAvailable < 5 THEN 0 ELSE CashbackAvailable - 5 END
+			SET #CashbackAvailable.[CashbackAvailable] = CASE WHEN #CashbackAvailable.[CashbackAvailable] < 5 THEN 0 ELSE #CashbackAvailable.[CashbackAvailable] - 5 END
 	
 			IF OBJECT_ID('tempdb..#RedemptionReminder_ValueCustomers') IS NOT NULL DROP TABLE #RedemptionReminder_ValueCustomers
 			SELECT cu.FanID
@@ -319,7 +319,7 @@ BEGIN TRY
 			FROM [Inbound].[Redemptions] re
 			WHERE EXISTS (	SELECT 1
 							FROM #RedemptionReminder_DaysCustomers rrdc
-							WHERE re.CustomerID = rrdc.SourceUID)
+							WHERE #RedemptionReminder_DaysCustomers.[re].CustomerID = rrdc.SourceUID)
 			GROUP BY re.CustomerID
 
 			CREATE CLUSTERED INDEX CIX_SourceUID ON #RedemptionReminder_DaysRedemptions (CustomerID)
@@ -337,30 +337,30 @@ BEGIN TRY
 
 		TRUNCATE TABLE [Email].[DailyData]
 
-		INSERT INTO [Email].[DailyData] (FanID
-									   , Email
-									   , PublisherID
-									   , CustomerSegment
-									   , Title
-									   , FirstName
-									   , LastName
-									   , DOB
-									   , CashbackAvailable
-									   , CashbackPending
-									   , CashbackLTV
-									   , PartialPostCode
-									   , Marketable
-									   , Birthday_Flag
-									   , Birthday_Code
-									   , Birthday_CodeExpiryDate
-									   , FirstEarn_Date
-									   , FirstEarn_Amount
-									   , FirstEarn_RetailerName
-									   , FirstEarn_Type
-									   , Reached5GBP_Date
-									   , RedeemReminder_Amount
-									   , RedeemReminder_Day
-									   , EarnConfirmation_Date)
+		INSERT INTO [Email].[DailyData] ([Email].[DailyData].[FanID]
+									   , [Email].[DailyData].[Email]
+									   , [Email].[DailyData].[PublisherID]
+									   , [Email].[DailyData].[CustomerSegment]
+									   , [Email].[DailyData].[Title]
+									   , [Email].[DailyData].[FirstName]
+									   , [Email].[DailyData].[LastName]
+									   , [Email].[DailyData].[DOB]
+									   , [Email].[DailyData].[CashbackAvailable]
+									   , [Email].[DailyData].[CashbackPending]
+									   , [Email].[DailyData].[CashbackLTV]
+									   , [Email].[DailyData].[PartialPostCode]
+									   , [Email].[DailyData].[Marketable]
+									   , [Email].[DailyData].[Birthday_Flag]
+									   , [Email].[DailyData].[Birthday_Code]
+									   , [Email].[DailyData].[Birthday_CodeExpiryDate]
+									   , [Email].[DailyData].[FirstEarn_Date]
+									   , [Email].[DailyData].[FirstEarn_Amount]
+									   , [Email].[DailyData].[FirstEarn_RetailerName]
+									   , [Email].[DailyData].[FirstEarn_Type]
+									   , [Email].[DailyData].[Reached5GBP_Date]
+									   , [Email].[DailyData].[RedeemReminder_Amount]
+									   , [Email].[DailyData].[RedeemReminder_Day]
+									   , [Email].[DailyData].[EarnConfirmation_Date])
 		SELECT cu.FanID
 			 , cu.Email
 			 , cu.ClubID AS PublisherID
@@ -432,7 +432,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

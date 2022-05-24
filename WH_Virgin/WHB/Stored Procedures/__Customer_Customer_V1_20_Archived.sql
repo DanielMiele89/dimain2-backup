@@ -35,8 +35,8 @@ BEGIN TRY
 	----------------------------------------------------------------------------------------------------*/
 
 	If Object_ID('tempdb..#PrevAct') Is Not Null Drop Table #PrevAct
-	Select FanID
-		 , [Date] as AgreedTCs
+	Select [Staging].[InsightArchiveData].[FanID]
+		 , [Staging].[InsightArchiveData].[Date] as AgreedTCs
 	Into #PrevAct
 	From Staging.InsightArchiveData as iad
 	Where iad.TypeID = 1 
@@ -49,17 +49,17 @@ BEGIN TRY
 	
 	If Object_ID('tempdb..#EmailEvent') Is Not Null Drop Table #EmailEvent
 	Select FanID
-		 , Unsubscribe
-		 , HardBounce
+		 , [ee].[UnSubscribe]
+		 , [ee].[HardBounce]
 	Into #EmailEvent
 	From (Select ee.FanID
-				, Max(Case When EmailEventCodeID = 301 Then [Date] Else NULL End) as UnSubscribe
-				, Max(Case When EmailEventCodeID = 702 Then [Date] Else NULL End) as HardBounce
+				, Max(Case When [SLC_Report].[dbo].[EmailEvent].[EmailEventCodeID] = 301 Then [SLC_Report].[dbo].[EmailEvent].[Date] Else NULL End) as UnSubscribe
+				, Max(Case When [SLC_Report].[dbo].[EmailEvent].[EmailEventCodeID] = 702 Then [SLC_Report].[dbo].[EmailEvent].[Date] Else NULL End) as HardBounce
 		  From SLC_Report.dbo.EmailEvent as ee
-		  Where EmailEventCodeID In (301, 702) -- CJM 20161116 uncomment this
-		  Group by FanID) as ee
-	Where Unsubscribe Is Not Null
-	Or Hardbounce Is Not Null
+		  Where [SLC_Report].[dbo].[EmailEvent].[EmailEventCodeID] In (301, 702) -- CJM 20161116 uncomment this
+		  Group by [SLC_Report].[dbo].[EmailEvent].[FanID]) as ee
+	Where [ee].[UnSubscribe] Is Not Null
+	Or [ee].[HardBounce] Is Not Null
 	
 	Create Clustered Index CIX_EmailEvent_Fan on #EmailEvent (FanID)
 
@@ -68,7 +68,7 @@ BEGIN TRY
 	----------------------------------------------------------------------------------------------------*/
 	
 	If Object_ID('tempdb..#CustomerAttribute') Is Not Null Drop Table #CustomerAttribute
-	Select Distinct FanID
+	Select Distinct [c].[FanID]
 	Into #CustomerAttribute
 	from Derived.CustomerAttribute as ca
 	Inner join Derived.CinList as CL
@@ -85,14 +85,14 @@ BEGIN TRY
 	Truncate Table Staging.Customer
 
 	Insert Into Staging.Customer (
-		FanID, [Status], SourceUID, DOB, Title, FirstName, LastName, Address1, Address2, City, County, PostCode, Email,
-		AgreedTCsDate, OfflineOnly, ContactByPost, Unsubscribed, Hardbounced, CompositeID, Primacy, IsJoint, 
-		ControlGroupNumber, ReportGroup, TreatmentGroup, LaunchGroup, OriginalEmailPermission, OriginalDMPermission, 
-		EmailOriginallySupplied, AgeCurrent, --AgeAtLaunch, 
-		AgeCurrentBandNumber, Gender, PostalSector, PostCodeDistrict, 
-		PostArea, Region, EmailStructureValid, MarketableByEmail, MarketableByDirectMail, EmailNonOpener, MobileTelephone, 
-		ValidMobile, Salutation, CurrentEmailPermission, CurrentDMPermission, ClubID, DeactivatedDate, OptedOutDate, 
-		CurrentlyActive, Rainbow_Customer	
+		[Staging].[Customer].[FanID], [Staging].[Customer].[Status], [Staging].[Customer].[SourceUID], [Staging].[Customer].[DOB], [Staging].[Customer].[Title], [Staging].[Customer].[FirstName], [Staging].[Customer].[LastName], [Staging].[Customer].[Address1], [Staging].[Customer].[Address2], [Staging].[Customer].[City], [Staging].[Customer].[County], [Staging].[Customer].[PostCode], [Staging].[Customer].[Email],
+		[Staging].[Customer].[AgreedTCsDate], [Staging].[Customer].[OfflineOnly], [Staging].[Customer].[ContactByPost], [Staging].[Customer].[Unsubscribed], [Staging].[Customer].[Hardbounced], [Staging].[Customer].[CompositeID], [Staging].[Customer].[Primacy], [Staging].[Customer].[IsJoint], 
+		[Staging].[Customer].[ControlGroupNumber], [Staging].[Customer].[ReportGroup], [Staging].[Customer].[TreatmentGroup], [Staging].[Customer].[LaunchGroup], [Staging].[Customer].[OriginalEmailPermission], [Staging].[Customer].[OriginalDMPermission], 
+		[Staging].[Customer].[EmailOriginallySupplied], [Staging].[Customer].[AgeCurrent], --AgeAtLaunch, 
+		[Staging].[Customer].[AgeCurrentBandNumber], [Staging].[Customer].[Gender], [Staging].[Customer].[PostalSector], [Staging].[Customer].[PostCodeDistrict], 
+		[Staging].[Customer].[PostArea], [Staging].[Customer].[Region], [Staging].[Customer].[EmailStructureValid], [Staging].[Customer].[MarketableByEmail], [Staging].[Customer].[MarketableByDirectMail], [Staging].[Customer].[EmailNonOpener], [Staging].[Customer].[MobileTelephone], 
+		[Staging].[Customer].[ValidMobile], [Staging].[Customer].[Salutation], [Staging].[Customer].[CurrentEmailPermission], [Staging].[Customer].[CurrentDMPermission], [Staging].[Customer].[ClubID], [Staging].[Customer].[DeactivatedDate], [Staging].[Customer].[OptedOutDate], 
+		[Staging].[Customer].[CurrentlyActive], [Staging].[Customer].[Rainbow_Customer]	
 	)
 	Select f.ID as FanID
 		 , Case
@@ -221,9 +221,9 @@ BEGIN TRY
 	Left join Archive_Light.Prod.NobleFanAttributes a 
 		on f.CompositeID = a.CompositeID
 	Left join #PrevAct as pa
-		on f.ID = pa.FanID
+		on #PrevAct.[f].ID = pa.FanID
 	Left join Report.CustomerActiveStatus ca 
-		on f.ID = ca.FanID
+		on #PrevAct.[f].ID = #PrevAct.[ca].FanID
 --	Left join [InsightArchive].[Customer_Backup20130724] as cb -- ############################
 --		on f.ID = cb.FanID
 	Left join #EmailEvent as UnSub
@@ -239,7 +239,7 @@ BEGIN TRY
 	------------------------------------------------------------------------
 
 	Update cu
-	Set PostalSector = Case
+	Set [Staging].[Customer].[PostalSector] = Case
 							When Replace(Replace(PostCode, Char(160),''),' ','') Like '[a-z][0-9][0-9][a-z][a-z]'
 								Then Left(Replace(Replace(PostCode, Char(160),''),' ',''),2) + ' ' + Right(Left(Replace(Replace(PostCode, Char(160), ''), ' ', ''), 3), 1)
 							When Replace(Replace(PostCode, Char(160),''),' ','') Like '[a-z][0-9][0-9][0-9][a-z][a-z]'
@@ -252,11 +252,11 @@ BEGIN TRY
 							Else ''
 					   End
 	  , cu.Region = pa.Region
-	  , EmailNonOpener = Case 
+	  , [Staging].[Customer].[EmailNonOpener] = Case 
 							When eno.FanID Is Null Then 0 
 							Else 1 
 						  End
-	  , AgeCurrentBandNumber = Case 
+	  , [Staging].[Customer].[AgeCurrentBandNumber] = Case 
 									When AgeCurrent Is Null then 0
 									When Not AgeCurrent Between 18 and 110 then 0
 									When AgeCurrent Between 18 and 24 then 1
@@ -278,44 +278,44 @@ BEGIN TRY
 	-----------------------Enchance Customer Data Part 3--------------------
 	------------------------------------------------------------------------
 	Update Staging.Customer
-	Set AgeCurrentBandText = Case 
-								When AgeCurrentBandNumber = 0 Then 'Unknown'
-								When AgeCurrentBandNumber = 1 Then '18 to 24' 
-								When AgeCurrentBandNumber = 2 Then '25 to 34' 
-								When AgeCurrentBandNumber = 3 Then '35 to 44' 
-								When AgeCurrentBandNumber = 4 Then '45 to 54' 
-								When AgeCurrentBandNumber = 5 Then '55 to 64' 
-								When AgeCurrentBandNumber = 6 Then '65 to 80' 
-								When AgeCurrentBandNumber = 7 Then '81+' 
+	Set [Staging].[Customer].[AgeCurrentBandText] = Case 
+								When [Staging].[Customer].[AgeCurrentBandNumber] = 0 Then 'Unknown'
+								When [Staging].[Customer].[AgeCurrentBandNumber] = 1 Then '18 to 24' 
+								When [Staging].[Customer].[AgeCurrentBandNumber] = 2 Then '25 to 34' 
+								When [Staging].[Customer].[AgeCurrentBandNumber] = 3 Then '35 to 44' 
+								When [Staging].[Customer].[AgeCurrentBandNumber] = 4 Then '45 to 54' 
+								When [Staging].[Customer].[AgeCurrentBandNumber] = 5 Then '55 to 64' 
+								When [Staging].[Customer].[AgeCurrentBandNumber] = 6 Then '65 to 80' 
+								When [Staging].[Customer].[AgeCurrentBandNumber] = 7 Then '81+' 
 							 End
-	  , MarketableByEmail = Case 
-								When AgreedTCsDate Is Not Null
-									 And ((LaunchGroup Is Not Null) Or AgreedTCsDate >= 'Aug 08, 2013')	--	not control
-									 And Status > 0						--account is active. This field will be set to 0 is customer is deceased. Discussed with Tracy 9 March 2012
-									 And Unsubscribed = 0				--customer has not unsubscribed. Joe + Niru to start updating this field from SFD (discussed 15 March 2012)
-									 And Hardbounced = 0				--email address has not hardbounced.
-									 And EmailStructureValid = 1		--result of basic structutral validation above
-									 And OfflineOnly = 0				--customer has not activated offline at contact centre
-									 And MarketableByEmail Is Null
+	  , [Staging].[Customer].[MarketableByEmail] = Case 
+								When [Staging].[Customer].[AgreedTCsDate] Is Not Null
+									 And (([Staging].[Customer].[LaunchGroup] Is Not Null) Or [Staging].[Customer].[AgreedTCsDate] >= 'Aug 08, 2013')	--	not control
+									 And [Staging].[Customer].[Status] > 0						--account is active. This field will be set to 0 is customer is deceased. Discussed with Tracy 9 March 2012
+									 And [Staging].[Customer].[Unsubscribed] = 0				--customer has not unsubscribed. Joe + Niru to start updating this field from SFD (discussed 15 March 2012)
+									 And [Staging].[Customer].[Hardbounced] = 0				--email address has not hardbounced.
+									 And [Staging].[Customer].[EmailStructureValid] = 1		--result of basic structutral validation above
+									 And [Staging].[Customer].[OfflineOnly] = 0				--customer has not activated offline at contact centre
+									 And [Staging].[Customer].[MarketableByEmail] Is Null
 								Then 1
 								Else 0 
 							End
-	 , MarketableByDirectMail = Case 
-									When LaunchGroup Is Not Null			--as above
-										 And Not LaunchGroup = 'INIT'		--etc
-										 And Status > 0						--etc
-										 And ContactByPost = 1				--This is set by a tick box within the CBP Site. It is ticked by default, indicating agreement to receive direct mail
-										 And (EmailStructureValid = 0 or HardBounced = 1)  --In the DM cells or activated but have undeliverable email address					 
-										 And Not (EmailStructureValid = 1 and Hardbounced = 0 and Unsubscribed = 0)
+	 , [Staging].[Customer].[MarketableByDirectMail] = Case 
+									When [Staging].[Customer].[LaunchGroup] Is Not Null			--as above
+										 And Not [Staging].[Customer].[LaunchGroup] = 'INIT'		--etc
+										 And [Staging].[Customer].[Status] > 0						--etc
+										 And [Staging].[Customer].[ContactByPost] = 1				--This is set by a tick box within the CBP Site. It is ticked by default, indicating agreement to receive direct mail
+										 And ([Staging].[Customer].[EmailStructureValid] = 0 or [Staging].[Customer].[HardBounced] = 1)  --In the DM cells or activated but have undeliverable email address					 
+										 And Not ([Staging].[Customer].[EmailStructureValid] = 1 and [Staging].[Customer].[Hardbounced] = 0 and [Staging].[Customer].[Unsubscribed] = 0)
 								  --	 And IsControl = 0					--etc
 									Then 1
 									Else 0 
 							    End
-	 , CurrentlyActive = Case
-							When DeactivatedDate Is Null
-								 And OptedOutDate Is Null
-								 And Status = 1
-								 And AgreedTCsDate <= Convert(Date, GetDate())
+	 , [Staging].[Customer].[CurrentlyActive] = Case
+							When [Staging].[Customer].[DeactivatedDate] Is Null
+								 And [Staging].[Customer].[OptedOutDate] Is Null
+								 And [Staging].[Customer].[Status] = 1
+								 And [Staging].[Customer].[AgreedTCsDate] <= Convert(Date, GetDate())
 							Then 1
 							Else 0
 						 End
@@ -345,65 +345,65 @@ BEGIN TRY
 
 	TRUNCATE TABLE Derived.Customer
 	INSERT INTO Derived.Customer (
-		FanID, SourceUID, CompositeID, [Status], Gender, Title, FirstName, LastName, Salutation, 
-		Address1, Address2, City, County, PostCode, PostalSector, PostCodeDistrict, PostArea, Region, 
-		Email, Unsubscribed, Hardbounced, EmailStructureValid, MobileTelephone, ValidMobile, Primacy, 
-		IsJoint, ControlGroupNumber, ReportGroup, TreatmentGroup, LaunchGroup, Activated, ActivatedDate, 
-		ActivatedOffline, MarketableByEmail, MarketableByDirectMail, EmailNonOpener, OriginalEmailPermission, 
-		OriginalDMPermission, EmailOriginallySupplied, CurrentEmailPermission, CurrentDMPermission, 
-		DOB, AgeCurrent, AgeCurrentBandNumber, AgeCurrentBandText, ClubID, DeactivatedDate, OptedOutDate, 
-		CurrentlyActive, Rainbow_Customer, Registered	
+		[Derived].[Customer].[FanID], [Derived].[Customer].[SourceUID], [Derived].[Customer].[CompositeID], [Derived].[Customer].[Status], [Derived].[Customer].[Gender], [Derived].[Customer].[Title], [Derived].[Customer].[FirstName], [Derived].[Customer].[LastName], [Derived].[Customer].[Salutation], 
+		[Derived].[Customer].[Address1], [Derived].[Customer].[Address2], [Derived].[Customer].[City], [Derived].[Customer].[County], [Derived].[Customer].[PostCode], [Derived].[Customer].[PostalSector], [Derived].[Customer].[PostCodeDistrict], [Derived].[Customer].[PostArea], [Derived].[Customer].[Region], 
+		[Derived].[Customer].[Email], [Derived].[Customer].[Unsubscribed], [Derived].[Customer].[Hardbounced], [Derived].[Customer].[EmailStructureValid], [Derived].[Customer].[MobileTelephone], [Derived].[Customer].[ValidMobile], [Derived].[Customer].[Primacy], 
+		[Derived].[Customer].[IsJoint], [Derived].[Customer].[ControlGroupNumber], [Derived].[Customer].[ReportGroup], [Derived].[Customer].[TreatmentGroup], [Derived].[Customer].[LaunchGroup], [Derived].[Customer].[Activated], [Derived].[Customer].[ActivatedDate], 
+		[Derived].[Customer].[ActivatedOffline], [Derived].[Customer].[MarketableByEmail], [Derived].[Customer].[MarketableByDirectMail], [Derived].[Customer].[EmailNonOpener], [Derived].[Customer].[OriginalEmailPermission], 
+		[Derived].[Customer].[OriginalDMPermission], [Derived].[Customer].[EmailOriginallySupplied], [Derived].[Customer].[CurrentEmailPermission], [Derived].[Customer].[CurrentDMPermission], 
+		[Derived].[Customer].[DOB], [Derived].[Customer].[AgeCurrent], [Derived].[Customer].[AgeCurrentBandNumber], [Derived].[Customer].[AgeCurrentBandText], [Derived].[Customer].[ClubID], [Derived].[Customer].[DeactivatedDate], [Derived].[Customer].[OptedOutDate], 
+		[Derived].[Customer].[CurrentlyActive], [Derived].[Customer].[Rainbow_Customer], [Derived].[Customer].[Registered]	
 	)
-	SELECT FanID
-		 , SourceUID
-		 , CompositeID
-		 , [Status]
-		 , Gender
-		 , Title
-		 , FirstName
-		 , LastName
-		 , Salutation
-		 , Address1
-		 , Address2
-		 , City
-		 , County
-		 , PostCode
-		 , PostalSector
-		 , PostCodeDistrict
-		 , PostArea
-		 , Region
-		 , Email
-		 , Unsubscribed
-		 , Hardbounced
-		 , EmailStructureValid
-		 , MobileTelephone
-		 , ValidMobile
-		 , Primacy
-		 , IsJoint
-		 , ControlGroupNumber
-		 , ReportGroup
-		 , TreatmentGroup
-		 , LaunchGroup
+	SELECT [Staging].[Customer].[FanID]
+		 , [Staging].[Customer].[SourceUID]
+		 , [Staging].[Customer].[CompositeID]
+		 , [Staging].[Customer].[Status]
+		 , [Staging].[Customer].[Gender]
+		 , [Staging].[Customer].[Title]
+		 , [Staging].[Customer].[FirstName]
+		 , [Staging].[Customer].[LastName]
+		 , [Staging].[Customer].[Salutation]
+		 , [Staging].[Customer].[Address1]
+		 , [Staging].[Customer].[Address2]
+		 , [Staging].[Customer].[City]
+		 , [Staging].[Customer].[County]
+		 , [Staging].[Customer].[PostCode]
+		 , [Staging].[Customer].[PostalSector]
+		 , [Staging].[Customer].[PostCodeDistrict]
+		 , [Staging].[Customer].[PostArea]
+		 , [Staging].[Customer].[Region]
+		 , [Staging].[Customer].[Email]
+		 , [Staging].[Customer].[Unsubscribed]
+		 , [Staging].[Customer].[Hardbounced]
+		 , [Staging].[Customer].[EmailStructureValid]
+		 , [Staging].[Customer].[MobileTelephone]
+		 , [Staging].[Customer].[ValidMobile]
+		 , [Staging].[Customer].[Primacy]
+		 , [Staging].[Customer].[IsJoint]
+		 , [Staging].[Customer].[ControlGroupNumber]
+		 , [Staging].[Customer].[ReportGroup]
+		 , [Staging].[Customer].[TreatmentGroup]
+		 , [Staging].[Customer].[LaunchGroup]
 		 , 1/*AgreedTCs*/ as Activated
-		 , AgreedTCsDate as ActivatedDate
-		 , OfflineOnly as ActivatedOffline
-		 , MarketableByEmail
-		 , MarketableByDirectMail
-		 , EmailNonOpener
-		 , OriginalEmailPermission --These fields removed (15 March 2012) as potentially confusing and not needed
-		 , OriginalDMPermission	 --Added back in 22 March 2012
-		 , EmailOriginallySupplied
-		 , CurrentEmailPermission
-		 , CurrentDMPermission			
-		 , DOB
-		 , AgeCurrent
-		 , AgeCurrentBandNumber
-		 , AgeCurrentBandText
-		 , ClubID
-		 , DeactivatedDate
-		 , OptedOutDate
-		 , CurrentlyActive
-		 , Rainbow_Customer
+		 , [Staging].[Customer].[AgreedTCsDate] as ActivatedDate
+		 , [Staging].[Customer].[OfflineOnly] as ActivatedOffline
+		 , [Staging].[Customer].[MarketableByEmail]
+		 , [Staging].[Customer].[MarketableByDirectMail]
+		 , [Staging].[Customer].[EmailNonOpener]
+		 , [Staging].[Customer].[OriginalEmailPermission] --These fields removed (15 March 2012) as potentially confusing and not needed
+		 , [Staging].[Customer].[OriginalDMPermission]	 --Added back in 22 March 2012
+		 , [Staging].[Customer].[EmailOriginallySupplied]
+		 , [Staging].[Customer].[CurrentEmailPermission]
+		 , [Staging].[Customer].[CurrentDMPermission]			
+		 , [Staging].[Customer].[DOB]
+		 , [Staging].[Customer].[AgeCurrent]
+		 , [Staging].[Customer].[AgeCurrentBandNumber]
+		 , [Staging].[Customer].[AgeCurrentBandText]
+		 , [Staging].[Customer].[ClubID]
+		 , [Staging].[Customer].[DeactivatedDate]
+		 , [Staging].[Customer].[OptedOutDate]
+		 , [Staging].[Customer].[CurrentlyActive]
+		 , [Staging].[Customer].[Rainbow_Customer]
 		 , 0 as Registered
 	FROM Staging.Customer
 
@@ -419,9 +419,9 @@ BEGIN TRY
 	--Change for David Crawford
 	*****************************/
 	Update Derived.Customer
-	Set Hardbounced = 0
-	  , MarketableByEmail = 1
-	Where FanID = 6137809
+	Set [Derived].[Customer].[Hardbounced] = 0
+	  , [Derived].[Customer].[MarketableByEmail] = 1
+	Where [Derived].[Customer].[FanID] = 6137809
 
 	
 	RETURN 0; -- normal exit here
@@ -442,7 +442,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

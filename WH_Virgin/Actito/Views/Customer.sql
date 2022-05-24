@@ -61,7 +61,7 @@ SampleCustomers AS (SELECT	[EmailAddress] = sclt.[EmailAddress]
 						,	[IsCredit] = 1
 						,	[Nominee] = ''
 						,	[RBSNomineeChange] = ''
-						,	[Marketable] = COALESCE([Marketable], 0)
+						,	[Marketable] = COALESCE([dd].[Marketable], 0)
 					FROM [Email].[SampleCustomersList] sclt
 					LEFT JOIN [Email].[SampleCustomerLinks] sclk
 						ON sclt.ID = sclk.SampleCustomerID
@@ -71,31 +71,31 @@ SampleCustomers AS (SELECT	[EmailAddress] = sclt.[EmailAddress]
 						ON sclk.RealCustomerFanID = cu.FanID
 					WHERE sclt.ID <= 750)
 
-	SELECT	EmailAddress
-		,	FanID
-		,	CIN
-		,	ClubID
+	SELECT	[n].[EmailAddress]
+		,	[n].[FanID]
+		,	[n].[CIN]
+		,	[n].[ClubID]
 	--	,	[ClubName]
-		,	Title
-		,	FirstName
-		,	LastName
-		,	DOB
-		,	Gender
-		,	PartialPostCode
-		,	FromAddress
-		,	FromName
-		,	CashbackAvailable
-		,	CashbackPending
-		,	LifetimeValue
-		,	AgreedTcsDate
-		,	CustomerSegment
-		,	LoyaltyAccount
-		,	JointAccount
-		,	IsDebit
-		,	IsCredit
-		,	Nominee
-		,	RBSNomineeChange
-		,	Marketable
+		,	[n].[Title]
+		,	[n].[FirstName]
+		,	[n].[LastName]
+		,	[n].[DOB]
+		,	[n].[Gender]
+		,	[n].[PartialPostCode]
+		,	[n].[FromAddress]
+		,	[n].[FromName]
+		,	[n].[CashbackAvailable]
+		,	[n].[CashbackPending]
+		,	[n].[LifetimeValue]
+		,	[n].[AgreedTcsDate]
+		,	[n].[CustomerSegment]
+		,	[n].[LoyaltyAccount]
+		,	[n].[JointAccount]
+		,	[n].[IsDebit]
+		,	[n].[IsCredit]
+		,	[n].[Nominee]
+		,	[n].[RBSNomineeChange]
+		,	[n].[Marketable]
 	FROM NewOrUpdated n
 	WHERE NOT EXISTS (	SELECT 1
 						FROM SampleCustomers sc
@@ -103,31 +103,31 @@ SampleCustomers AS (SELECT	[EmailAddress] = sclt.[EmailAddress]
 
 	UNION
 
-	SELECT	EmailAddress
-		,	FanID
-		,	COALESCE((SELECT CONVERT(VARCHAR(24), LionSendID) FROM [Email].[OfferSlotData] osd WHERE sc.FanID = osd.FanID), '') AS CIN
-		,	ClubID
+	SELECT	[sc].[EmailAddress]
+		,	[sc].[FanID]
+		,	COALESCE((SELECT CONVERT(VARCHAR(24), [osd].[LionSendID]) FROM [Email].[OfferSlotData] osd WHERE sc.FanID = osd.FanID), '') AS CIN
+		,	[sc].[ClubID]
 	--	,	[ClubName]
-		,	Title
-		,	FirstName
-		,	LastName
-		,	DOB
-		,	Gender
-		,	PartialPostCode
-		,	FromAddress
-		,	FromName
-		,	CashbackAvailable
-		,	CashbackPending
-		,	LifetimeValue
-		,	AgreedTcsDate
-		,	CustomerSegment
-		,	LoyaltyAccount
-		,	JointAccount
-		,	IsDebit
-		,	IsCredit
-		,	Nominee
-		,	RBSNomineeChange
-		,	Marketable
+		,	[sc].[Title]
+		,	[sc].[FirstName]
+		,	[sc].[LastName]
+		,	[sc].[DOB]
+		,	[sc].[Gender]
+		,	[sc].[PartialPostCode]
+		,	[sc].[FromAddress]
+		,	[sc].[FromName]
+		,	[sc].[CashbackAvailable]
+		,	[sc].[CashbackPending]
+		,	[sc].[LifetimeValue]
+		,	[sc].[AgreedTcsDate]
+		,	[sc].[CustomerSegment]
+		,	[sc].[LoyaltyAccount]
+		,	[sc].[JointAccount]
+		,	[sc].[IsDebit]
+		,	[sc].[IsCredit]
+		,	[sc].[Nominee]
+		,	[sc].[RBSNomineeChange]
+		,	[sc].[Marketable]
 	FROM SampleCustomers sc
 
 

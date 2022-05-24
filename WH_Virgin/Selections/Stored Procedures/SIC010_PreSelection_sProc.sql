@@ -91,17 +91,17 @@ CREATE CLUSTERED INDEX ix_CINID on #FB_VM(CINID)
 
 
 IF OBJECT_ID('tempdb..#CC_vm') IS NOT NULL DROP TABLE #CC_vm
-SELECT ConsumerCombinationID
+SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
 INTO	#CC_vm
 FROM	WH_Virgin.trans.ConsumerCombination  CC
-WHERE	BrandID IN (2526)						
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN (2526)						
 
 
 IF OBJECT_ID('tempdb..#Trans_vm') IS NOT NULL DROP TABLE #Trans_vm
 SELECT	CT.CINID, COUNT(F.CINID) AS Txn
 INTO	#Trans_vm
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB_VM F ON F.CINID = CT.CINID
+JOIN	#FB_VM F ON F.CINID = #FB_VM.[CT].CINID
 JOIN	#CC_vm C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	TranDate >= DATEADD(MONTH,-12,GETDATE())
 		AND Amount >= 9.99
@@ -110,10 +110,10 @@ CREATE CLUSTERED INDEX ix_CINID on #Trans_vm(CINID)
 
 
 IF OBJECT_ID('Sandbox.RukanK.VM_simply_cook') IS NOT NULL DROP TABLE Sandbox.RukanK.VM_simply_cook
-SELECT	CINID
+SELECT	#FB_VM.[CINID]
 INTO	Sandbox.RukanK.VM_simply_cook
 FROM	#FB_VM
-WHERE	CINID NOT IN (SELECT CINID FROM #Trans_vm)
+WHERE	#FB_VM.[CINID] NOT IN (SELECT #Trans_vm.[CINID] FROM #Trans_vm)
 
 
 IF OBJECT_ID('[WH_Virgin].[Selections].[SIC010_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[SIC010_PreSelection]
@@ -122,6 +122,6 @@ INTO [WH_Virgin].[Selections].[SIC010_PreSelection]
 FROM #FB_vm fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.RukanK.VM_simply_cook sb
-				WHERE fb.CINID = sb.CINID)
+				WHERE fb.CINID = #FB_vm.[sb].CINID)
 
 END;

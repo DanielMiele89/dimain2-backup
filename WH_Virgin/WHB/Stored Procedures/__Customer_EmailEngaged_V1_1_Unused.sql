@@ -26,16 +26,16 @@ BEGIN TRY
 	----------------------------Pull out Activated Customers----------------------------
 	------------------------------------------------------------------------------------
 	--For those no longer Active or not MarketabelbyEmail then mark as EmailEngaged = 0
-	select	Fanid,
+	select	[c].[FanID],
 			c.ActivatedDate,
-			MarketablebyEmail,
+			[c].[MarketableByEmail],
 			Case 
-				When CurrentlyActive = 0 or MarketableByEmail = 0 then 0
+				When [c].[CurrentlyActive] = 0 or [c].[MarketableByEmail] = 0 then 0
 				Else NULL
 			End as EmailEngaged
 	into #Cust_Emailable
 	from Derived.customer as c
-	Where Activated = 1
+	Where [Derived].[customer].[Activated] = 1
 	Order by EmailEngaged Desc
 	--(183415 row(s) affected)
 
@@ -45,26 +45,26 @@ BEGIN TRY
 	Select	ce.FanID,
 			ec.CampaignKey,
 			ec.SendDate,
-			OpenDate,
+			#Cust_Emailable.[OpenDate],
 			ROW_NUMBER() OVER(PARTITION BY ce.FanID ORDER BY SendDate DESC) AS RowNo
 	Into #Emails
 	from #Cust_Emailable as ce
 	inner join slc_report.dbo.EmailActivity as ea ---Rolled up Email Event data
-		on ce.FanID = ea.FanID
+		on ce.FanID = #Cust_Emailable.[ea].FanID
 	inner join Derived.EmailCampaign as ec
-		on ea.EmailCampaignID = ec.ID
+		on #Cust_Emailable.[ea].EmailCampaignID = ec.ID
 	inner join Derived.CampaignLionSendIDs as cls --Find only email campaigns
-		on ec.CampaignKey = cls.CampaignKey
-	Where EmailEngaged is null and SendDate >= Dateadd(month,-6,cast(getdate() as date))
+		on ec.CampaignKey = #Cust_Emailable.[cls].CampaignKey
+	Where [ce].[EmailEngaged] is null and SendDate >= Dateadd(month,-6,cast(getdate() as date))
 	--(1509317 row(s) affected)
 
 	------------------------------------------------------------------------------------
 	---------------------Work out who has been sent at least 4 emails-------------------
 	------------------------------------------------------------------------------------
-	Select Distinct FanID
+	Select Distinct #Emails.[FanID]
 	Into #Email_AtLeast4
 	From #Emails
-	Where RowNo >= 4
+	Where #Emails.[RowNo] >= 4
 	--(66843 row(s) affected)
 
 	------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ BEGIN TRY
 		on ce.FanID = e.Fanid
 	Left Outer join #EmailOpens as EO
 		on ce.FanID = EO.FanID
-	Left Outer join (Select FanID,Max(SendDate) as LastSentDate From #Emails Group by FanID) as a
+	Left Outer join (Select #Emails.[FanID],Max(#Emails.[SendDate]) as LastSentDate From #Emails Group by #Emails.[FanID]) as a
 		on ce.FanID = a.FanID
 	--(183415 row(s) affected)
 
@@ -124,18 +124,18 @@ BEGIN TRY
 			EE.EmailEngaged
 	from #EmailEngagement as EE
 	Left Outer join Derived.Customer_EmailEngagement as CEE
-		on EE.FanID = CEE.FanID and EE.EmailEngaged = CEE.EmailEngaged and EndDate is null
-	Where cee.FaniD is null
+		on EE.FanID = #EmailEngagement.[CEE].FanID and EE.EmailEngaged = #EmailEngagement.[CEE].EmailEngaged and #EmailEngagement.[EndDate] is null
+	Where #EmailEngagement.[cee].FaniD is null
 
 	------------------------------------------------------------------------------------
 	------------------------------Update old row----------------------------------------
 	------------------------------------------------------------------------------------
 	--When new engagement record added previous record updated
 	Update Derived.Customer_EmailEngagement
-	Set EndDate = dateadd(day,-1,cast(getdate() as date))
+	Set [Derived].[Customer_EmailEngagement].[EndDate] = dateadd(day,-1,cast(getdate() as date))
 	From Derived.Customer_EmailEngagement as cee
 	inner join #EmailEngagement as EE
-		on EE.FanID = CEE.FanID and EE.EmailEngaged <> CEE.EmailEngaged and EndDate is null
+		on EE.FanID = #EmailEngagement.[CEE].FanID and EE.EmailEngaged <> #EmailEngagement.[CEE].EmailEngaged and #EmailEngagement.[EndDate] is null
 
 
 
@@ -157,7 +157,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

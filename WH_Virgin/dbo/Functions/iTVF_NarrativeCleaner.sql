@@ -33,10 +33,10 @@ RETURNS TABLE AS RETURN (
 							Else nc_1.Narrative_Cleaned
 						End as Narrative_Cleaned) nc_2
 
-	WHERE LiveRule = 1
+	WHERE [Warehouse].[Staging].[CTLoad_MIDINarrativeCleanup].[LiveRule] = 1
 		AND (d.Narrative_Cleaned Like q.TextToReplacejoin Or d.Narrative_Cleaned Like q.TextToReplacejoin_NoSpaces)
 		AND d.Narrative_Cleaned Not Like q.NarrativeNotLike
-		AND ID > @ID
+		AND [Warehouse].[Staging].[CTLoad_MIDINarrativeCleanup].[ID] > @ID
 	ORDER BY cl.ID
 
 	)

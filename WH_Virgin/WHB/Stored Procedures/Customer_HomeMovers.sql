@@ -55,14 +55,14 @@ BEGIN
 			2. Insert this data to permanent table
 		*******************************************************************************************************************************************/
 	
-			INSERT INTO [Derived].[Customer_HomemoverDetails] (FanID
-															 , OldPostCode
-															 , NewPostCode
-															 , LoadDate)
+			INSERT INTO [Derived].[Customer_HomemoverDetails] ([Derived].[Customer_HomemoverDetails].[FanID]
+															 , [Derived].[Customer_HomemoverDetails].[OldPostCode]
+															 , [Derived].[Customer_HomemoverDetails].[NewPostCode]
+															 , [Derived].[Customer_HomemoverDetails].[LoadDate])
 
-			SELECT	FanID
-				,	OldPostCode = CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', OldPostCode), 2)
-				,	NewPostCode = CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', NewPostCode), 2)
+			SELECT	[hm].[FanID]
+				,	OldPostCode = CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', [hm].[OldPostCode]), 2)
+				,	NewPostCode = CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', [hm].[NewPostCode]), 2)
 				,	@RunDate
 			FROM #HomeMovers hm
 			WHERE NOT EXISTS (	SELECT 1
@@ -90,7 +90,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

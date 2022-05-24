@@ -28,19 +28,19 @@ BEGIN
 
 	IF OBJECT_ID('tempdb..#CycleDates') IS NOT NULL DROP TABLE #CycleDates;
 	WITH
-	Dates AS (	SELECT	MIN(EmailDate) AS StartDate
-					,	CONVERT(DATETIME, DATEADD(DAY, 13, MIN(EmailDate))) + CONVERT(DATETIME, '1900-01-01 23:59:59') AS EndDate
+	Dates AS (	SELECT	MIN([Selections].[CampaignSetup_POS].[EmailDate]) AS StartDate
+					,	CONVERT(DATETIME, DATEADD(DAY, 13, MIN([Selections].[CampaignSetup_POS].[EmailDate]))) + CONVERT(DATETIME, '1900-01-01 23:59:59') AS EndDate
 				FROM [Selections].[CampaignSetup_POS]
-				WHERE EmailDate > GETDATE())
+				WHERE [Selections].[CampaignSetup_POS].[EmailDate] > GETDATE())
 
 
-	SELECT	StartDate
-		,	EndDate
+	SELECT	[Dates].[StartDate]
+		,	[Dates].[EndDate]
 	INTO #CycleDates
 	FROM Dates
 	UNION
-	SELECT	DATEADD(DAY, 14, StartDate)
-		,	DATEADD(DAY, 14, EndDate)
+	SELECT	DATEADD(DAY, 14, [Dates].[StartDate])
+		,	DATEADD(DAY, 14, [Dates].[EndDate])
 	FROM Dates
 
 
@@ -60,7 +60,7 @@ BEGIN
 	FROM [Derived].[IronOffer] iof
 	INNER JOIN [Derived].[Partner] pa
 		ON iof.PartnerID = pa.PartnerID
-	WHERE iof.EndDate > (SELECT MIN(StartDate) FROM #CycleDates)
+	WHERE iof.EndDate > (SELECT MIN(#CycleDates.[StartDate]) FROM #CycleDates)
 	AND iof.IsSignedOff = 1
 	AND iof.IronOfferName LIKE '%welcome%'
 

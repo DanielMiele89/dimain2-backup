@@ -52,7 +52,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 		  , @SegmentationStartTime DATETIME = GETDATE()
 		  , @SegmentationLength INT
 
-	SELECT @PartnerName = PartnerName, @BrandID = BrandID FROM [Warehouse].[Relational].[Partner] WHERE PartnerID = @PartnerNo
+	SELECT @PartnerName = [Warehouse].[Relational].[Partner].[PartnerName], @BrandID = [Warehouse].[Relational].[Partner].[BrandID] FROM [Warehouse].[Relational].[Partner] WHERE [Warehouse].[Relational].[Partner].[PartnerID] = @PartnerNo
 
 	Print '
 
@@ -60,11 +60,11 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 	
 	'
 
-	SELECT @Acquire = Acquire 
-		 , @Lapsed = Lapsed
+	SELECT @Acquire = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Acquire] 
+		 , @Lapsed = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Lapsed]
 	FROM [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ]
-	WHERE PartnerID = @PartnerID
-	AND EndDate IS NULL
+	WHERE [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[PartnerID] = @PartnerID
+	AND [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[EndDate] IS NULL
 	
 	--SET @BrandID = (SELECT BrandID FROM Relational.Partner WHERE PartnerID = @PartnerID)
 
@@ -72,18 +72,18 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 	2. INSERT entry in to JobLog_Temp
 *******************************************************************************************************************************************/
 
-	INSERT INTO Segmentation.Shopper_Segmentation_JobLog_Temp (StoredProcedureName
-															 , StartDate
-															 , EndDate
-															 , PartnerID
-															 , ShopperCount
-															 , LapsedCount
-															 , AcquireCount
-															 , IsRanked
-															 , LapsedDate
-															 , AcquireDate
-															 , ErrorCode
-															 , ErrorMessage)
+	INSERT INTO Segmentation.Shopper_Segmentation_JobLog_Temp ([Segmentation].[Shopper_Segmentation_JobLog_Temp].[StoredProcedureName]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StartDate]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[PartnerID]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ShopperCount]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedCount]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireCount]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[IsRanked]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedDate]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireDate]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorCode]
+															 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorMessage])
 	VALUES (@SPName
 		  , GETDATE()
 		  , NULL
@@ -129,10 +129,10 @@ BEGIN TRY
 		***********************************************************************************************************************/
 	
 			IF OBJECT_ID('tempdb..#CCIDs') IS NOT NULL DROP TABLE #CCIDs
-			SELECT ConsumerCombinationID 
+			SELECT [cc].[ConsumerCombinationID] 
 			INTO #CCIDs
 			FROM Trans.ConsumerCombination cc WITH (NOLOCK)
-			WHERE BrandID = @BrandID
+			WHERE [cc].[BrandID] = @BrandID
 		
 			CREATE CLUSTERED INDEX CIX_CCID_CCID ON #CCIDs (ConsumerCombinationID)
 
@@ -250,23 +250,23 @@ BEGIN TRY
 
 			-- #3 slowest statement
 			UPDATE ssm
-			SET Enddate = @EndDate
+			SET [ssm].[EndDate] = @EndDate
 			FROM Segmentation.Roc_Shopper_Segment_Members ssm
 			WHERE ssm.EndDate IS NULL
 			AND ssm.PartnerID = @PartnerID
 			AND NOT EXISTS (SELECT 1
 							FROM #AllCustomers ac
-							WHERE ssm.FanID = ac.FanID)
+							WHERE #AllCustomers.[ssm].FanID = ac.FanID)
 
 
 	/*******************************************************************************************************************************************
 		7. Update variables to update JobLog
 	*******************************************************************************************************************************************/
 		SELECT 
-			@AcquireCount = SUM(CASE WHEN Segment = 7 THEN cnt ELSE 0 END),
-			@LapsedCount = SUM(CASE WHEN Segment = 8 THEN cnt ELSE 0 END),
-			@ShopperCount = SUM(CASE WHEN Segment = 9 THEN cnt ELSE 0 END)
-		FROM (SELECT Segment, cnt = COUNT(*) FROM #AllCustomers GROUP BY Segment) d
+			@AcquireCount = SUM(CASE WHEN [d].[Segment] = 7 THEN [d].[cnt] ELSE 0 END),
+			@LapsedCount = SUM(CASE WHEN [d].[Segment] = 8 THEN [d].[cnt] ELSE 0 END),
+			@ShopperCount = SUM(CASE WHEN [d].[Segment] = 9 THEN [d].[cnt] ELSE 0 END)
+		FROM (SELECT #AllCustomers.[Segment], cnt = COUNT(*) FROM #AllCustomers GROUP BY #AllCustomers.[Segment]) d
 
 		--IF OBJECT_ID('tempdb..#SegmentCounts') IS NOT NULL DROP TABLE #SegmentCounts
 		--SELECT Segment
@@ -322,39 +322,39 @@ END TRY
 *******************************************************************************************************************************************/
 
 	Update Segmentation.Shopper_Segmentation_JobLog_Temp
-	SET ErrorCode = @ErrorCode
-	  , ErrorMessage = @ErrorMessage
-	  , EndDate = GETDATE()
-	  , ShopperCount = @ShopperCount
-	  , LapsedCount = @LapsedCount
-	  , AcquireCount = @AcquireCount
+	SET [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorCode] = @ErrorCode
+	  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorMessage] = @ErrorMessage
+	  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate] = GETDATE()
+	  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ShopperCount] = @ShopperCount
+	  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedCount] = @LapsedCount
+	  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireCount] = @AcquireCount
 
-	INSERT INTO Segmentation.Shopper_Segmentation_JobLog (StoredProcedureName
-														, StartDate
-														, EndDate
-														, Duration
-														, PartnerID
-														, ShopperCount
-														, LapsedCount
-														, AcquireCount
-														, IsRanked
-														, LapsedDate
-														, AcquireDate
-														, ErrorCode
-														, ErrorMessage)
-	SELECT StoredProcedureName
-		 , StartDate
-		 , EndDate
-		 , CONVERT(VARCHAR(3), DATEDiff(second, StartDate, EndDate) / 60) + ':' + Right('0' + CONVERT(VARCHAR(2), DATEDiff(second, StartDate, EndDate) % 60), 2) AS Duration
-		 , PartnerID
-		 , ShopperCount
-		 , LapsedCount
-		 , AcquireCount
-		 , IsRanked
-		 , LapsedDate
-		 , AcquireDate
-		 , ErrorCode
-		 , ErrorMessage
+	INSERT INTO Segmentation.Shopper_Segmentation_JobLog ([Segmentation].[Shopper_Segmentation_JobLog].[StoredProcedureName]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[StartDate]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[EndDate]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[Duration]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[PartnerID]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[ShopperCount]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[LapsedCount]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[AcquireCount]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[IsRanked]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[LapsedDate]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[AcquireDate]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[ErrorCode]
+														, [Segmentation].[Shopper_Segmentation_JobLog].[ErrorMessage])
+	SELECT [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StoredProcedureName]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StartDate]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate]
+		 , CONVERT(VARCHAR(3), DATEDiff(second, [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StartDate], [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate]) / 60) + ':' + Right('0' + CONVERT(VARCHAR(2), DATEDiff(second, [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StartDate], [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate]) % 60), 2) AS Duration
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[PartnerID]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ShopperCount]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedCount]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireCount]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[IsRanked]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedDate]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireDate]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorCode]
+		 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorMessage]
 	FROM Segmentation.Shopper_Segmentation_JobLog_Temp
 
 	Truncate Table Segmentation.Shopper_Segmentation_JobLog_Temp

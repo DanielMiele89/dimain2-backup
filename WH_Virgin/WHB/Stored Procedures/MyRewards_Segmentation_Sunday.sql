@@ -51,11 +51,11 @@ IF DATENAME(DW, GETDATE()) = 'Sunday' BEGIN
 
 	-- 3. Fetch all partner settings and place to holding table
 	IF OBJECT_ID('Tempdb..#PartnerSettings') IS NOT NULL DROP TABLE #PartnerSettings
-	SELECT PartnerID
-			, MAX(IsPos) AS IsPos
-			, MAX(IsDD) AS IsDD
+	SELECT [ps].[PartnerID]
+			, MAX([ps].[IsPos]) AS IsPos
+			, MAX([ps].[IsDD]) AS IsDD
 	INTO #PartnerSettings
-	FROM (SELECT PartnerID
+	FROM (SELECT [ps].[PartnerID]
 	  			, 1 AS IsPos
 	  			, 0 AS IsDD
 			FROM Segmentation.ROC_Shopper_Segment_Partner_Settings ps
@@ -63,61 +63,61 @@ IF DATENAME(DW, GETDATE()) = 'Sunday' BEGIN
 			AND ps.StartDate <= @EDate
 			AND (ps.EndDate IS NULL OR ps.EndDate > @EDate)
 			Union ALL
-			SELECT PartnerID
+			SELECT [Segmentation].[PartnerSettings_DD].[PartnerID]
 	  			, 0 AS IsPos
 	  			, 1 AS IsDD
 			FROM Segmentation.PartnerSettings_DD ps
 			WHERE ps.AutoRun = 1
 			AND ps.StartDate <= @EDate
 			AND (ps.EndDate IS NULL OR ps.EndDate > @EDate)) ps
-	GROUP BY PartnerID
+	GROUP BY [ps].[PartnerID]
 
 
 	-- 4. Find offers that will be live at the time (non Core Base)
 	IF OBJECT_ID('Tempdb..#UpcomingCampaigns') IS NOT NULL DROP TABLE #UpcomingCampaigns
-	SELECT EmailDate
-			, PartnerID
-			, ClientServicesRef
+	SELECT [cs].[EmailDate]
+			, [cs].[PartnerID]
+			, [cs].[ClientServicesRef]
 			, @FullCycle AS IsFullCycle
 			, NULL AS SegmentationOverride
 			, CASE
-				WHEN EmailDate = FirstEmailDate THEN 1
+				WHEN [cs].[EmailDate] = [cs].[FirstEmailDate] THEN 1
 				ELSE 0
 			END AS FirstEmail
-			, MAX(IsPOS) OVER (PARTITION BY PartnerID) AS IsPOS
-			, MAX(IsDD) OVER (PARTITION BY PartnerID) AS IsDD
+			, MAX([cs].[IsPOS]) OVER (PARTITION BY [cs].[PartnerID]) AS IsPOS
+			, MAX([cs].[IsDD]) OVER (PARTITION BY [cs].[PartnerID]) AS IsDD
 	INTO #UpcomingCampaigns
-	FROM (SELECT EmailDate
-	  			, PartnerID
-	  			, ClientServicesRef
+	FROM (SELECT [Selections].[ROCShopperSegment_PreSelection_ALS].[EmailDate]
+	  			, [Selections].[ROCShopperSegment_PreSelection_ALS].[PartnerID]
+	  			, [Selections].[ROCShopperSegment_PreSelection_ALS].[ClientServicesRef]
 				, 1 AS IsPOS
 				, 0 AS IsDD
-				, MIN(EmailDate) OVER (PARTITION BY ClientServicesRef) AS FirstEmailDate
+				, MIN([Selections].[ROCShopperSegment_PreSelection_ALS].[EmailDate]) OVER (PARTITION BY [Selections].[ROCShopperSegment_PreSelection_ALS].[ClientServicesRef]) AS FirstEmailDate
 			FROM Selections.ROCShopperSegment_PreSelection_ALS
 			UNION
-			SELECT EmailDate
-	  			, PartnerID
-	  			, ClientServicesRef
+			SELECT [Selections].[CampaignSetup_DD].[EmailDate]
+	  			, [Selections].[CampaignSetup_DD].[PartnerID]
+	  			, [Selections].[CampaignSetup_DD].[ClientServicesRef]
 				, 0 AS IsPOS
 				, 1 AS IsDD
-				, MIN(EmailDate) OVER (PARTITION BY ClientServicesRef) AS FirstEmailDate
+				, MIN([Selections].[CampaignSetup_DD].[EmailDate]) OVER (PARTITION BY [Selections].[CampaignSetup_DD].[ClientServicesRef]) AS FirstEmailDate
 			FROM Selections.CampaignSetup_DD) cs
-	WHERE EmailDate = @EDate
+	WHERE [cs].[EmailDate] = @EDate
 
 
 	-- 5. Run manual exceptions
-	UPDATE #UpcomingCampaigns SET SegmentationOverride = 1 WHERE ClientServicesRef = 'SKY001'
+	UPDATE #UpcomingCampaigns SET #UpcomingCampaigns.[SegmentationOverride] = 1 WHERE #UpcomingCampaigns.[ClientServicesRef] = 'SKY001'
 
-	UPDATE #UpcomingCampaigns SET SegmentationOverride = 0 WHERE PartnerID = 4263 AND EmailDate = '2019-07-04'
+	UPDATE #UpcomingCampaigns SET #UpcomingCampaigns.[SegmentationOverride] = 0 WHERE #UpcomingCampaigns.[PartnerID] = 4263 AND #UpcomingCampaigns.[EmailDate] = '2019-07-04'
 
 
 	-- 6. Find Partners that have settings corerctly added
-	;WITH UpcomingCampaigns AS (SELECT PartnerID
-							  	, MAX(IsPOS) AS IsPOS
-							  	, MAX(IsDD) AS IsDD
-							  	, MAX(COALESCE(SegmentationOverride, IsFullCycle, FirstEmail)) AS SegmetationToRun
+	;WITH UpcomingCampaigns AS (SELECT #UpcomingCampaigns.[PartnerID]
+							  	, MAX(#UpcomingCampaigns.[IsPOS]) AS IsPOS
+							  	, MAX(#UpcomingCampaigns.[IsDD]) AS IsDD
+							  	, MAX(COALESCE(#UpcomingCampaigns.[SegmentationOverride], #UpcomingCampaigns.[IsFullCycle], #UpcomingCampaigns.[FirstEmail])) AS SegmetationToRun
 							FROM #UpcomingCampaigns
-							GROUP BY PartnerID)
+							GROUP BY #UpcomingCampaigns.[PartnerID])
 
 	INSERT INTO #SegmentsToRun
 	SELECT pa.PartnerID
@@ -127,12 +127,12 @@ IF DATENAME(DW, GETDATE()) = 'Sunday' BEGIN
 	FROM UpcomingCampaigns pa
 	INNER JOIN #PartnerSettings ps
 		ON pa.PartnerID = ps.PartnerID
-	WHERE SegmetationToRun = 1
+	WHERE #PartnerSettings.[SegmetationToRun] = 1
 
 
 	-- 7. Find Partners that have settings corerctly added
 	DECLARE @RowNo INT = 1
-			, @RowNoMax INT = (SELECT COALESCE(MAX(RowNo), 0) FROM #SegmentsToRun)
+			, @RowNoMax INT = (SELECT COALESCE(MAX(#SegmentsToRun.[RowNo]), 0) FROM #SegmentsToRun)
 			, @PartnerID INT
 			, @IsDD INT
 			, @IsPOS INT
@@ -142,11 +142,11 @@ IF DATENAME(DW, GETDATE()) = 'Sunday' BEGIN
 
 	WHILE @RowNo <= @RowNoMax BEGIN
 		  
-		SELECT @PartnerID = PartnerID
-				, @IsDD = IsDD
-				, @IsPOS = IsPOS
+		SELECT @PartnerID = #SegmentsToRun.[PartnerID]
+				, @IsDD = #SegmentsToRun.[IsDD]
+				, @IsPOS = #SegmentsToRun.[IsPOS]
 		FROM #SegmentsToRun
-		WHERE RowNo = @RowNo
+		WHERE #SegmentsToRun.[RowNo] = @RowNo
 		
 		IF @IsPOS = 1 EXEC [Segmentation].[Segmentation_IndividualPartner_POS] @PartnerID, 1, 1	--	PartnerID, ToBeRanked, WeekyRun
 		IF @IsDD = 1  EXEC [Segmentation].[Segmentation_IndividualPartner_DD] @PartnerID, 1, 1, 56, 1	--	PartnerID, ToBeRanked, ExlcudeNewJoiners, NewJoinerLength_Days, WeekyRun
@@ -173,7 +173,7 @@ IF DATENAME(DW, GETDATE()) = 'Sunday' BEGIN
 	Declare @EndDate DATETIME = DATEADD(day, DATEDIFF(dd, 0, GETDATE()) - 0, 0)
 
 	UPDATE up
-		SET EndDate = @EndDate
+		SET [up].[EndDate] = @EndDate
 	FROM Segmentation.Roc_Shopper_Segment_Members up
 	WHERE up.EndDate IS NULL AND EXISTS (
 		SELECT 1 FROM Derived.Customer cu
@@ -183,7 +183,7 @@ IF DATENAME(DW, GETDATE()) = 'Sunday' BEGIN
 				
 
 	UPDATE cs
-		SET EndDate = @EndDate
+		SET [Segmentation].[CustomerSegment_DD].[EndDate] = @EndDate
 	FROM Segmentation.CustomerSegment_DD cs	
 	WHERE cs.EndDate IS NULL AND EXISTS (
 		SELECT 1 FROM Derived.Customer cu

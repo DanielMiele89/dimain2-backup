@@ -22,7 +22,7 @@ BEGIN
 
 	IF OBJECT_ID('tempdb..#OfferPrioritisation') IS NOT NULL DROP TABLE #OfferPrioritisation
 	SELECT DISTINCT
-		   PartnerID
+		   [op].[PartnerID]
 	INTO #OfferPrioritisation
 	FROM [Email].[Newsletter_OfferPrioritisation] op
 	WHERE op.EmailDate = @Email
@@ -41,12 +41,12 @@ BEGIN
 			WHERE pc.EndDate IS NULL
 			AND EXISTS (SELECT 1
 						FROM #OfferPrioritisation op
-						WHERE pc.PartnerID = op.PartnerID)) pc
+						WHERE #OfferPrioritisation.[pc].PartnerID = op.PartnerID)) pc
 	WHERE pc.PartnersLive > pc.MaxMembershipsCount
 
 
 	IF OBJECT_ID('tempdb..#OldRules') IS NOT NULL DROP TABLE #OldRules
-	SELECT RuleID
+	SELECT [pc].[RuleID]
 		 , pc.MaxMembershipsCount
 		 , COUNT(DISTINCT op.PartnerID) AS Partners
 	INTO #OldRules

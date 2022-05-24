@@ -26,43 +26,43 @@ BEGIN
 		IF OBJECT_ID('tempdb..#CamapignDetails') IS NOT NULL DROP TABLE #CamapignDetails;
 		WITH
 		CamapignDetails AS (SELECT	'MyRewards POS' as Scheme
-								,	EmailDate
-								,	ClientServicesRef
-								,	OfferID
+								,	[als].[EmailDate]
+								,	[als].[ClientServicesRef]
+								,	[als].[OfferID]
 								,	CASE
-										WHEN Gender != '' THEN 'Gender: ' + Gender + ', '
+										WHEN [als].[Gender] != '' THEN 'Gender: ' + [als].[Gender] + ', '
 										ELSE ''
 									END
 								 +	CASE
-										WHEN AgeRange != '' THEN 'Age Range: ' + AgeRange + ', '
+										WHEN [als].[AgeRange] != '' THEN 'Age Range: ' + [als].[AgeRange] + ', '
 										ELSE ''
 									END
 								 +	CASE
-										WHEN DriveTimeMins = '25' THEN REPLACE('Drive Time: ' + DriveTimeMins + ' minutes, ', '  ', ' ')
+										WHEN [als].[DriveTimeMins] = '25' THEN REPLACE('Drive Time: ' + [als].[DriveTimeMins] + ' minutes, ', '  ', ' ')
 										ELSE ''
 									END
 								 +	CASE
-										WHEN SocialClass != '' THEN 'Social Class: ' + SocialClass
+										WHEN [als].[SocialClass] != '' THEN 'Social Class: ' + [als].[SocialClass]
 										ELSE ''
 									END AS DemographicTargetting
-								,	CustomerBaseOfferDate
+								,	[als].[CustomerBaseOfferDate]
 							FROM [Selections].[CampaignSetup_POS] als)
 
-		SELECT EmailDate
-			 , ClientServicesRef
+		SELECT [CamapignDetails].[EmailDate]
+			 , [CamapignDetails].[ClientServicesRef]
 			 , iof.Item AS OfferID
 			 , DemographicTargetting
-			 , CustomerBaseOfferDate
+			 , [CamapignDetails].[CustomerBaseOfferDate]
 		INTO #CamapignDetails
 		FROM CamapignDetails
-		CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (OfferID, ',') iof
+		CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] ([CamapignDetails].[OfferID], ',') iof
 		WHERE iof.Item > 0
 
 		UPDATE #CamapignDetails
-		SET DemographicTargetting = CASE
-										WHEN DemographicTargetting = '' THEN DemographicTargetting
-										WHEN RIGHT(DemographicTargetting, 1) = ' ' THEN LEFT(DemographicTargetting, LEN(DemographicTargetting) - 1)
-										ELSE DemographicTargetting
+		SET #CamapignDetails.[DemographicTargetting] = CASE
+										WHEN #CamapignDetails.[DemographicTargetting] = '' THEN #CamapignDetails.[DemographicTargetting]
+										WHEN RIGHT(#CamapignDetails.[DemographicTargetting], 1) = ' ' THEN LEFT(#CamapignDetails.[DemographicTargetting], LEN(#CamapignDetails.[DemographicTargetting]) - 1)
+										ELSE #CamapignDetails.[DemographicTargetting]
 									END
 
 
@@ -71,140 +71,140 @@ BEGIN
 	*******************************************************************************************************************************************/
 		
 	
-		DECLARE @UpcomingEmailDate DATE = (SELECT MIN(EmailDate) FROM [Selections].[CampaignSetup_POS] WHERE GETDATE() < EmailDate)
+		DECLARE @UpcomingEmailDate DATE = (SELECT MIN([Selections].[CampaignSetup_POS].[EmailDate]) FROM [Selections].[CampaignSetup_POS] WHERE GETDATE() < [Selections].[CampaignSetup_POS].[EmailDate])
 		
 	
 		IF OBJECT_ID('tempdb..#CampaignSetup_POS') IS NOT NULL DROP TABLE #CampaignSetup_POS;
 		WITH
 		CampaignSetup_POS AS (	SELECT DISTINCT 
-									   PartnerID
-									 , ClientServicesRef
-									 , CampaignName
+									   [als].[PartnerID]
+									 , [als].[ClientServicesRef]
+									 , [als].[CampaignName]
 									 , iof.Item AS OfferID
 									 , pch.Item AS PredictedCardholderVolumes
 									 , CASE
-											WHEN thr.Item > 0 AND RandomThrottle = 0 THEN 'Throttled to top ' + Throttling + ' customers'
-											WHEN thr.Item > 0 AND RandomThrottle = 1 THEN 'Throttled to a random ' + Throttling + ' customers'
+											WHEN thr.Item > 0 AND [als].[RandomThrottle] = 0 THEN 'Throttled to top ' + [als].[Throttling] + ' customers'
+											WHEN thr.Item > 0 AND [als].[RandomThrottle] = 1 THEN 'Throttled to a random ' + [als].[Throttling] + ' customers'
 											ELSE ''
 									   END AS Throttling
 									 , CASE
-											WHEN EmailDate = '2020-02-05' THEN '2020-01-30'
-											ELSE EmailDate
+											WHEN [als].[EmailDate] = '2020-02-05' THEN '2020-01-30'
+											ELSE [als].[EmailDate]
 									   END AS EmailDate
 									 , CASE
-											WHEN StartDate = '2020-02-05' THEN '2020-01-30'
-											ELSE StartDate
+											WHEN [als].[StartDate] = '2020-02-05' THEN '2020-01-30'
+											ELSE [als].[StartDate]
 									   END AS StartDate
-									 , EndDate
-									 , FreqStretch_TransCount
-									 , BriefLocation
-									 , DATEDIFF(WEEK, StartDate, EndDate) AS CampaignCycleLength
-									 , BespokeCampaign
-									 , ControlGroupPercentage / 100.0 AS ControlGroupPercentage
+									 , [als].[EndDate]
+									 , [als].[FreqStretch_TransCount]
+									 , [als].[BriefLocation]
+									 , DATEDIFF(WEEK, [als].[StartDate], [als].[EndDate]) AS CampaignCycleLength
+									 , [als].[BespokeCampaign]
+									 , [als].[ControlGroupPercentage] / 100.0 AS ControlGroupPercentage
 									 , CASE 
 									 		WHEN als.NewCampaign = 1 THEN 1
 									 		ELSE 0
 									   END AS NewCampaign
 									 , DATEDIFF(DAY, CASE
-														WHEN StartDate = '2020-02-05' THEN '2020-01-30'
-														ELSE StartDate
-													 END, EndDate) AS SelectionLength
+														WHEN [als].[StartDate] = '2020-02-05' THEN '2020-01-30'
+														ELSE [als].[StartDate]
+													 END, [als].[EndDate]) AS SelectionLength
 								FROM [Selections].[CampaignSetup_POS] als
-								CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (OfferID, ',') iof
-								CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (PredictedCardholderVolumes, ',') pch
-								CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (Throttling, ',') thr
+								CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] ([als].[OfferID], ',') iof
+								CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] ([als].[PredictedCardholderVolumes], ',') pch
+								CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] ([als].[Throttling], ',') thr
 								WHERE iof.ItemNumber = pch.ItemNumber
 								AND iof.ItemNumber = thr.ItemNumber
 								AND iof.Item > 0
-								AND EmailDate <= @UpcomingEmailDate),
+								AND [als].[EmailDate] <= @UpcomingEmailDate),
 
-		DatesExpanded AS (	SELECT PartnerID
-								 , ClientServicesRef
-								 , CampaignName
+		DatesExpanded AS (	SELECT [CampaignSetup_POS].[PartnerID]
+								 , [CampaignSetup_POS].[ClientServicesRef]
+								 , [CampaignSetup_POS].[CampaignName]
 								 , OfferID
 								 , PredictedCardholderVolumes
-								 , Throttling
-								 , EmailDate
-								 , StartDate
-								 , EndDate
-								 , FreqStretch_TransCount
-								 , BriefLocation
-								 , CampaignCycleLength
-								 , BespokeCampaign
-								 , ControlGroupPercentage
-								 , NewCampaign
+								 , [CampaignSetup_POS].[Throttling]
+								 , [CampaignSetup_POS].[EmailDate]
+								 , [CampaignSetup_POS].[StartDate]
+								 , [CampaignSetup_POS].[EndDate]
+								 , [CampaignSetup_POS].[FreqStretch_TransCount]
+								 , [CampaignSetup_POS].[BriefLocation]
+								 , [CampaignSetup_POS].[CampaignCycleLength]
+								 , [CampaignSetup_POS].[BespokeCampaign]
+								 , [CampaignSetup_POS].[ControlGroupPercentage]
+								 , [CampaignSetup_POS].[NewCampaign]
 							FROM CampaignSetup_POS
-							WHERE SelectionLength != 27
+							WHERE [CampaignSetup_POS].[SelectionLength] != 27
 		
 							UNION
 
-							SELECT PartnerID
-								 , ClientServicesRef
-								 , CampaignName
+							SELECT [CampaignSetup_POS].[PartnerID]
+								 , [CampaignSetup_POS].[ClientServicesRef]
+								 , [CampaignSetup_POS].[CampaignName]
 								 , OfferID
 								 , PredictedCardholderVolumes
-								 , Throttling
-								 , EmailDate
-								 , StartDate
-								 , DATEADD(DAY, -14, EndDate) AS EndDate
-								 , FreqStretch_TransCount
-								 , BriefLocation
-								 , CampaignCycleLength
-								 , BespokeCampaign
-								 , ControlGroupPercentage
-								 , NewCampaign
+								 , [CampaignSetup_POS].[Throttling]
+								 , [CampaignSetup_POS].[EmailDate]
+								 , [CampaignSetup_POS].[StartDate]
+								 , DATEADD(DAY, -14, [CampaignSetup_POS].[EndDate]) AS EndDate
+								 , [CampaignSetup_POS].[FreqStretch_TransCount]
+								 , [CampaignSetup_POS].[BriefLocation]
+								 , [CampaignSetup_POS].[CampaignCycleLength]
+								 , [CampaignSetup_POS].[BespokeCampaign]
+								 , [CampaignSetup_POS].[ControlGroupPercentage]
+								 , [CampaignSetup_POS].[NewCampaign]
 							FROM CampaignSetup_POS
-							WHERE SelectionLength = 27
+							WHERE [CampaignSetup_POS].[SelectionLength] = 27
 
 							UNION
 
-							SELECT PartnerID
-								 , ClientServicesRef
-								 , CampaignName
+							SELECT [CampaignSetup_POS].[PartnerID]
+								 , [CampaignSetup_POS].[ClientServicesRef]
+								 , [CampaignSetup_POS].[CampaignName]
 								 , OfferID
 								 , PredictedCardholderVolumes
-								 , Throttling
-								 , EmailDate
-								 , DATEADD(DAY, 14, StartDate) AS StartDate
-								 , EndDate
-								 , FreqStretch_TransCount
-								 , BriefLocation
-								 , CampaignCycleLength
-								 , BespokeCampaign
-								 , ControlGroupPercentage
-								 , NewCampaign
+								 , [CampaignSetup_POS].[Throttling]
+								 , [CampaignSetup_POS].[EmailDate]
+								 , DATEADD(DAY, 14, [CampaignSetup_POS].[StartDate]) AS StartDate
+								 , [CampaignSetup_POS].[EndDate]
+								 , [CampaignSetup_POS].[FreqStretch_TransCount]
+								 , [CampaignSetup_POS].[BriefLocation]
+								 , [CampaignSetup_POS].[CampaignCycleLength]
+								 , [CampaignSetup_POS].[BespokeCampaign]
+								 , [CampaignSetup_POS].[ControlGroupPercentage]
+								 , [CampaignSetup_POS].[NewCampaign]
 							FROM CampaignSetup_POS
-							WHERE SelectionLength = 27)
+							WHERE [CampaignSetup_POS].[SelectionLength] = 27)
 
-		SELECT PartnerID
-			 , ClientServicesRef
-			 , CampaignName
+		SELECT [DatesExpanded].[PartnerID]
+			 , [DatesExpanded].[ClientServicesRef]
+			 , [DatesExpanded].[CampaignName]
 			 , OfferID
 			 , MAX(PredictedCardholderVolumes) AS PredictedCardholderVolumes
 			 , MAX(Throttling) AS Throttling
 			 , EmailDate
 			 , StartDate
-			 , EndDate
-			 , FreqStretch_TransCount
-			 , BriefLocation
+			 , [DatesExpanded].[EndDate]
+			 , [DatesExpanded].[FreqStretch_TransCount]
+			 , [DatesExpanded].[BriefLocation]
 			 , CampaignCycleLength
-			 , BespokeCampaign
+			 , [DatesExpanded].[BespokeCampaign]
 			 , ControlGroupPercentage
 			 , NewCampaign
 		INTO #CampaignSetup_POS
 		FROM DatesExpanded
 		WHERE StartDate <= @UpcomingEmailDate
-		GROUP BY PartnerID
-			   , ClientServicesRef
-			   , CampaignName
+		GROUP BY [DatesExpanded].[PartnerID]
+			   , [DatesExpanded].[ClientServicesRef]
+			   , [DatesExpanded].[CampaignName]
 			   , OfferID
 			   , EmailDate
 			   , StartDate
-			   , EndDate
-			   , FreqStretch_TransCount
-			   , BriefLocation
+			   , [DatesExpanded].[EndDate]
+			   , [DatesExpanded].[FreqStretch_TransCount]
+			   , [DatesExpanded].[BriefLocation]
 			   , CampaignCycleLength
-			   , BespokeCampaign
+			   , [DatesExpanded].[BespokeCampaign]
 			   , ControlGroupPercentage
 			   , NewCampaign
 		
@@ -435,8 +435,8 @@ BEGIN
 											   StartDate
 											 , PartnerID
 											 , ClientServicesRef
-											 , UpcomingCount_ClientServicesRef
-											 , ClientServicesRefRank
+											 , [CampaignCounts_POS].[UpcomingCount_ClientServicesRef]
+											 , [CampaignCounts_POS].[ClientServicesRefRank]
 										FROM CampaignCounts_POS) cs),
 
 		PartnerID AS (	SELECT StartDate
@@ -447,8 +447,8 @@ BEGIN
 						FROM (	SELECT DISTINCT
 									   StartDate
 									 , PartnerID
-									 , UpcomingCount_PartnerID
-									 , PartnerNameRank
+									 , [CampaignCounts_POS].[UpcomingCount_PartnerID]
+									 , [CampaignCounts_POS].[PartnerNameRank]
 								FROM CampaignCounts_POS) pa)
 
 		SELECT cc.EmailDate
@@ -491,9 +491,9 @@ BEGIN
 		IF OBJECT_ID('tempdb..#CampaignDetailsCounts_POS') IS NOT NULL DROP TABLE #CampaignDetailsCounts_POS;
 		WITH
 		SelectedPartners AS (	SELECT	DISTINCT
-										PartnerID
-									,	ClientServicesRef
-									,	EmailDate
+										[cc].[PartnerID]
+									,	[cc].[ClientServicesRef]
+									,	[cc].[EmailDate]
 								FROM #CampaignCounts_POS cc
 								WHERE cc.EmailDate = @UpcomingEmailDate)
 
@@ -577,39 +577,39 @@ BEGIN
 	*******************************************************************************************************************************************/
 	
 		IF OBJECT_ID('tempdb..#CampaignDetailsCounts') IS NOT NULL DROP TABLE #CampaignDetailsCounts;
-		SELECT EmailDate
-			 , NewCampaign
-			 , PartnerID
-			 , PartnerName
-			 , ClientServicesRef
-			 , CampaignName
-			 , OfferID
-			 , BriefLocation
-			 , StartDate
-			 , EndDate
-			 , BespokeCampaign
-			 , CampaignCycleLength
-			 , ControlGroupPercentage
-			 , UpcomingCount_Offer
-			 , UpcomingCount_ClientServicesRef
-			 , UpcomingCount_PartnerID
-			 , PreviousCount_Offer
-			 , PreviousCount_ClientServicesRef
-			 , PreviousCount_PartnerID
-			 , PredictedCardholderVolumes
-			 , Throttling
-			 , CampaignSelected
-			 , PartnerSelected
+		SELECT #CampaignDetailsCounts_POS.[EmailDate]
+			 , #CampaignDetailsCounts_POS.[NewCampaign]
+			 , #CampaignDetailsCounts_POS.[PartnerID]
+			 , #CampaignDetailsCounts_POS.[PartnerName]
+			 , #CampaignDetailsCounts_POS.[ClientServicesRef]
+			 , #CampaignDetailsCounts_POS.[CampaignName]
+			 , #CampaignDetailsCounts_POS.[OfferID]
+			 , #CampaignDetailsCounts_POS.[BriefLocation]
+			 , #CampaignDetailsCounts_POS.[StartDate]
+			 , #CampaignDetailsCounts_POS.[EndDate]
+			 , #CampaignDetailsCounts_POS.[BespokeCampaign]
+			 , #CampaignDetailsCounts_POS.[CampaignCycleLength]
+			 , #CampaignDetailsCounts_POS.[ControlGroupPercentage]
+			 , #CampaignDetailsCounts_POS.[UpcomingCount_Offer]
+			 , #CampaignDetailsCounts_POS.[UpcomingCount_ClientServicesRef]
+			 , #CampaignDetailsCounts_POS.[UpcomingCount_PartnerID]
+			 , #CampaignDetailsCounts_POS.[PreviousCount_Offer]
+			 , #CampaignDetailsCounts_POS.[PreviousCount_ClientServicesRef]
+			 , #CampaignDetailsCounts_POS.[PreviousCount_PartnerID]
+			 , #CampaignDetailsCounts_POS.[PredictedCardholderVolumes]
+			 , #CampaignDetailsCounts_POS.[Throttling]
+			 , #CampaignDetailsCounts_POS.[CampaignSelected]
+			 , #CampaignDetailsCounts_POS.[PartnerSelected]
 			 , CASE
-					WHEN UpcomingCount_Offer BETWEEN PreviousCount_Offer * 0.90 AND PreviousCount_Offer * 1.10 THEN 0
+					WHEN #CampaignDetailsCounts_POS.[UpcomingCount_Offer] BETWEEN #CampaignDetailsCounts_POS.[PreviousCount_Offer] * 0.90 AND #CampaignDetailsCounts_POS.[PreviousCount_Offer] * 1.10 THEN 0
 					ELSE 1
 			   END AS OutsideThreshold_Offer
 			 , CASE
-					WHEN UpcomingCount_ClientServicesRef BETWEEN PreviousCount_ClientServicesRef * 0.90 AND PreviousCount_ClientServicesRef * 1.10 THEN 0
+					WHEN #CampaignDetailsCounts_POS.[UpcomingCount_ClientServicesRef] BETWEEN #CampaignDetailsCounts_POS.[PreviousCount_ClientServicesRef] * 0.90 AND #CampaignDetailsCounts_POS.[PreviousCount_ClientServicesRef] * 1.10 THEN 0
 					ELSE 1
 			   END AS OutsideThreshold_ClientServicesRef
 			 , CASE
-					WHEN UpcomingCount_PartnerID BETWEEN PreviousCount_PartnerID * 0.90 AND PreviousCount_PartnerID * 1.10 THEN 0
+					WHEN #CampaignDetailsCounts_POS.[UpcomingCount_PartnerID] BETWEEN #CampaignDetailsCounts_POS.[PreviousCount_PartnerID] * 0.90 AND #CampaignDetailsCounts_POS.[PreviousCount_PartnerID] * 1.10 THEN 0
 					ELSE 1
 			   END AS OutsideThreshold_PartnerID
 		INTO #CampaignDetailsCounts
@@ -659,21 +659,21 @@ BEGIN
 
 		IF OBJECT_ID('tempdb..#IronOfferNames') IS NOT NULL DROP TABLE #IronOfferNames;
 		WITH 
-		IronOffer AS (SELECT StartDate
-						   , IronOfferID
-						   , IronOfferName
+		IronOffer AS (SELECT [ofn].[StartDate]
+						   , [ofn].[IronOfferID]
+						   , [ofn].[IronOfferName]
 						   , OfferName
-						   , ItemNumber
-						   , MAX(ItemNumber) OVER (PARTITION BY IronOfferID) AS MaxItemNumber
+						   , [ofn].[ItemNumber]
+						   , MAX([ofn].[ItemNumber]) OVER (PARTITION BY [ofn].[IronOfferID]) AS MaxItemNumber
 					  FROM (SELECT iof.StartDate
 								 , iof.IronOfferID
 								 , iof.IronOfferName
 								 , ofn.Item AS OfferName
 								 , RANK() OVER (PARTITION BY iof.IronOfferID ORDER BY ofn.ItemNumber DESC) AS ItemNumber
 							FROM [Derived].[IronOffer] iof
-							CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (IronOfferName, '/') ofn) ofn),
+							CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] ([iof].[IronOfferName], '/') ofn) ofn),
 
-		OfferSegment AS (SELECT IronOfferID
+		OfferSegment AS (SELECT [IronOffer].[IronOfferID]
 						 	  , OfferName AS OfferSegment
 							  , CASE
 									WHEN OfferName LIKE '%Debit%' AND OfferName LIKE '%Credit%' THEN 2
@@ -684,16 +684,16 @@ BEGIN
 						 WHERE ItemNumber = 1),
 
 		OfferCampaign AS (SELECT DISTINCT
-								 IronOfferID
+								 [IronOffer].[IronOfferID]
 							   , CASE
-									WHEN StartDate < '2019-06-17' AND MaxItemNumber = 5 AND ItemNumber = 2 THEN OfferName
-									WHEN '2019-06-17' < StartDate AND MaxItemNumber = 3 AND ItemNumber = 2 THEN OfferName
+									WHEN [IronOffer].[StartDate] < '2019-06-17' AND [IronOffer].[MaxItemNumber] = 5 AND ItemNumber = 2 THEN OfferName
+									WHEN '2019-06-17' < [IronOffer].[StartDate] AND [IronOffer].[MaxItemNumber] = 3 AND ItemNumber = 2 THEN OfferName
 							     END AS OfferCampaign
 						  FROM IronOffer)
 
 		SELECT os.IronOfferID
 			 , MAX(os.OfferSegment) AS OfferSegment
-			 , PaymentMethodTypeID
+			 , [oc].[PaymentMethodTypeID]
 			 , COALESCE(MAX(oc.OfferCampaign), 'General') AS OfferCampaign
 		INTO #IronOfferNames
 		FROM IronOffer iof
@@ -704,7 +704,7 @@ BEGIN
 		GROUP BY os.IronOfferID
 			   , iof.IronOfferName
 			   , iof.StartDate
-			   , PaymentMethodTypeID
+			   , [oc].[PaymentMethodTypeID]
 
 
 	/*******************************************************************************************************************************************
@@ -780,41 +780,41 @@ BEGIN
 	*******************************************************************************************************************************************/
 
 		SELECT	'Virgin' AS Publisher
-			,	AccountManager
-			,	PartnerID
-			,	PartnerName
-			,	ClientServicesRef
-			,	CampaignName
-			,	REPLACE(CampaignName, PartnerName + ' - ', '') AS CampaignNameReduced
-			,	CampaignType
-			,	IronOfferID
-			,	OfferCampaign
-			,	OfferSegment
-			,	DemographicTargetting
-			,	TopCashBackRate
-			,	CampaignSetup
-			,	CONVERT(VARCHAR(2), CampaignCycleLength) + ' Weeks' AS CampaignCycleLength
-			,	ControlGroupPercentage
-			,	CONVERT(INT, PredictedCardholderVolumes) AS PredictedCardholderVolumes
-			,	REPLACE(BriefLocation, '.xlsx', '') AS BriefLocation
-			,	EmailDate
+			,	#SSRS_R0180_OfferCountsReconciliation.[AccountManager]
+			,	#SSRS_R0180_OfferCountsReconciliation.[PartnerID]
+			,	#SSRS_R0180_OfferCountsReconciliation.[PartnerName]
+			,	#SSRS_R0180_OfferCountsReconciliation.[ClientServicesRef]
+			,	#SSRS_R0180_OfferCountsReconciliation.[CampaignName]
+			,	REPLACE(#SSRS_R0180_OfferCountsReconciliation.[CampaignName], #SSRS_R0180_OfferCountsReconciliation.[PartnerName] + ' - ', '') AS CampaignNameReduced
+			,	#SSRS_R0180_OfferCountsReconciliation.[CampaignType]
+			,	#SSRS_R0180_OfferCountsReconciliation.[IronOfferID]
+			,	#SSRS_R0180_OfferCountsReconciliation.[OfferCampaign]
+			,	#SSRS_R0180_OfferCountsReconciliation.[OfferSegment]
+			,	#SSRS_R0180_OfferCountsReconciliation.[DemographicTargetting]
+			,	#SSRS_R0180_OfferCountsReconciliation.[TopCashBackRate]
+			,	#SSRS_R0180_OfferCountsReconciliation.[CampaignSetup]
+			,	CONVERT(VARCHAR(2), #SSRS_R0180_OfferCountsReconciliation.[CampaignCycleLength]) + ' Weeks' AS CampaignCycleLength
+			,	#SSRS_R0180_OfferCountsReconciliation.[ControlGroupPercentage]
+			,	CONVERT(INT, #SSRS_R0180_OfferCountsReconciliation.[PredictedCardholderVolumes]) AS PredictedCardholderVolumes
+			,	REPLACE(#SSRS_R0180_OfferCountsReconciliation.[BriefLocation], '.xlsx', '') AS BriefLocation
+			,	#SSRS_R0180_OfferCountsReconciliation.[EmailDate]
 			
-			,	COALESCE(UpcomingCount_Offer, 0) AS UpcomingCount_Offer
-			,	COALESCE(PreviousCount_Offer, 0) AS PreviousCount_Offer
-			,	OutsideTolerance_Offer
+			,	COALESCE(#SSRS_R0180_OfferCountsReconciliation.[UpcomingCount_Offer], 0) AS UpcomingCount_Offer
+			,	COALESCE(#SSRS_R0180_OfferCountsReconciliation.[PreviousCount_Offer], 0) AS PreviousCount_Offer
+			,	#SSRS_R0180_OfferCountsReconciliation.[OutsideTolerance_Offer]
 			
-			,	UpcomingCount_CSR
-			,	PreviousCount_CSR
-			,	OutsideTolerance_CSR
+			,	#SSRS_R0180_OfferCountsReconciliation.[UpcomingCount_CSR]
+			,	#SSRS_R0180_OfferCountsReconciliation.[PreviousCount_CSR]
+			,	#SSRS_R0180_OfferCountsReconciliation.[OutsideTolerance_CSR]
 			
-			,	UpcomingCount_Partner
-			,	PreviousCount_Partner
+			,	#SSRS_R0180_OfferCountsReconciliation.[UpcomingCount_Partner]
+			,	#SSRS_R0180_OfferCountsReconciliation.[PreviousCount_Partner]
 
-			,	OutsideTolerance_Partner
+			,	#SSRS_R0180_OfferCountsReconciliation.[OutsideTolerance_Partner]
 		FROM #SSRS_R0180_OfferCountsReconciliation
 		--WHERE EmailDate = @EmailDate	
-				ORDER BY	EmailDate
-						,	CampaignType
-						,	PartnerName
+				ORDER BY	#SSRS_R0180_OfferCountsReconciliation.[EmailDate]
+						,	#SSRS_R0180_OfferCountsReconciliation.[CampaignType]
+						,	#SSRS_R0180_OfferCountsReconciliation.[PartnerName]
 			   
 END

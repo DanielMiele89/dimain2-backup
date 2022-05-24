@@ -29,22 +29,22 @@ BEGIN
 			DECLARE @ClubID INT = 166
 
 			TRUNCATE TABLE [Derived].[IronOffer]
-			INSERT INTO [Derived].[IronOffer] (	IronOfferID
-											,	IronOfferName
-											,	HydraOfferID
-											,	StartDate
-											,	EndDate
-											,	PartnerID
-											,	IsAboveTheLine
-											,	AutoAddToNewRegistrants
-											,	IsDefaultCollateral
-											,	IsSignedOff
-											,	AreEligibleMembersCommitted
-											,	AreControlMembersCommitted
-											,	IsTriggerOffer
-											,	TopCashBackRate
-											,	SegmentName
-											,	ClubID)
+			INSERT INTO [Derived].[IronOffer] (	[Derived].[IronOffer].[IronOfferID]
+											,	[Derived].[IronOffer].[IronOfferName]
+											,	[Derived].[IronOffer].[HydraOfferID]
+											,	[Derived].[IronOffer].[StartDate]
+											,	[Derived].[IronOffer].[EndDate]
+											,	[Derived].[IronOffer].[PartnerID]
+											,	[Derived].[IronOffer].[IsAboveTheLine]
+											,	[Derived].[IronOffer].[AutoAddToNewRegistrants]
+											,	[Derived].[IronOffer].[IsDefaultCollateral]
+											,	[Derived].[IronOffer].[IsSignedOff]
+											,	[Derived].[IronOffer].[AreEligibleMembersCommitted]
+											,	[Derived].[IronOffer].[AreControlMembersCommitted]
+											,	[Derived].[IronOffer].[IsTriggerOffer]
+											,	[Derived].[IronOffer].[TopCashBackRate]
+											,	[Derived].[IronOffer].[SegmentName]
+											,	[Derived].[IronOffer].[ClubID])
 			SELECT	CONVERT(INT, iof.[ID]) AS IronOfferID
 				,	CONVERT(NVARCHAR(200), iof.[Name]) AS IronOfferName
 				,	oca.HydraOfferID
@@ -84,12 +84,12 @@ BEGIN
 			ORDER BY	iof.ID DESC
 
 			UPDATE [Derived].[IronOffer]
-			SET IronOfferName = REPLACE(IronOfferName, 'Shopper', 'Welcome')
-			WHERE IronOfferID IN (22400)
+			SET [Derived].[IronOffer].[IronOfferName] = REPLACE([Derived].[IronOffer].[IronOfferName], 'Shopper', 'Welcome')
+			WHERE [Derived].[IronOffer].[IronOfferID] IN (22400)
 
 			UPDATE [Derived].[IronOffer]
-			SET IronOfferName = REPLACE(IronOfferName, 'HUS003', 'HUS003')
-			WHERE IronOfferID IN (23832, 23833, 23830, 23831)
+			SET [Derived].[IronOffer].[IronOfferName] = REPLACE([Derived].[IronOffer].[IronOfferName], 'HUS003', 'HUS003')
+			WHERE [Derived].[IronOffer].[IronOfferID] IN (23832, 23833, 23830, 23831)
 
 
 		/*******************************************************************************************************************************************
@@ -97,7 +97,7 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			UPDATE iof
-			SET TopCashbackRate = TCBR
+			SET [iof].[TopCashBackRate] = TCBR
 			FROM [Derived].[IronOffer] iof
 			CROSS APPLY (	SELECT MAX(CommissionRate) AS TCBR
 							FROM [DIMAIN_TR].[SLC_REPL].[dbo].[PartnerCommissionRule] pcr
@@ -112,7 +112,7 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			UPDATE i
-			SET CampaignType = 'Tactical Campaign'
+			SET [i].[CampaignType] = 'Tactical Campaign'
 			FROM [Derived].[IronOffer] as i
 			--INNER JOIN [Derived].[IronOffer_Campaign_HTM] htm
 			--	on i.IronOfferID = htm.IronOfferID
@@ -154,7 +154,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

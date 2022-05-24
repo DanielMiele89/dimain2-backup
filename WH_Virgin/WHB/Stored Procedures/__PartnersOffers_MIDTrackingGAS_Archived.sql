@@ -34,11 +34,11 @@ BEGIN TRY
 
 	If OBJECT_ID ('Tempdb..#SLC_Report_Match') Is Not Null Drop Table #SLC_Report_Match
 	Select Distinct
-		   MerchantID
-		 , RetailOutletID
+		   [SLC_Report].[dbo].[Match].[MerchantID]
+		 , [SLC_Report].[dbo].[Match].[RetailOutletID]
 	Into #SLC_Report_Match
 	From SLC_Report..Match
-	Where AddedDate >= @MatchDate
+	Where [SLC_Report].[dbo].[Match].[AddedDate] >= @MatchDate
 
 	Create Index CIX_SLCReportMatch_RetailOutletMID On #SLC_Report_Match (MerchantID, RetailOutletID)
 
@@ -67,7 +67,7 @@ BEGIN TRY
 			Select *
 			Into #MissingMID_Join
 			From [Derived].[MIDTrackingGAS] mtg
-			Where MID_Join is null
+			Where [Derived].[MIDTrackingGAS].[MID_Join] is null
 
 		-------------------------------------------------------------------------------------
 		----------------------   Join to Match & CC to find MID_Join   ----------------------
@@ -126,11 +126,11 @@ BEGIN TRY
 		-------------------------------------------------------------------------------------
 
 			Update [Derived].[MIDTrackingGAS]
-			Set MID_Join = MID_Join_New
+			Set [Derived].[MIDTrackingGAS].[MID_Join] = [mmccwd].[MID_Join_New]
 			From [Derived].[MIDTrackingGAS] mtg
 			Inner Join #MissingMID_JoinWithData mmccwd
-				on mtg.RetailOutletID=mmccwd.RetailOutletID
-			Where mtg.MID_Join Is Null;
+				on #MissingMID_JoinWithData.[mtg].RetailOutletID=mmccwd.RetailOutletID
+			Where #MissingMID_JoinWithData.[mtg].MID_Join Is Null;
 
 	--------------------------------------------------------------------------------------------------------------------
 	-------------------------------------   Update any MIDs that have been hashed   ------------------------------------
@@ -142,10 +142,10 @@ BEGIN TRY
 
 			If OBJECT_ID ('Tempdb..#HashedMIDs') Is Not Null Drop Table #HashedMIDs
 			Select ro.ID RetailOutletID
-				 , MerchantID as MID_GAS_New
+				 , [SLC_Report].[dbo].[RetailOutlet].[MerchantID] as MID_GAS_New
 			Into #HashedMIDs
 			From SLC_Report..RetailOutlet ro
-			Where (MerchantID Like '#%' Or MerchantID Like 'x%' Or MerchantID Like 'ARCHIVED-%')
+			Where ([SLC_Report].[dbo].[RetailOutlet].[MerchantID] Like '#%' Or [SLC_Report].[dbo].[RetailOutlet].[MerchantID] Like 'x%' Or [SLC_Report].[dbo].[RetailOutlet].[MerchantID] Like 'ARCHIVED-%')
 			And not exists (Select 1
 							From [Derived].[MIDTrackingGAS] mtg
 							Where ro.MerchantID = mtg.MID_GAS
@@ -156,12 +156,12 @@ BEGIN TRY
 		-------------------------------------------------------------------------------------
 	
 			Update mtg
-			Set MID_GAS = MID_GAS_New
-			  , EndDate = @EndDate
+			Set [Derived].[MIDTrackingGAS].[MID_GAS] = [hm].[MID_GAS_New]
+			  , [Derived].[MIDTrackingGAS].[EndDate] = @EndDate
 			From [Derived].[MIDTrackingGAS] mtg
 			Inner Join #HashedMIDs hm
-				on mtg.RetailOutletID=hm.RetailOutletID
-			Where mtg.EndDate Is Null;
+				on #HashedMIDs.[mtg].RetailOutletID=hm.RetailOutletID
+			Where #HashedMIDs.[mtg].EndDate Is Null;
 
 
 	--------------------------------------------------------------------------------------------------------------------
@@ -174,13 +174,13 @@ BEGIN TRY
 
 			If OBJECT_ID ('Tempdb..#UnhashedMIDs') Is Not Null Drop Table #UnhashedMIDs
 			Select ro.ID RetailOutletID
-				 , MerchantID as MID_GAS_New
+				 , [SLC_Report].[dbo].[RetailOutlet].[MerchantID] as MID_GAS_New
 			Into #UnhashedMIDs
 			From SLC_Report..RetailOutlet ro
-			Where MerchantID Not Like '#%'
-			And MerchantID Not Like 'x%'
-			And MerchantID Not Like 'ARCHIVED-%'
-			And Len(MerchantID) > 0
+			Where [SLC_Report].[dbo].[RetailOutlet].[MerchantID] Not Like '#%'
+			And [SLC_Report].[dbo].[RetailOutlet].[MerchantID] Not Like 'x%'
+			And [SLC_Report].[dbo].[RetailOutlet].[MerchantID] Not Like 'ARCHIVED-%'
+			And Len([SLC_Report].[dbo].[RetailOutlet].[MerchantID]) > 0
 			And exists (Select 1
 							From [Derived].[MIDTrackingGAS] mtg --[Derived].[MIDTrackingGAS] mtg
 							Where ro.ID = mtg.RetailOutletID
@@ -194,22 +194,22 @@ BEGIN TRY
 		----------------  UPDATE MID_GAS with new hashed value and EndDate   ----------------
 		-------------------------------------------------------------------------------------
 
-			Insert Into [Derived].[MIDTrackingGAS] (PartnerID
-												 , RetailOutletID
-												 , MID_GAS
-												 , MID_Join
-												 , StartDate
-												 , EndDate)
-			Select mtg.PartnerID
-				 , mtg.RetailOutletID
-				 , MID_GAS_New
-				 , mtg.MID_Join
+			Insert Into [Derived].[MIDTrackingGAS] ([Derived].[MIDTrackingGAS].[PartnerID]
+												 , [Derived].[MIDTrackingGAS].[RetailOutletID]
+												 , [Derived].[MIDTrackingGAS].[MID_GAS]
+												 , [Derived].[MIDTrackingGAS].[MID_Join]
+												 , [Derived].[MIDTrackingGAS].[StartDate]
+												 , [Derived].[MIDTrackingGAS].[EndDate])
+			Select #UnhashedMIDs.[mtg].PartnerID
+				 , #UnhashedMIDs.[mtg].RetailOutletID
+				 , [uhm].[MID_GAS_New]
+				 , #UnhashedMIDs.[mtg].MID_Join
 				 , @MatchDate as StartDate
 				 , Null as EndDate
 			From [Derived].[MIDTrackingGAS] mtg
 			Inner Join #UnhashedMIDs uhm
-				on mtg.RetailOutletID=uhm.RetailOutletID
-			Where mtg.MID_GAS = mtg.MID_Join;
+				on #UnhashedMIDs.[mtg].RetailOutletID=uhm.RetailOutletID
+			Where #UnhashedMIDs.[mtg].MID_GAS = #UnhashedMIDs.[mtg].MID_Join;
 
 
 	--------------------------------------------------------------------------------------------------------------------
@@ -250,7 +250,7 @@ BEGIN TRY
 						 , no.MID_GAS
 						 , cc.MID as MID_Join
 						 , no.StartDate
-						 , EndDate
+						 , [no].[EndDate]
 					From #NewOutLets no
 					Left Join [Trans].[ConsumerCombination] cc
 						on cc.MID=Replace(Replace(no.MID_GAS,'#',''),'x','')),
@@ -261,7 +261,7 @@ BEGIN TRY
 						 , no.MID_GAS
 						 , cc.MID as MID_Join
 						 , no.StartDate
-						 , EndDate
+						 , [no].[EndDate]
 					From #NewOutLets no
 					Left Join [Trans].[ConsumerCombination] cc
 						on '0'+cc.MID=Replace(Replace(no.MID_GAS,'#',''),'x','')
@@ -291,20 +291,20 @@ BEGIN TRY
 				Select * From NewOutletsInMatch) no
 
 
-		Insert into [Derived].[MIDTrackingGAS] (PartnerID
-											 , RetailOutletID
-											 , MID_GAS
-											 , MID_Join
-											 , StartDate
-											 , EndDate)
-			Select PartnerID
-				 , RetailOutletID
-				 , MID_GAS
-				 , MID_Join
-				 , StartDate
-				 , EndDate
+		Insert into [Derived].[MIDTrackingGAS] ([Derived].[MIDTrackingGAS].[PartnerID]
+											 , [Derived].[MIDTrackingGAS].[RetailOutletID]
+											 , [Derived].[MIDTrackingGAS].[MID_GAS]
+											 , [Derived].[MIDTrackingGAS].[MID_Join]
+											 , [Derived].[MIDTrackingGAS].[StartDate]
+											 , [Derived].[MIDTrackingGAS].[EndDate])
+			Select #NewOutLetsWithData.[PartnerID]
+				 , #NewOutLetsWithData.[RetailOutletID]
+				 , #NewOutLetsWithData.[MID_GAS]
+				 , #NewOutLetsWithData.[MID_Join]
+				 , #NewOutLetsWithData.[StartDate]
+				 , #NewOutLetsWithData.[EndDate]
 			From #NewOutLetsWithData
-			Where Rank = 1
+			Where #NewOutLetsWithData.[Rank] = 1
 
 
 
@@ -330,7 +330,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller
