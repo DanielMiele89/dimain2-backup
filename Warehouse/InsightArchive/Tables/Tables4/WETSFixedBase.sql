@@ -1,0 +1,5 @@
+﻿CREATE TABLE [InsightArchive].[WETSFixedBase] (
+    [CINID] INT NOT NULL,
+    PRIMARY KEY CLUSTERED ([CINID] ASC) WITH (FILLFACTOR = 90)
+);
+

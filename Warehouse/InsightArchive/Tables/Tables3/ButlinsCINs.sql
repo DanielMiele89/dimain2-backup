@@ -1,0 +1,5 @@
+﻿CREATE TABLE [InsightArchive].[ButlinsCINs] (
+    [CINID] INT NOT NULL,
+    PRIMARY KEY CLUSTERED ([CINID] ASC)
+);
+

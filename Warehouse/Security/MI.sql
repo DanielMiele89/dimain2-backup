@@ -1,0 +1,353 @@
+﻿CREATE SCHEMA [MI]
+    AUTHORIZATION [dbo];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[MI] TO [New_PIIRemoved];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [New_PIIRemoved];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [crtimport];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[MI] TO [New_ReadOnly];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [New_ReadOnly];
+
+
+GO
+GRANT VIEW CHANGE TRACKING
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT REFERENCES
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT CREATE SEQUENCE
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[MI] TO [New_OnCall];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [DB5\reportinguser];
+
+
+GO
+GRANT VIEW CHANGE TRACKING
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT TAKE OWNERSHIP
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT REFERENCES
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT CREATE SEQUENCE
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT CONTROL
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[MI] TO [New_BI];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[MI] TO [Stuart];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [Stuart];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[MI] TO [Stuart];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [Stuart];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[MI] TO [Stuart];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[MI] TO [Stuart];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [gas];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[MI] TO [gas];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [gas];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[MI] TO [New_CampaignOps];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[MI] TO [New_CampaignOps];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [New_CampaignOps];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[MI] TO [New_CampaignOps];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [New_CampaignOps];
+
+
+GO
+GRANT CONTROL
+    ON SCHEMA::[MI] TO [New_CampaignOps];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[MI] TO [New_CampaignOps];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[MI] TO [New_DataOps];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [New_DataOps];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [New_DataOps];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[MI] TO [New_Insight];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [New_Insight];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[MI] TO [InsightTeam];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[MI] TO [InsightTeam];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [InsightTeam];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[MI] TO [InsightTeam];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [InsightTeam];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[MI] TO [InsightTeam];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[MI] TO [InsightTeam];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[MI] TO [DataTeam];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[MI] TO [DataTeam];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [DataTeam];
+
+
+GO
+GRANT REFERENCES
+    ON SCHEMA::[MI] TO [DataTeam];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[MI] TO [DataTeam];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [DataTeam];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[MI] TO [DataTeam];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[MI] TO [DataTeam];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[MI] TO [Prakash];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[MI] TO [DataMart];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[MI] TO [DataMart];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[MI] TO [DataMart];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[MI] TO [DataMart];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[MI] TO [DataMart];
+

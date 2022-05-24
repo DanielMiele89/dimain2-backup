@@ -1,0 +1,26 @@
+﻿CREATE TABLE [InsightArchive].[Supermarket_Postcodes] (
+    [ConsumerCombinationID] INT             NOT NULL,
+    [brandname]             VARCHAR (50)    NOT NULL,
+    [BrandID]               SMALLINT        NOT NULL,
+    [LocationCountry]       VARCHAR (3)     NOT NULL,
+    [MID]                   VARCHAR (50)    NOT NULL,
+    [Narrative]             VARCHAR (50)    NOT NULL,
+    [IsHighVariance]        BIT             NOT NULL,
+    [MCC]                   VARCHAR (4)     NULL,
+    [MCCDesc]               VARCHAR (200)   NULL,
+    [SectorID]              TINYINT         NULL,
+    [MIDFrequency]          INT             NULL,
+    [OriginatorID]          VARCHAR (11)    NOT NULL,
+    [SectorName]            VARCHAR (50)    NOT NULL,
+    [rw]                    BIGINT          NULL,
+    [Date1]                 VARCHAR (10)    NOT NULL,
+    [Amount]                MONEY           NULL,
+    [First_tran]            DATE            NULL,
+    [Last_tran]             DATE            NULL,
+    [No_trans]              INT             NULL,
+    [No_customers]          INT             NULL,
+    [MerchantDbaCity]       NVARCHAR (100)  NULL,
+    [MerchantZip]           NVARCHAR (4000) NULL,
+    [No_matched_postcodes]  INT             NOT NULL
+);
+
