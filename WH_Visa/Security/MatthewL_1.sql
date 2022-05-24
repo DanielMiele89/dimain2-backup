@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [MatthewL]
+    WITH PASSWORD = N'y0l$dfuwcals!?|feepRMt4tmsFT7_&#$!~<Aaluqblcrk5s', SID = 0xF6150D15720510429CDA6BB06CA979C5, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

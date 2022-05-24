@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [ConalM]
+    WITH PASSWORD = N'wqdzsbnD5bSb|4m{styqtnrrmsFT7_&#$!~<ubTfat;|g|pl', SID = 0xFA4F6FAC67835C42A337049D735513D9, DEFAULT_DATABASE = [Warehouse], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

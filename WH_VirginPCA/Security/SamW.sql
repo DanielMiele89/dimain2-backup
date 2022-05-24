@@ -1,0 +1,2 @@
+﻿CREATE USER [SamW] FOR LOGIN [SamW];
+

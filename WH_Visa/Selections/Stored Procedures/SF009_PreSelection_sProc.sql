@@ -1,0 +1,1 @@
+﻿CREATE PROCEDURE [Selections].[SF009_PreSelection_sProc] AS BEGIN IF OBJECT_ID('[WH_Visa].[Selections].[SF009_PreSelection]') IS NOT NULL DROP TABLE [WH_Visa].[Selections].[SF009_PreSelection] SELECT CONVERT(INT, 0) AS FanID INTO [WH_Visa].[Selections].[SF009_PreSelection] WHERE 1 = 2 END
