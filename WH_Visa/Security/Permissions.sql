@@ -1,0 +1,338 @@
+﻿GRANT VIEW ANY COLUMN ENCRYPTION KEY DEFINITION TO PUBLIC;
+
+
+GO
+GRANT VIEW ANY COLUMN MASTER KEY DEFINITION TO PUBLIC;
+
+
+GO
+GRANT CONNECT TO [BastienC];
+
+
+GO
+GRANT CONNECT TO [ChrisN];
+
+
+GO
+GRANT CONNECT TO [crtimport];
+
+
+GO
+GRANT CONNECT TO [conord];
+
+
+GO
+GRANT CONNECT TO [Ewan];
+
+
+GO
+GRANT CONNECT TO [gabor];
+
+
+GO
+GRANT CONNECT TO [danielm];
+
+
+GO
+GRANT CONNECT TO [Michael];
+
+
+GO
+GRANT CONNECT TO [DarrenW];
+
+
+GO
+GRANT CONNECT TO [SamW];
+
+
+GO
+GRANT CONNECT TO [tony];
+
+
+GO
+GRANT CONNECT TO [datarecon];
+
+
+GO
+GRANT CONNECT TO [DIMAIN2\conordimain2];
+
+
+GO
+GRANT CONNECT TO [Ed];
+
+
+GO
+GRANT CONNECT TO [visa_prod];
+
+
+GO
+GRANT CONNECT TO [ExcelQuery_DataOps];
+
+
+GO
+GRANT CONNECT TO [glynd];
+
+
+GO
+GRANT CONNECT TO [GunayS];
+
+
+GO
+GRANT CONNECT TO [Hayden];
+
+
+GO
+GRANT CONNECT TO [kevinc];
+
+
+GO
+GRANT CONNECT TO [Prakash];
+
+
+GO
+GRANT CONNECT TO [LeoP];
+
+
+GO
+GRANT CONNECT TO [MarkD];
+
+
+GO
+GRANT CONNECT TO [patrickm];
+
+
+GO
+GRANT ALTER TO [New_DataOps2];
+
+
+GO
+GRANT CREATE FUNCTION TO [New_DataOps2];
+
+
+GO
+GRANT CREATE PROCEDURE TO [New_DataOps2];
+
+
+GO
+GRANT CREATE TABLE TO [New_DataOps2];
+
+
+GO
+GRANT CREATE VIEW TO [New_DataOps2];
+
+
+GO
+GRANT EXECUTE TO [New_DataOps2];
+
+
+GO
+GRANT INSERT TO [New_DataOps2];
+
+
+GO
+GRANT SELECT TO [New_DataOps2];
+
+
+GO
+GRANT SHOWPLAN TO [New_DataOps2];
+
+
+GO
+GRANT UPDATE TO [New_DataOps2];
+
+
+GO
+GRANT VIEW DEFINITION TO [New_DataOps2];
+
+
+GO
+GRANT CONNECT TO [GAS];
+
+
+GO
+GRANT CONNECT TO [DIMAIN\conordimain];
+
+
+GO
+GRANT CONNECT TO [peter];
+
+
+GO
+GRANT CONNECT TO [PhillipB];
+
+
+GO
+GRANT CONNECT TO [Process_AWS_SpendEarn];
+
+
+GO
+GRANT CONNECT TO [ProcessOp];
+
+
+GO
+GRANT CONNECT TO [Rory];
+
+
+GO
+GRANT CONNECT TO [RukanK];
+
+
+GO
+GRANT CONNECT TO [JosephS];
+
+
+GO
+GRANT CONNECT TO [ConalM];
+
+
+GO
+GRANT CONNECT TO [JoanneK];
+
+
+GO
+GRANT CONNECT TO [SamH];
+
+
+GO
+GRANT CONNECT TO [SLCReplication];
+
+
+GO
+GRANT CONNECT TO [tasfia];
+
+
+GO
+GRANT CONNECT TO [Vernon];
+
+
+GO
+GRANT CONNECT TO [virgin_etl_user];
+
+
+GO
+GRANT CONNECT TO [visa_etl_user];
+
+
+GO
+GRANT CONNECT TO [VitaliiV];
+
+
+GO
+GRANT CONNECT TO [WilliamA];
+
+
+GO
+GRANT CONNECT TO [Zoe];
+
+
+GO
+GRANT CONNECT TO [RichardS];
+
+
+GO
+GRANT CONNECT TO [MatthewL];
+
+
+GO
+GRANT CONNECT TO [ShannonM];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT CONTROL
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT CREATE SEQUENCE
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT REFERENCES
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT TAKE OWNERSHIP
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT VIEW CHANGE TRACKING
+    ON SCHEMA::[dbo] TO [New_DataOps];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[dbo] TO [New_DataOps2];
+
+
+GO
+GRANT CONTROL
+    ON SCHEMA::[dbo] TO [New_DataOps2];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[dbo] TO [New_DataOps2];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[dbo] TO [New_DataOps2];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[dbo] TO [New_DataOps2];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[dbo] TO [New_DataOps2];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[dbo] TO [New_DataOps2];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[dbo] TO [New_DataOps2];
+

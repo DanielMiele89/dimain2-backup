@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [ProcessOp]
+    WITH PASSWORD = N'ol9qshq4nkzc{{g69S1?qr{amsFT7_&#$!~<d|9{crwnfk}!', SID = 0x0052E8CECCE79C418425A09292861541, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

@@ -1,0 +1,5 @@
+﻿CREATE SEQUENCE [AWS].[S3Upload_RunID]
+    AS BIGINT
+    START WITH 1
+    INCREMENT BY 1;
+

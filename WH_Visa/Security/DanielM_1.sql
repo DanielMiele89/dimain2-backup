@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [DanielM]
+    WITH PASSWORD = N'w@qd^zsbbo0q|PmC+{s@t#y:msFT7_&#$!~<qtrrneubfaJt', SID = 0xDE0F9B290750054EAAE77B61E80930C8, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

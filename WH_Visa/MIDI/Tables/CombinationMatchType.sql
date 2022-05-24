@@ -1,0 +1,7 @@
+﻿CREATE TABLE [MIDI].[CombinationMatchType] (
+    [MatchTypeID] TINYINT      NOT NULL,
+    [Confidence]  VARCHAR (5)  NOT NULL,
+    [MatchType]   VARCHAR (50) NOT NULL,
+    PRIMARY KEY CLUSTERED ([MatchTypeID] ASC)
+);
+
