@@ -1,0 +1,7 @@
+﻿CREATE TABLE [Staging].[VM_DIMAIN_WELCOME_OFFER_MEMBERS_20210411] (
+    [column1] NVARCHAR (50) NULL,
+    [column2] NVARCHAR (50) NULL,
+    [column3] DATETIME2 (7) NULL,
+    [column4] DATETIME2 (7) NULL
+);
+
