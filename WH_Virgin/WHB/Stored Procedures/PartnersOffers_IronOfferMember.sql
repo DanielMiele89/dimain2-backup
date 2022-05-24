@@ -73,7 +73,7 @@ BEGIN
 				ON oma.IronOfferID = opl.IronOfferID
 				AND opl.IsUpdate = 0
 				AND opl.Processed = 1
-			WHERE @TwoDaysAgo < ProcessedDate
+			WHERE @TwoDaysAgo < [opl].[ProcessedDate]
 			GROUP BY	oma.IronOfferID
 					,	oma.CompositeID
 					,	oma.StartDate
@@ -124,11 +124,11 @@ BEGIN
 			--DECLARE @InsertQuery VARCHAR(MAX)
 
 			--SET @InsertQuery = '
-			INSERT INTO [Derived].[IronOfferMember] (	IronOfferID
-													,	CompositeID
-													,	StartDate
-													,	EndDate
-													,	ImportDate)
+			INSERT INTO [Derived].[IronOfferMember] (	[Derived].[IronOfferMember].[IronOfferID]
+													,	[Derived].[IronOfferMember].[CompositeID]
+													,	[Derived].[IronOfferMember].[StartDate]
+													,	[Derived].[IronOfferMember].[EndDate]
+													,	[Derived].[IronOfferMember].[ImportDate])
 			SELECT iom.IronOfferID
 				 , iom.CompositeID
 				 , iom.StartDate
@@ -161,7 +161,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

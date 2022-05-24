@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [iron]
+    AUTHORIZATION [dbo];
+

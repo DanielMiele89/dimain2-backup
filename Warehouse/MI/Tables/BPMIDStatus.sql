@@ -1,0 +1,6 @@
+﻿CREATE TABLE [MI].[BPMIDStatus] (
+    [StatusID]   TINYINT      NOT NULL,
+    [StatusDesc] VARCHAR (50) NOT NULL,
+    CONSTRAINT [PK_MI_BPMIDStatus] PRIMARY KEY CLUSTERED ([StatusID] ASC)
+);
+

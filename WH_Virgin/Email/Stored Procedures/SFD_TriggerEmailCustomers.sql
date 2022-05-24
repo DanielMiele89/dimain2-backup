@@ -55,19 +55,19 @@ SELECT *
 	 , @Today AS EmailSendDate
 INTO #DailyData
 FROM [Email].[DailyData]
-WHERE RedeemReminder_Day IS NOT NULL
-OR EarnConfirmation_Date IS NOT NULL
+WHERE [Email].[DailyData].[RedeemReminder_Day] IS NOT NULL
+OR [Email].[DailyData].[EarnConfirmation_Date] IS NOT NULL
 
 SELECT *
 FROM Email.TriggerEmailType
 
 
 IF OBJECT_ID('tempdb..#TriggerEmailTracking') IS NOT NULL DROP TABLE #TriggerEmailTracking
-SELECT FanID
+SELECT [Email].[DailyData].[FanID]
 	 , 14 AS TriggerEmailTypeID
 	 , @Today AS EmailSendDate
-	 , Birthday_Code
-	 , Birthday_CodeExpiryDate
+	 , [Email].[DailyData].[Birthday_Code]
+	 , [Email].[DailyData].[Birthday_CodeExpiryDate]
 	 , NULL AS FirstEarn_RetailerName
 	 , NULL AS FirstEarn_Date
 	 , NULL AS FirstEarn_Amount
@@ -78,9 +78,9 @@ SELECT FanID
 	 , NULL AS RedeemReminder_Day
 INTO #TriggerEmailTracking
 FROM [Email].[DailyData]
-WHERE Birthday_Flag IS NOT NULL
+WHERE [Email].[DailyData].[Birthday_Flag] IS NOT NULL
 UNION
-SELECT FanID
+SELECT [dd].[FanID]
 	 , 1 AS TriggerEmailTypeID
 	 , @Today AS EmailSendDate
 	 , NULL AS Birthday_Code
@@ -94,9 +94,9 @@ SELECT FanID
 	 , NULL AS RedeemReminder_Amount
 	 , NULL AS RedeemReminder_Day
 FROM [Email].[DailyData] dd
-WHERE FirstEarn_Date IS NOT NULL
+WHERE [dd].[FirstEarn_Date] IS NOT NULL
 UNION
-SELECT FanID
+SELECT [dd].[FanID]
 	 , 2 AS TriggerEmailTypeID
 	 , @Today AS EmailSendDate
 	 , NULL AS Birthday_Code
@@ -110,9 +110,9 @@ SELECT FanID
 	 , NULL AS RedeemReminder_Amount
 	 , NULL AS RedeemReminder_Day
 FROM [Email].[DailyData] dd
-WHERE Reached5GBP_Date IS NOT NULL
+WHERE [dd].[Reached5GBP_Date] IS NOT NULL
 UNION
-SELECT FanID
+SELECT [Email].[DailyData].[FanID]
 	 , 4 AS TriggerEmailTypeID
 	 , @Today AS EmailSendDate
 	 , NULL AS Birthday_Code
@@ -122,11 +122,11 @@ SELECT FanID
 	 , NULL AS FirstEarn_Amount
 	 , NULL AS FirstEarn_Type
 	 , NULL AS Reached5GBP_Date
-	 , EarnConfirmation_Date
+	 , [Email].[DailyData].[EarnConfirmation_Date]
 	 , NULL AS RedeemReminder_Amount
 	 , NULL AS RedeemReminder_Day
 FROM [Email].[DailyData]
-WHERE EarnConfirmation_Date IS NOT NULL
+WHERE [Email].[DailyData].[EarnConfirmation_Date] IS NOT NULL
 UNION
 SELECT FanID
 	 , tet.ID AS TriggerEmailTypeID

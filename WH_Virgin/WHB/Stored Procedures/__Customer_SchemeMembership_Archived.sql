@@ -54,7 +54,7 @@ BEGIN TRY
 
 
 		UPDATE b
-			SET SchemeMembershipTypeID = 
+			SET [b].[SchemeMembershipTypeID] = 
 					(Case
 						When b.SchemeMembershipTypeID in (1,2,5) then 6
 						When b.SchemeMembershipTypeID in (3,4) then 7
@@ -63,22 +63,22 @@ BEGIN TRY
 				
 		FROM #SMT b
 		INNER JOIN Staging.SLC_Report_DailyLoad_Phase2DataFields a
-			on b.FanID = a.FanID
-		WHERE a.LoyaltyAccount = 1 
+			on b.FanID = #SMT.[a].FanID
+		WHERE #SMT.[a].LoyaltyAccount = 1 
 			and b.SchemeMembershipTypeID in (1,2,3,4,5)
 
 
 		--Close off existing records in Relational.Customer_SchemeMembership
 		UPDATE cs
-			SET EndDate = Case
-							When DeactivatedDate = Cast(getdate() as date) then Dateadd(day,-1,CAST(getdate() as Date))
+			SET [Derived].[Customer_SchemeMembership].[EndDate] = Case
+							When [smt].[DeactivatedDate] = Cast(getdate() as date) then Dateadd(day,-1,CAST(getdate() as Date))
 							Else Dateadd(day,-2,CAST(getdate() as Date))
 						End
 		FROM Derived.Customer_SchemeMembership as cs	
 		INNER JOIN #SMT as smt	
-			on smt.FanID = cs.FanID
-		WHERE smt.SchemeMembershipTypeID <> cs.SchemeMembershipTypeID 
-			and cs.EndDate is null
+			on smt.FanID = #SMT.[cs].FanID
+		WHERE smt.SchemeMembershipTypeID <> #SMT.[cs].SchemeMembershipTypeID 
+			and #SMT.[cs].EndDate is null
 
 
 		--Create new entries in Relational.Customer_SchemeMembership-----------------------
@@ -86,15 +86,15 @@ BEGIN TRY
 		SELECT	smt.FanID,
 				smt.SchemeMembershipTypeID,
 				Case
-					When RegistrationDate = CAST(getdate() as Date) then CAST(getdate() as Date)
+					When [smt].[RegistrationDate] = CAST(getdate() as Date) then CAST(getdate() as Date)
 					Else dateadd(day,-1,CAST(getdate() as Date))
 				End as StartDate,
 				CAST(NULL as Date) as EndDate
 		FROM #SMT as smt
 		WHERE NOT EXISTS (SELECT 1 FROM Derived.Customer_SchemeMembership as cs
-			WHERE smt.FanID = cs.FanID 
-				and smt.SchemeMembershipTypeID = cs.SchemeMembershipTypeID 
-				and cs.EndDate is null)
+			WHERE smt.FanID = #SMT.[cs].FanID 
+				and smt.SchemeMembershipTypeID = #SMT.[cs].SchemeMembershipTypeID 
+				and #SMT.[cs].EndDate is null)
 
 	EXEC [Monitor].[ProcessLog_Insert] 'Customer_SchemeMembership', 'Finished'
 
@@ -117,7 +117,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

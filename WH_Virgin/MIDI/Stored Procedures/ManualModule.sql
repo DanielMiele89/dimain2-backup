@@ -37,27 +37,27 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	ALTER INDEX [ix_Stuff2] ON [MIDI].[CTLoad_MIDINewCombo] DISABLE
 	ALTER INDEX [ix_Stuff3] ON [MIDI].[CTLoad_MIDINewCombo] DISABLE
 
-	INSERT INTO [MIDI].[CTLoad_MIDINewCombo] (	MID
-											,	OriginalNarrative
-											,	LocationCountry
-											,	MCCID
-											,	MatchCount)
-	SELECT	MID
-		,	MerchantName
-		,	MerchantCountry
-		,	MCCID
+	INSERT INTO [MIDI].[CTLoad_MIDINewCombo] (	[MIDI].[CTLoad_MIDINewCombo].[MID]
+											,	[MIDI].[CTLoad_MIDINewCombo].[OriginalNarrative]
+											,	[MIDI].[CTLoad_MIDINewCombo].[LocationCountry]
+											,	[MIDI].[CTLoad_MIDINewCombo].[MCCID]
+											,	[MIDI].[CTLoad_MIDINewCombo].[MatchCount])
+	SELECT	[mh].[MID]
+		,	[mh].[MerchantName]
+		,	[mh].[MerchantCountry]
+		,	[mh].[MCCID]
 		,	COUNT(*)
 	FROM [MIDI].[CTLoad_MIDIHolding] mh
-	WHERE ConsumerCombinationID IS NULL
-	AND MID IS NOT NULL
-	GROUP BY	MID
-			,	MerchantName
-			,	MerchantCountry
-			,	MCCID
-	ORDER BY	MerchantName
-			,	MerchantCountry
-			,	MCCID
-			,	MID
+	WHERE [mh].[ConsumerCombinationID] IS NULL
+	AND [mh].[MID] IS NOT NULL
+	GROUP BY	[mh].[MID]
+			,	[mh].[MerchantName]
+			,	[mh].[MerchantCountry]
+			,	[mh].[MCCID]
+	ORDER BY	[mh].[MerchantName]
+			,	[mh].[MerchantCountry]
+			,	[mh].[MCCID]
+			,	[mh].[MID]
 
 	SET @RowsAffected = @@ROWCOUNT
 
@@ -99,7 +99,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 *******************************************************************************************************************************************/
 
 	UPDATE mnc
-	SET	Narrative_Cleaned = ISNULL(x.Narrative_Cleaned, mnc.OriginalNarrative)
+	SET	[mnc].[Narrative_Cleaned] = ISNULL(x.Narrative_Cleaned, mnc.OriginalNarrative)
 	FROM [MIDI].[CTLoad_MIDINewCombo] mnc -- 90,605
 	OUTER APPLY dbo.iTVF_NarrativeCleaner(-1,mnc.OriginalNarrative) q1
 	OUTER APPLY dbo.iTVF_NarrativeCleaner(q1.ID,q1.Narrative_Cleaned) q2
@@ -119,43 +119,43 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 
 		IF OBJECT_ID('tempdb..#Combinations') IS NOT NULL DROP TABLE #Combinations
 		SELECT	DISTINCT
-				BrandID
-			,	MID
-			,	Narrative
-			,	LocationCountry
-			,	MCCID
+				[Warehouse].[Relational].[ConsumerCombination].[BrandID]
+			,	[Warehouse].[Relational].[ConsumerCombination].[MID]
+			,	[Warehouse].[Relational].[ConsumerCombination].[Narrative]
+			,	[Warehouse].[Relational].[ConsumerCombination].[LocationCountry]
+			,	[Warehouse].[Relational].[ConsumerCombination].[MCCID]
 		INTO #Combinations
 		FROM [Warehouse].[Relational].[ConsumerCombination] cc
-		WHERE PaymentGatewayStatusID = 0	--	exclude non-individuated paypal
-		AND BrandID != 944
+		WHERE [Warehouse].[Relational].[ConsumerCombination].[PaymentGatewayStatusID] = 0	--	exclude non-individuated paypal
+		AND [Warehouse].[Relational].[ConsumerCombination].[BrandID] != 944
 		AND EXISTS (SELECT 1
 					FROM [Warehouse].[Relational].[ConsumerTransaction] ct
 					WHERE cc.ConsumerCombinationID = ct.ConsumerCombinationID
 					AND @LastYear <= ct.TranDate)
 		UNION
 		SELECT	DISTINCT
-				BrandID
-			,	MID
-			,	Narrative
-			,	LocationCountry
-			,	MCCID
+				[Warehouse].[Relational].[ConsumerCombination].[BrandID]
+			,	[Warehouse].[Relational].[ConsumerCombination].[MID]
+			,	[Warehouse].[Relational].[ConsumerCombination].[Narrative]
+			,	[Warehouse].[Relational].[ConsumerCombination].[LocationCountry]
+			,	[Warehouse].[Relational].[ConsumerCombination].[MCCID]
 		FROM [Warehouse].[Relational].[ConsumerCombination] cc
-		WHERE PaymentGatewayStatusID = 0	--	exclude non-individuated paypal
-		AND BrandID != 944
+		WHERE [Warehouse].[Relational].[ConsumerCombination].[PaymentGatewayStatusID] = 0	--	exclude non-individuated paypal
+		AND [Warehouse].[Relational].[ConsumerCombination].[BrandID] != 944
 		AND EXISTS (SELECT 1
 					FROM [Warehouse].[Relational].[ConsumerTransaction_CreditCard] ct
 					WHERE cc.ConsumerCombinationID = ct.ConsumerCombinationID
 					AND @LastYear <= ct.TranDate)
 		UNION
 		SELECT	DISTINCT
-				BrandID
-			,	MID
-			,	Narrative
-			,	LocationCountry
-			,	MCCID
+				[cc].[BrandID]
+			,	[cc].[MID]
+			,	[cc].[Narrative]
+			,	[cc].[LocationCountry]
+			,	[cc].[MCCID]
 		FROM [Trans].[ConsumerCombination] cc
-		WHERE PaymentGatewayStatusID = 0	--	exclude non-individuated paypal
-		AND BrandID != 944
+		WHERE [cc].[PaymentGatewayStatusID] = 0	--	exclude non-individuated paypal
+		AND [cc].[BrandID] != 944
 		AND EXISTS (SELECT 1
 					FROM [Trans].[ConsumerTransaction] ct
 					WHERE cc.ConsumerCombinationID = ct.ConsumerCombinationID
@@ -175,16 +175,16 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Store Combinations [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 		
 		IF OBJECT_ID('tempdb..#NarrativeBrandLookup') IS NOT NULL DROP TABLE #NarrativeBrandLookup
-		SELECT	BrandID
-			,	Narrative
+		SELECT	[WH_Virgin].[MIDI].[BrandMatch].[BrandID]
+			,	[WH_Virgin].[MIDI].[BrandMatch].[Narrative]
 		INTO #NarrativeBrandLookup
 		FROM [WH_Virgin].[MIDI].[BrandMatch]
-		WHERE BrandID != 944
+		WHERE [WH_Virgin].[MIDI].[BrandMatch].[BrandID] != 944
 		UNION
-		SELECT	BrandID
-			,	Narrative
+		SELECT	[Warehouse].[Staging].[BrandMatch].[BrandID]
+			,	[Warehouse].[Staging].[BrandMatch].[Narrative]
 		FROM [Warehouse].[Staging].[BrandMatch]
-		WHERE BrandID != 944
+		WHERE [Warehouse].[Staging].[BrandMatch].[BrandID] != 944
 		
 		SET @RowsAffected = @@ROWCOUNT
 
@@ -202,9 +202,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		6.1.	Narrative, MID, MCC, Country
 	***********************************************************************************************************************/
 
-		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	ComboID
-																,	SuggestedBrandID
-																,	MatchTypeID)
+		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[ComboID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[SuggestedBrandID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[MatchTypeID])
 		SELECT	DISTINCT 
 				mnc.ID
 			,	cc.BrandID
@@ -217,10 +217,10 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 							,	cc.BrandID
 							,	COUNT(*) AS Matches
 						FROM #Combinations cc
-						WHERE mnc.MID = cc.MID
-						AND mnc.LocationCountry = cc.LocationCountry
-						AND mnc.MCCID = cc.MCCID
-						AND mnc.OriginalNarrative = cc.Narrative
+						WHERE #Combinations.[mnc].MID = cc.MID
+						AND #Combinations.[mnc].LocationCountry = cc.LocationCountry
+						AND #Combinations.[mnc].MCCID = cc.MCCID
+						AND #Combinations.[mnc].OriginalNarrative = cc.Narrative
 						AND cc.BrandID NOT IN (944, 943, 1293)
 						GROUP BY	cc.MID
 								,	cc.MCCID
@@ -235,9 +235,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		6.2.	Narrative Lookup, MID, MCC, Country
 	***********************************************************************************************************************/
 
-		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	ComboID
-																,	SuggestedBrandID
-																,	MatchTypeID)
+		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[ComboID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[SuggestedBrandID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[MatchTypeID])
 		SELECT	DISTINCT 
 				mnc.ID
 			,	cc.BrandID
@@ -272,9 +272,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		6.3.	Narrative Lookup, MID, Country
 	***********************************************************************************************************************/
 	
-		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	ComboID
-																,	SuggestedBrandID
-																,	MatchTypeID)
+		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[ComboID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[SuggestedBrandID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[MatchTypeID])
 		SELECT	DISTINCT 
 				mnc.ID
 			,	cc.BrandID
@@ -306,9 +306,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		6.4.	Narrative Lookup, MCC, Country
 	***********************************************************************************************************************/
 
-		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	ComboID
-																,	SuggestedBrandID
-																,	MatchTypeID)
+		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[ComboID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[SuggestedBrandID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[MatchTypeID])
 		SELECT	DISTINCT 
 				mnc.ID
 			,	cc.BrandID
@@ -341,9 +341,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		6.5.	Narrative Lookup, MID
 	***********************************************************************************************************************/
 
-		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	ComboID
-																,	SuggestedBrandID
-																,	MatchTypeID)
+		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[ComboID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[SuggestedBrandID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[MatchTypeID])
 		SELECT	DISTINCT 
 				mnc.ID
 			,	cc.BrandID
@@ -372,9 +372,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		6.6.	Narrative Lookup, MCC
 	***********************************************************************************************************************/
 
-		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	ComboID
-																,	SuggestedBrandID
-																,	MatchTypeID)
+		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[ComboID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[SuggestedBrandID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[MatchTypeID])
 		SELECT	DISTINCT 
 				mnc.ID
 			,	cc.BrandID
@@ -405,118 +405,118 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	
 		IF OBJECT_ID('tempdb..#SharedMIDs') IS NOT NULL DROP TABLE #SharedMIDs;
 		WITH
-		CurveCard AS (	SELECT	MID
-							,	MCCID
+		CurveCard AS (	SELECT	[c].[MID]
+							,	[c].[MCCID]
 						FROM #Combinations c
 						WHERE c.Narrative LIKE '%PP%*%'
 						OR c.Narrative LIKE 'CURVE*%'),
 
-		PayPal AS (		SELECT	MID
-							,	MCCID
+		PayPal AS (		SELECT	[c].[MID]
+							,	[c].[MCCID]
 						 FROM #Combinations c
 						WHERE c.Narrative LIKE 'CRV*%'
 						OR c.Narrative LIKE '%PayPal%*%'
-						OR BrandID = 943),
+						OR [c].[BrandID] = 943),
 
-		iZettle AS (	SELECT	MID
-							,	MCCID
+		iZettle AS (	SELECT	[c].[MID]
+							,	[c].[MCCID]
 						FROM #Combinations c
 						WHERE c.Narrative LIKE 'iz*%'
-						OR BrandID = 1293),
+						OR [c].[BrandID] = 1293),
 
-		Facebook AS (	SELECT	MID
-							,	MCCID
+		Facebook AS (	SELECT	[c].[MID]
+							,	[c].[MCCID]
 						FROM #Combinations c
 						WHERE c.Narrative LIKE 'FBPAY%'),
 
-		LayBuy AS (		SELECT	MID
-							,	MCCID
+		LayBuy AS (		SELECT	[c].[MID]
+							,	[c].[MCCID]
 						FROM #Combinations c
 						WHERE c.Narrative LIKE 'LAYBUY%'),
 
-		NYA AS (		SELECT	MID
-							,	MCCID
+		NYA AS (		SELECT	[c].[MID]
+							,	[c].[MCCID]
 						FROM #Combinations c
 						WHERE c.Narrative LIKE 'NYA%'),
 
-		DMN AS (		SELECT	MID
-							,	MCCID
+		DMN AS (		SELECT	[c].[MID]
+							,	[c].[MCCID]
 						FROM #Combinations c
 						WHERE c.Narrative LIKE 'DMN%'),
 
-		Ritual AS (		SELECT	MID
-							,	MCCID
+		Ritual AS (		SELECT	[c].[MID]
+							,	[c].[MCCID]
 						FROM #Combinations c
 						WHERE c.Narrative LIKE 'RITUAL-%'),
 
-		SQ AS (			SELECT	MID
-							,	MCCID
+		SQ AS (			SELECT	[c].[MID]
+							,	[c].[MCCID]
 						FROM #Combinations c
 						WHERE c.Narrative LIKE 'SQ%*%'),
 
-		SUMUP AS (		SELECT	MID
-							,	MCCID
+		SUMUP AS (		SELECT	[c].[MID]
+							,	[c].[MCCID]
 						FROM #Combinations c
 						WHERE c.Narrative LIKE 'SUMUP%'),
 
-		MultipleByMID AS (	SELECT	MID
-								,	MCCID
+		MultipleByMID AS (	SELECT	[c].[MID]
+								,	[c].[MCCID]
 							FROM #Combinations c
-							GROUP BY	MID
-									,	MCCID
-							HAVING COUNT(DISTINCT BrandID) > 5),
+							GROUP BY	[c].[MID]
+									,	[c].[MCCID]
+							HAVING COUNT(DISTINCT [c].[BrandID]) > 5),
 
-		Combined AS (	SELECT	MID
-							,	MCCID
+		Combined AS (	SELECT	[CurveCard].[MID]
+							,	[CurveCard].[MCCID]
 						FROM CurveCard
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[PayPal].[MID]
+							,	[PayPal].[MCCID]
 						FROM PayPal
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[iZettle].[MID]
+							,	[iZettle].[MCCID]
 						FROM iZettle
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[Facebook].[MID]
+							,	[Facebook].[MCCID]
 						FROM Facebook
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[LayBuy].[MID]
+							,	[LayBuy].[MCCID]
 						FROM LayBuy
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[NYA].[MID]
+							,	[NYA].[MCCID]
 						FROM NYA
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[DMN].[MID]
+							,	[DMN].[MCCID]
 						FROM DMN
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[Ritual].[MID]
+							,	[Ritual].[MCCID]
 						FROM Ritual
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[SQ].[MID]
+							,	[SQ].[MCCID]
 						FROM SQ
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[SUMUP].[MID]
+							,	[SUMUP].[MCCID]
 						FROM SUMUP
 						UNION ALL
-						SELECT	MID
-							,	MCCID
+						SELECT	[MultipleByMID].[MID]
+							,	[MultipleByMID].[MCCID]
 						FROM MultipleByMID)
 
-		SELECT	MID
-			,	MCCID
+		SELECT	[Combined].[MID]
+			,	[Combined].[MCCID]
 		INTO #SharedMIDs
 		FROM Combined
 		UNION
-		SELECT	MID
-			,	MCCID
+		SELECT	[c].[MID]
+			,	[c].[MCCID]
 		FROM #Combinations c
 		WHERE EXISTS (SELECT 1
 					  FROM Combined cu
@@ -540,38 +540,38 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		FROM [MIDI].[CTLoad_MIDINewCombo] mnc
 		CROSS APPLY (	SELECT	cc.MID
 							,	cc.MCCID
-							,	Narrative_Cleaned
+							,	#Combinations.[Narrative_Cleaned]
 							,	cc.LocationCountry
 							,	cc.BrandID
-							,	br.BrandName
+							,	#Combinations.[br].BrandName
 							,	COUNT(*) AS Matches
 						FROM #Combinations cc
 						INNER JOIN [Warehouse].[Relational].[Brand] br
-							ON cc.BrandID = br.BrandID	
-						WHERE mnc.MCCID = cc.MCCID
-						AND mnc.MID = cc.MID
+							ON cc.BrandID = #Combinations.[br].BrandID	
+						WHERE #Combinations.[mnc].MCCID = cc.MCCID
+						AND #Combinations.[mnc].MID = cc.MID
 						GROUP BY	cc.MID
 								,	cc.MCCID
 								,	cc.LocationCountry
 								,	cc.BrandID
-								,	br.BrandName) x
+								,	#Combinations.[br].BrandName) x
 		OUTER APPLY [dbo].[FuzzyMatch_iTVF2k5](mnc.Narrative_Cleaned, x.BrandName) fm
 		WHERE NOT EXISTS (	SELECT 1
 							FROM [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] p
 							WHERE p.ComboID = mnc.ID)
 		AND NOT EXISTS (	SELECT 1
 							FROM #SharedMIDs sm
-							WHERE mnc.MID = sm.MID
-							AND mnc.MCCID = sm.MCCID)
+							WHERE #SharedMIDs.[mnc].MID = sm.MID
+							AND #SharedMIDs.[mnc].MCCID = sm.MCCID)
 
 		DELETE
 		FROM #MCCMID
-		WHERE MatchRank > 1
+		WHERE #MCCMID.[MatchRank] > 1
 
 
-		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	ComboID
-																,	SuggestedBrandID
-																,	MatchTypeID)
+		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[ComboID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[SuggestedBrandID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[MatchTypeID])
 		SELECT	DISTINCT 
 				mnc.ID
 			,	mm.BrandID
@@ -586,9 +586,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		6.8.	Narrative Lookup ONLY
 	***********************************************************************************************************************/
 
-		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	ComboID
-																,	SuggestedBrandID
-																,	MatchTypeID)
+		INSERT INTO [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] (	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[ComboID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[SuggestedBrandID]
+																,	[MIDI].[CTLoad_MIDINewCombo_PossibleBrands].[MatchTypeID])
 		SELECT	DISTINCT 
 				mnc.ID
 			,	bm.BrandID
@@ -731,19 +731,19 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 *******************************************************************************************************************************************/
 		
 	UPDATE mnc
-	SET OriginalBrandID = pbm.SuggestedBrandID
-	,	MatchType = pbm.MatchTypeID
-	,	BrandProbability = pbm.BrandProbability
+	SET [mnc].[OriginalBrandID] = pbm.SuggestedBrandID
+	,	[mnc].[MatchType] = pbm.MatchTypeID
+	,	[mnc].[BrandProbability] = pbm.BrandProbability
 	FROM [MIDI].[CTLoad_MIDINewCombo] mnc
-	INNER JOIN (SELECT	ID
-					,	ComboID
-					,	SuggestedBrandID
-					,	MatchTypeID
-					,	BrandProbability
-					,	MIN(MatchTypeID) OVER (PARTITION BY ComboID) AS MinMatchTypeID
+	INNER JOIN (SELECT	[pb].[ID]
+					,	[pb].[ComboID]
+					,	[pb].[SuggestedBrandID]
+					,	[pb].[MatchTypeID]
+					,	[pb].[BrandProbability]
+					,	MIN([pb].[MatchTypeID]) OVER (PARTITION BY [pb].[ComboID]) AS MinMatchTypeID
 				FROM [MIDI].[CTLoad_MIDINewCombo_PossibleBrands] pb) pbm
 		ON mnc.ID = pbm.ComboID
-	WHERE MatchTypeID = MinMatchTypeID 
+	WHERE [pbm].[MatchTypeID] = MinMatchTypeID 
 	AND mnc.OriginalBrandID IS NULL
 
 	SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Update BrandIDs [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
@@ -754,9 +754,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 *******************************************************************************************************************************************/
 
 	UPDATE [MIDI].[CTLoad_MIDINewCombo]
-	SET	OriginalBrandID = 944
-	,	MatchType = 10
-	WHERE OriginalBrandID IS NULL
+	SET	[MIDI].[CTLoad_MIDINewCombo].[OriginalBrandID] = 944
+	,	[MIDI].[CTLoad_MIDINewCombo].[MatchType] = 10
+	WHERE [MIDI].[CTLoad_MIDINewCombo].[OriginalBrandID] IS NULL
 
 	SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Mark remaining unbranded [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 	
@@ -770,11 +770,11 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	***********************************************************************************************************************/
 
 		UPDATE [MIDI].[CTLoad_MIDINewCombo] 
-		SET	OriginalBrandID = 943
-		,	MatchType = 11
-		WHERE (	OriginalNarrative LIKE '%PAYPAL%'
-			OR	OriginalNarrative LIKE 'PP*%')
-		AND (OriginalBrandID = 944 OR MatchType = 9)
+		SET	[MIDI].[CTLoad_MIDINewCombo].[OriginalBrandID] = 943
+		,	[MIDI].[CTLoad_MIDINewCombo].[MatchType] = 11
+		WHERE (	[MIDI].[CTLoad_MIDINewCombo].[OriginalNarrative] LIKE '%PAYPAL%'
+			OR	[MIDI].[CTLoad_MIDINewCombo].[OriginalNarrative] LIKE 'PP*%')
+		AND ([MIDI].[CTLoad_MIDINewCombo].[OriginalBrandID] = 944 OR [MIDI].[CTLoad_MIDINewCombo].[MatchType] = 9)
 
 		SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Mark PayPal [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
@@ -783,10 +783,10 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	***********************************************************************************************************************/
 
 		UPDATE [MIDI].[CTLoad_MIDINewCombo]
-		SET	OriginalBrandID = 1293
-		,	MatchType = 12
-		WHERE OriginalNarrative Like '%IZ *%'
-		AND (OriginalBrandID = 944 OR MatchType = 9)
+		SET	[MIDI].[CTLoad_MIDINewCombo].[OriginalBrandID] = 1293
+		,	[MIDI].[CTLoad_MIDINewCombo].[MatchType] = 12
+		WHERE [MIDI].[CTLoad_MIDINewCombo].[OriginalNarrative] Like '%IZ *%'
+		AND ([MIDI].[CTLoad_MIDINewCombo].[OriginalBrandID] = 944 OR [MIDI].[CTLoad_MIDINewCombo].[MatchType] = 9)
 
 		SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Mark iZettle [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 	
@@ -800,7 +800,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	***********************************************************************************************************************/
 
 		UPDATE mnc
-		SET OriginalBrandID = mc.BrandIDChange
+		SET [mnc].[OriginalBrandID] = mc.BrandIDChange
 		FROM [MIDI].[CTLoad_MIDINewCombo] mnc
 		INNER JOIN [MIDI].[MIDIBrandChange_MCC] mc
 			ON mnc.OriginalBrandID = mc.BrandIDInitial
@@ -814,7 +814,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	***********************************************************************************************************************/
 
 		UPDATE mnc
-		SET OriginalBrandID = mc.BrandIDChange
+		SET [mnc].[OriginalBrandID] = mc.BrandIDChange
 		FROM [MIDI].[CTLoad_MIDINewCombo] mnc
 		INNER JOIN [MIDI].[MIDIBrandChange_Narrative] mc
 			ON mnc.OriginalBrandID = mc.BrandIDInitial
@@ -882,25 +882,25 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 					,	MCCID
 					,	IsHighVariance
 			UNION ALL
-			SELECT	BrandID
-				,	MID
-				,	Narrative
-				,	LocationCountry
-				,	MCCID
-				,	IsHighVariance
+			SELECT	[cc].[BrandID]
+				,	[cc].[MID]
+				,	[cc].[Narrative]
+				,	[cc].[LocationCountry]
+				,	[cc].[MCCID]
+				,	[cc].[IsHighVariance]
 				,	SUM(1) AS Transactions
-				,	SUM(Amount) AS Amount
+				,	SUM([ct].[Amount]) AS Amount
 			FROM [Trans].[ConsumerCombination] cc
 			INNER JOIN [Trans].[ConsumerTransaction] ct
 				ON cc.ConsumerCombinationID = ct.ConsumerCombinationID
 				AND @TransactionStartDate <= ct.TranDate
-			WHERE PaymentGatewayStatusID = 0	--	exclude non-individuated paypal
-			GROUP BY	BrandID
-					,	MID
-					,	Narrative
-					,	LocationCountry
-					,	MCCID
-					,	IsHighVariance) cc
+			WHERE [cc].[PaymentGatewayStatusID] = 0	--	exclude non-individuated paypal
+			GROUP BY	[cc].[BrandID]
+					,	[cc].[MID]
+					,	[cc].[Narrative]
+					,	[cc].[LocationCountry]
+					,	[cc].[MCCID]
+					,	[cc].[IsHighVariance]) cc
 	LEFT JOIN [Warehouse].[Relational].[Brand] br
 		ON cc.BrandID = br.BrandID
 	GROUP BY	cc.BrandID
@@ -912,7 +912,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 			,	cc.IsHighVariance
 
 	UPDATE c
-	SET	Narrative_Cleaned = ISNULL(x.Narrative_Cleaned, c.Narrative)
+	SET	[c].[Narrative_Cleaned] = ISNULL(#Combinations_All.[x].Narrative_Cleaned, c.Narrative)
 	FROM #Combinations_All c -- 90,605
 	OUTER APPLY dbo.iTVF_NarrativeCleaner(-1,c.Narrative) q1
 	OUTER APPLY dbo.iTVF_NarrativeCleaner(q1.ID,q1.Narrative_Cleaned) q2
@@ -933,36 +933,36 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 
 	IF OBJECT_ID('tempdb..#MCCs') IS NOT NULL DROP TABLE #MCCs
 	;WITH
-	MCCIDs AS (	SELECT	BrandID
-		    		,	BrandName
-					,	MCCID
-		    		,	Transactions
-					,	Amount
-					,	SUM(Amount) OVER (PARTITION BY BrandID) AS Amount_BrandID
-				FROM (	SELECT	BrandID
-							,	BrandName
-							,	MCCID
-							,	SUM(Transactions) AS Transactions
-							,	SUM(ABS(Amount)) AS Amount
+	MCCIDs AS (	SELECT	[c].[BrandID]
+		    		,	[c].[BrandName]
+					,	[c].[MCCID]
+		    		,	[c].[Transactions]
+					,	[c].[Amount]
+					,	SUM([c].[Amount]) OVER (PARTITION BY [c].[BrandID]) AS Amount_BrandID
+				FROM (	SELECT	#Combinations_All.[BrandID]
+							,	#Combinations_All.[BrandName]
+							,	#Combinations_All.[MCCID]
+							,	SUM(#Combinations_All.[Transactions]) AS Transactions
+							,	SUM(ABS(#Combinations_All.[Amount])) AS Amount
 						FROM #Combinations_All
-						GROUP BY	BrandID
-								,	BrandName
-								,	MCCID) c),
+						GROUP BY	#Combinations_All.[BrandID]
+								,	#Combinations_All.[BrandName]
+								,	#Combinations_All.[MCCID]) c),
 	
 	MCCIDRanked AS (SELECT	m.BrandID
 						,	m.MCCID
-						,	RANK() OVER (PARTITION BY BrandID ORDER BY Amount DESC, Transactions DESC) AS RankMCC
+						,	RANK() OVER (PARTITION BY [m].[BrandID] ORDER BY Amount DESC, Transactions DESC) AS RankMCC
 					FROM MCCIDs m
 					INNER JOIN [Warehouse].[Relational].[MCCList] mcc
 						ON m.MCCID = mcc.MCCID
 					WHERE Amount_BrandID * @MCC_SpendThreshold <= Amount),
 
-	MMCCIDRanked_Pivot AS (	SELECT	BrandID
-								,	MAX(CASE WHEN RankMCC = 1 THEN MCCID ELSE '' END) AS MostCommonMCCID
-								,	MAX(CASE WHEN RankMCC = 2 THEN MCCID ELSE '' END) AS SecondMostCommonMCCID
-								,	MAX(CASE WHEN RankMCC = 3 THEN MCCID ELSE '' END) AS ThirdMostCommonMCCID
+	MMCCIDRanked_Pivot AS (	SELECT	#Combinations_All.[BrandID]
+								,	MAX(CASE WHEN [MCCIDRanked].[RankMCC] = 1 THEN #Combinations_All.[MCCID] ELSE '' END) AS MostCommonMCCID
+								,	MAX(CASE WHEN [MCCIDRanked].[RankMCC] = 2 THEN #Combinations_All.[MCCID] ELSE '' END) AS SecondMostCommonMCCID
+								,	MAX(CASE WHEN [MCCIDRanked].[RankMCC] = 3 THEN #Combinations_All.[MCCID] ELSE '' END) AS ThirdMostCommonMCCID
 							FROM MCCIDRanked
-							GROUP BY BrandID)
+							GROUP BY #Combinations_All.[BrandID])
 
 	SELECT	mcc.BrandID
 		,	COALESCE(mcc.MostCommonMCCID, '') AS MostCommonMCCID
@@ -977,62 +977,62 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	,	mnc.OriginalBrand_ThirdMostCommonMCCID = COALESCE(mcc.ThirdMostCommonMCCID, '')
 	FROM [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo] mnc
 	LEFT JOIN #MCCs mcc
-		ON mnc.OriginalBrandID = mcc.BrandID
+		ON #MCCs.[mnc].OriginalBrandID = mcc.BrandID
 
 	UPDATE [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo]
-	SET DoMCCsMatch =	CASE
-							WHEN MCCID IN (OriginalBrand_FirstMostCommonMCCID,	OriginalBrand_SecondMostCommonMCCID, OriginalBrand_ThirdMostCommonMCCID) THEN 1
+	SET [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[DoMCCsMatch] =	CASE
+							WHEN [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[MCCID] IN ([WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[OriginalBrand_FirstMostCommonMCCID],	[WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[OriginalBrand_SecondMostCommonMCCID], [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[OriginalBrand_ThirdMostCommonMCCID]) THEN 1
 							ELSE 0
 						END
 
 
 	IF OBJECT_ID('tempdb..#CombinedCombinationsTemp') IS NOT NULL DROP TABLE #CombinedCombinationsTemp
-	SELECT	MID
-		,	LocationCountry
-		,	MCCID
-		,	Narrative
-		,	Narrative_Cleaned
-		,	BrandID
-		,	LEN(Narrative_Cleaned) AS Narrative_CleanedLength
+	SELECT	[c].[MID]
+		,	[c].[LocationCountry]
+		,	[c].[MCCID]
+		,	[c].[Narrative]
+		,	[c].[Narrative_Cleaned]
+		,	[c].[BrandID]
+		,	LEN([c].[Narrative_Cleaned]) AS Narrative_CleanedLength
 	INTO #CombinedCombinationsTemp
-	FROM (	SELECT	MID
-				,	LocationCountry
-				,	MCCID
-				,	Narrative
-				,	Narrative_Cleaned
-				,	BrandID
+	FROM (	SELECT	#Combinations_All.[MID]
+				,	#Combinations_All.[LocationCountry]
+				,	#Combinations_All.[MCCID]
+				,	#Combinations_All.[Narrative]
+				,	#Combinations_All.[Narrative_Cleaned]
+				,	#Combinations_All.[BrandID]
 			FROM #Combinations_All
 			UNION ALL
-			SELECT	MID
-				,	LocationCountry
-				,	MCCID
-				,	OriginalNarrative
-				,	Narrative_Cleaned
-				,	OriginalBrandID
+			SELECT	[WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[MID]
+				,	[WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[LocationCountry]
+				,	[WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[MCCID]
+				,	[WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[OriginalNarrative]
+				,	[WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[Narrative_Cleaned]
+				,	[WH_Virgin].[MIDI].[CTLoad_MIDINewCombo].[OriginalBrandID]
 			FROM [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo]) c
 
 	;WITH
-	Updater AS (SELECT	MID
-					,	LocationCountry
-					,	MCCID
-					,	Narrative_CleanedLength
-					,	AVG(Narrative_CleanedLength) OVER (PARTITION BY MID, LocationCountry, MCCID) AS Narrative_CleanedLength_Avg
+	Updater AS (SELECT	#CombinedCombinationsTemp.[MID]
+					,	#CombinedCombinationsTemp.[LocationCountry]
+					,	#CombinedCombinationsTemp.[MCCID]
+					,	#CombinedCombinationsTemp.[Narrative_CleanedLength]
+					,	AVG(#CombinedCombinationsTemp.[Narrative_CleanedLength]) OVER (PARTITION BY #CombinedCombinationsTemp.[MID], #CombinedCombinationsTemp.[LocationCountry], #CombinedCombinationsTemp.[MCCID]) AS Narrative_CleanedLength_Avg
 				FROM #CombinedCombinationsTemp)
 
 	UPDATE Updater
-	SET Narrative_CleanedLength = Narrative_CleanedLength_Avg;
+	SET #CombinedCombinationsTemp.[Narrative_CleanedLength] = Narrative_CleanedLength_Avg;
 
 	CREATE NONCLUSTERED COLUMNSTORE INDEX CSI_All ON #CombinedCombinationsTemp (MID, LocationCountry, MCCID, Narrative, Narrative_Cleaned, BrandID, Narrative_CleanedLength)
 
 	IF OBJECT_ID('tempdb..#CombinedCombinations') IS NOT NULL DROP TABLE #CombinedCombinations
 	SELECT	DISTINCT
-			MID
-		,	LocationCountry
-		,	MCCID
-		,	Narrative
-		,	Narrative_Cleaned
-		,	BrandID
-		,	Narrative_CleanedLength
+			[c].[MID]
+		,	[c].[LocationCountry]
+		,	[c].[MCCID]
+		,	[c].[Narrative]
+		,	[c].[Narrative_Cleaned]
+		,	[c].[BrandID]
+		,	[c].[Narrative_CleanedLength]
 		,	CONVERT(INT, NULL) AS NarrativeCount
 		,	CONVERT(INT, NULL) AS NarrativeCount_PartialLeft
 		,	CONVERT(INT, NULL) AS NarrativeCount_PartialRight
@@ -1040,37 +1040,37 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	FROM #CombinedCombinationsTemp c
 
 	;WITH
-	Updater AS (SELECT	MID
-					,	LocationCountry
-					,	MCCID
-					,	NarrativeCount
-					,	NarrativeCount_PartialLeft
-					,	NarrativeCount_PartialRight
-					,	COUNT(*) OVER (PARTITION BY MID, LocationCountry, MCCID) AS NarrativeCount_New
-					,	COUNT(*) OVER (PARTITION BY LEFT(Narrative_Cleaned, Narrative_CleanedLength * 0.25), MID, LocationCountry, MCCID) AS NarrativeCount_PartialLeft_New
-					,	COUNT(*) OVER (PARTITION BY RIGHT(Narrative_Cleaned, Narrative_CleanedLength * 0.25), MID, LocationCountry, MCCID) AS NarrativeCount_PartialRight_New
+	Updater AS (SELECT	#CombinedCombinations.[MID]
+					,	#CombinedCombinations.[LocationCountry]
+					,	#CombinedCombinations.[MCCID]
+					,	#CombinedCombinations.[NarrativeCount]
+					,	#CombinedCombinations.[NarrativeCount_PartialLeft]
+					,	#CombinedCombinations.[NarrativeCount_PartialRight]
+					,	COUNT(*) OVER (PARTITION BY #CombinedCombinations.[MID], #CombinedCombinations.[LocationCountry], #CombinedCombinations.[MCCID]) AS NarrativeCount_New
+					,	COUNT(*) OVER (PARTITION BY LEFT(#CombinedCombinations.[Narrative_Cleaned], #CombinedCombinations.[Narrative_CleanedLength] * 0.25), #CombinedCombinations.[MID], #CombinedCombinations.[LocationCountry], #CombinedCombinations.[MCCID]) AS NarrativeCount_PartialLeft_New
+					,	COUNT(*) OVER (PARTITION BY RIGHT(#CombinedCombinations.[Narrative_Cleaned], #CombinedCombinations.[Narrative_CleanedLength] * 0.25), #CombinedCombinations.[MID], #CombinedCombinations.[LocationCountry], #CombinedCombinations.[MCCID]) AS NarrativeCount_PartialRight_New
 				FROM #CombinedCombinations)
 
 	UPDATE Updater
-	SET NarrativeCount = NarrativeCount_New
-	,	NarrativeCount_PartialLeft = NarrativeCount_PartialLeft_New
-	,	NarrativeCount_PartialRight = NarrativeCount_PartialRight_New;
+	SET #CombinedCombinations.[NarrativeCount] = NarrativeCount_New
+	,	#CombinedCombinations.[NarrativeCount_PartialLeft] = NarrativeCount_PartialLeft_New
+	,	#CombinedCombinations.[NarrativeCount_PartialRight] = NarrativeCount_PartialRight_New;
 
 
 	IF OBJECT_ID('tempdb..#EntriesPerCombination') IS NOT NULL DROP TABLE #EntriesPerCombination
-	SELECT	MID
-		,	LocationCountry
-		,	MCCID
-		,	NarrativeCount
-		,	MAX(NarrativeCount_PartialLeft) AS NarrativeCount_PartialLeft
-		,	MAX(NarrativeCount_PartialRight) AS NarrativeCount_PartialRight
-		,	COUNT(DISTINCT BrandID) AS BrandCount
+	SELECT	#CombinedCombinations.[MID]
+		,	#CombinedCombinations.[LocationCountry]
+		,	#CombinedCombinations.[MCCID]
+		,	#CombinedCombinations.[NarrativeCount]
+		,	MAX(#CombinedCombinations.[NarrativeCount_PartialLeft]) AS NarrativeCount_PartialLeft
+		,	MAX(#CombinedCombinations.[NarrativeCount_PartialRight]) AS NarrativeCount_PartialRight
+		,	COUNT(DISTINCT #CombinedCombinations.[BrandID]) AS BrandCount
 	INTO #EntriesPerCombination
 	FROM #CombinedCombinations
-	GROUP BY	MID
-			,	LocationCountry
-			,	MCCID
-			,	NarrativeCount
+	GROUP BY	#CombinedCombinations.[MID]
+			,	#CombinedCombinations.[LocationCountry]
+			,	#CombinedCombinations.[MCCID]
+			,	#CombinedCombinations.[NarrativeCount]
 
 
 	UPDATE mnc
@@ -1080,9 +1080,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	,	mnc.BrandCount = COALESCE(epc.BrandCount, 0)
 	FROM [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo] mnc
 	LEFT JOIN #EntriesPerCombination epc
-		ON mnc.MID = epc.MID
-		AND mnc.MCCID = epc.MCCID
-		AND mnc.LocationCountry = epc.LocationCountry
+		ON #EntriesPerCombination.[mnc].MID = epc.MID
+		AND #EntriesPerCombination.[mnc].MCCID = epc.MCCID
+		AND #EntriesPerCombination.[mnc].LocationCountry = epc.LocationCountry
 
 
 
@@ -1176,37 +1176,37 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	SET mnc.BrandProbability = CONVERT(DECIMAL(19,4), pcm.CorrectMatches)
 	FROM #ProbabilityCorrectMatch_BrandID_MCCID pcm
 	INNER JOIN [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo] mnc
-		ON pcm.OriginalBrandID = mnc.OriginalBrandID
-		AND pcm.MCCID = mnc.MCCID
-		AND pcm.DoMCCsMatch = mnc.DoMCCsMatch
-		AND pcm.MatchTypeID = mnc.MatchType
-	WHERE BrandProbability IS NULL
+		ON pcm.OriginalBrandID = #ProbabilityCorrectMatch_BrandID_MCCID.[mnc].OriginalBrandID
+		AND pcm.MCCID = #ProbabilityCorrectMatch_BrandID_MCCID.[mnc].MCCID
+		AND pcm.DoMCCsMatch = #ProbabilityCorrectMatch_BrandID_MCCID.[mnc].DoMCCsMatch
+		AND pcm.MatchTypeID = #ProbabilityCorrectMatch_BrandID_MCCID.[mnc].MatchType
+	WHERE #ProbabilityCorrectMatch_BrandID_MCCID.[BrandProbability] IS NULL
 
 	UPDATE mnc
 	SET mnc.BrandProbability = CONVERT(DECIMAL(19,4), pcm.CorrectMatches)
 	FROM #ProbabilityCorrectMatch_BrandID pcm
 	INNER JOIN [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo] mnc
-		ON pcm.OriginalBrandID = mnc.OriginalBrandID
-		AND pcm.DoMCCsMatch = mnc.DoMCCsMatch
-		AND pcm.MatchTypeID = mnc.MatchType
-	WHERE BrandProbability IS NULL
+		ON pcm.OriginalBrandID = #ProbabilityCorrectMatch_BrandID.[mnc].OriginalBrandID
+		AND pcm.DoMCCsMatch = #ProbabilityCorrectMatch_BrandID.[mnc].DoMCCsMatch
+		AND pcm.MatchTypeID = #ProbabilityCorrectMatch_BrandID.[mnc].MatchType
+	WHERE #ProbabilityCorrectMatch_BrandID.[BrandProbability] IS NULL
 
 	UPDATE mnc
 	SET mnc.BrandProbability = CONVERT(DECIMAL(19,4), pcm.CorrectMatches)
 	FROM #ProbabilityCorrectMatch_MCCID pcm
 	INNER JOIN [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo] mnc
-		ON pcm.MCCID = mnc.MCCID
-		AND pcm.DoMCCsMatch = mnc.DoMCCsMatch
-		AND pcm.MatchTypeID = mnc.MatchType
-	WHERE BrandProbability IS NULL
+		ON pcm.MCCID = #ProbabilityCorrectMatch_MCCID.[mnc].MCCID
+		AND pcm.DoMCCsMatch = #ProbabilityCorrectMatch_MCCID.[mnc].DoMCCsMatch
+		AND pcm.MatchTypeID = #ProbabilityCorrectMatch_MCCID.[mnc].MatchType
+	WHERE #ProbabilityCorrectMatch_MCCID.[BrandProbability] IS NULL
 
 	UPDATE mnc
 	SET mnc.BrandProbability = CONVERT(DECIMAL(19,4), pcm.CorrectMatches)
 	FROM #ProbabilityCorrectMatch pcm
 	INNER JOIN [WH_Virgin].[MIDI].[CTLoad_MIDINewCombo] mnc
-		ON pcm.DoMCCsMatch = mnc.DoMCCsMatch
-		AND pcm.MatchTypeID = mnc.MatchType
-	WHERE BrandProbability IS NULL
+		ON pcm.DoMCCsMatch = #ProbabilityCorrectMatch.[mnc].DoMCCsMatch
+		AND pcm.MatchTypeID = #ProbabilityCorrectMatch.[mnc].MatchType
+	WHERE #ProbabilityCorrectMatch.[BrandProbability] IS NULL
 
 
 

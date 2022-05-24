@@ -14,7 +14,7 @@ AS
 SET NOCOUNT ON;
 
 INSERT INTO monitor.ProcessLog 
-	(ProcessName, ActionName, IsError)
+	([monitor].[ProcessLog].[ProcessName], [monitor].[ProcessLog].[ActionName], [monitor].[ProcessLog].[IsError])
 VALUES (@ProcessName, @ActionName, @IsError)
 
 

@@ -13,7 +13,7 @@ BEGIN
 		,	cu.ClubID AS PublisherID
 		,	cu.Gender
 		,	CASE
-				WHEN cup.DOB != '1900-01-01 00:00:00.000'THEN DOB
+				WHEN cup.DOB != '1900-01-01 00:00:00.000'THEN [cup].[DOB]
 				ELSE NULL
 			END AS DOB
 		,	cu.RegistrationDate AS ActivationDate

@@ -41,20 +41,20 @@ BEGIN
 		SELECT TOP 1
 			@RunStartDateTime = pls.RunStartDateTime
 		FROM Monitor.Package_Log pls
-		WHERE RunID = @RunID
-			AND SourceID = @SourceID
+		WHERE [pls].[RunID] = @RunID
+			AND [pls].[SourceID] = @SourceID
 			AND pls.PackageID = @PackageID
 		ORDER BY pls.RunStartDateTime DESC
 
 		-- Insert into Error table
 		INSERT INTO Monitor.Package_Errors
 		(
-			RunID
-		  , PackageID
-		  , SourceID
-		  , RunStartDateTime
-		  , ErrorDetails
-		  , ErrorCode
+			[Monitor].[Package_Errors].[RunID]
+		  , [Monitor].[Package_Errors].[PackageID]
+		  , [Monitor].[Package_Errors].[SourceID]
+		  , [Monitor].[Package_Errors].[RunStartDateTime]
+		  , [Monitor].[Package_Errors].[ErrorDetails]
+		  , [Monitor].[Package_Errors].[ErrorCode]
 		)
 
 		 SELECT
@@ -67,13 +67,13 @@ BEGIN
 
 		-- Update error flag on log table
 		UPDATE Monitor.Package_Log
-		SET isError = 1
-		  , RunEndDateTime = GETDATE()
-		WHERE RunID = @RunID
-			AND SourceID = @SourceID
-			AND RunStartDateTime = @RunStartDateTime
-			AND PackageID = @PackageID
-			AND RunEndDateTime IS NULL
+		SET [Monitor].[Package_Log].[isError] = 1
+		  , [Monitor].[Package_Log].[RunEndDateTime] = GETDATE()
+		WHERE [Monitor].[Package_Log].[RunID] = @RunID
+			AND [Monitor].[Package_Log].[SourceID] = @SourceID
+			AND [Monitor].[Package_Log].[RunStartDateTime] = @RunStartDateTime
+			AND [Monitor].[Package_Log].[PackageID] = @PackageID
+			AND [Monitor].[Package_Log].[RunEndDateTime] IS NULL
 
 	COMMIT TRAN
 

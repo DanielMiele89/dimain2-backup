@@ -1,0 +1,3 @@
+﻿Create Procedure Staging.SSRS_SFDExtractedDataAssessment_SMS_TableList
+As
+Select Distinct Tablename from Relational.PostSFD_SMSEvaluation_CJStageCounts

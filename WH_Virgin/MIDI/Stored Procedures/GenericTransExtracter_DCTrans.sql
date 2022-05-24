@@ -15,14 +15,14 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 
 IF OBJECT_ID('tempdb..#FilesToProcess') IS NOT NULL DROP TABLE #FilesToProcess
 SELECT	TOP 1
-		ID AS FileID
-	,	LoadDate
-	,	FileName
+		[f].[ID] AS FileID
+	,	[f].[LoadDate]
+	,	[f].[FileName]
 INTO #FilesToProcess
 FROM [WHB].[Inbound_Files] f
-WHERE TableName = 'Transactions'
-AND FileProcessed = 0
-ORDER BY ID
+WHERE [f].[TableName] = 'Transactions'
+AND [f].[FileProcessed] = 0
+ORDER BY [f].[ID]
 
 SET @RowsAffected = @@ROWCOUNT
 
@@ -32,7 +32,7 @@ IF @RowsAffected = 0 BEGIN
 	RETURN 0
 END
 
-DECLARE @WorkWithFile VARCHAR(15) = (SELECT CONVERT(VARCHAR(15), FileID ,105) FROM #FilesToProcess)
+DECLARE @WorkWithFile VARCHAR(15) = (SELECT CONVERT(VARCHAR(15), #FilesToProcess.[FileID] ,105) FROM #FilesToProcess)
 SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Starting extract for file - [' + @WorkWithFile + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
 ------------------------------------------------------
@@ -52,24 +52,24 @@ ALTER INDEX IX_CCID ON [MIDI].[CTLoad_InitialStage] DISABLE
 
 -- loop step [Load CTLoad_InitialStage]
 TRUNCATE TABLE [MIDI].[CTLoad_InitialStage]
-INSERT INTO [MIDI].[CTLoad_InitialStage] (	[FileID]
-											,	[RowNum]
-											,	[FileName]
-											,	[LoadDate]
-											,	[CardID]
-											,	[MID]
-											,	[MerchantCountry]
-											,	[MerchantName]
-											,	[CardholderPresentData]
-											,	[MCC]
-											,	[TranDate]
-											,	[TranTime]
-											,	[Amount]
-											,	[CurrencyCode]
-											,	[CardInputMode]
-											,	[CashbackAmount]
-											,	[IsOnline]
-											,	[IsRefund])
+INSERT INTO [MIDI].[CTLoad_InitialStage] (	[MIDI].[CTLoad_InitialStage].[FileID]
+											,	[MIDI].[CTLoad_InitialStage].[RowNum]
+											,	[MIDI].[CTLoad_InitialStage].[FileName]
+											,	[MIDI].[CTLoad_InitialStage].[LoadDate]
+											,	[MIDI].[CTLoad_InitialStage].[CardID]
+											,	[MIDI].[CTLoad_InitialStage].[MID]
+											,	[MIDI].[CTLoad_InitialStage].[MerchantCountry]
+											,	[MIDI].[CTLoad_InitialStage].[MerchantName]
+											,	[MIDI].[CTLoad_InitialStage].[CardholderPresentData]
+											,	[MIDI].[CTLoad_InitialStage].[MCC]
+											,	[MIDI].[CTLoad_InitialStage].[TranDate]
+											,	[MIDI].[CTLoad_InitialStage].[TranTime]
+											,	[MIDI].[CTLoad_InitialStage].[Amount]
+											,	[MIDI].[CTLoad_InitialStage].[CurrencyCode]
+											,	[MIDI].[CTLoad_InitialStage].[CardInputMode]
+											,	[MIDI].[CTLoad_InitialStage].[CashbackAmount]
+											,	[MIDI].[CTLoad_InitialStage].[IsOnline]
+											,	[MIDI].[CTLoad_InitialStage].[IsRefund])
 SELECT	ftp.FileID
 	,	RowNum = ROW_NUMBER() OVER (PARTITION BY ftp.FileID ORDER BY tr.TransactionDate, tr.TransactionTime, tr.Amount, tr.CardID)
 	,	ftp.FileName
@@ -137,10 +137,10 @@ WHEN MATCHED THEN
 			,	target.ImportedDate = GETDATE()		-- If matched, update to new value
 
 WHEN NOT MATCHED THEN			-- If not matched, add new rows
-	INSERT (FileID
-		,	LoadDate
-		,	RowsImported
-		,	ImportedDate)
+	INSERT ([target].[FileID]
+		,	[target].[LoadDate]
+		,	[target].[RowsImported]
+		,	[target].[ImportedDate])
 	VALUES (source.FileID
 		,	source.LoadDate
 		,	@RowsAffected

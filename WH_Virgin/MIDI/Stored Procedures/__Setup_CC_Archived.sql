@@ -28,7 +28,7 @@ SELECT CAST(CASE @DayName WHEN 'SATURDAY' THEN 1 WHEN 'SUNDAY' THEN 2 ELSE 0 END
 
 --update high and non-high variance non-paypal combinations
 UPDATE cch
-SET ConsumerCombinationID = c.ConsumerCombinationID
+SET [MIDI].[CreditCardLoad_MIDIHolding].[ConsumerCombinationID] = c.ConsumerCombinationID
 FROM MIDI.CreditCardLoad_MIDIHolding cch
 INNER JOIN Trans.ConsumerCombination c 
 	ON cch.MID = c.MID
@@ -43,13 +43,13 @@ WHERE cch.ConsumerCombinationID IS NULL
 
 --update paypal combinations
 UPDATE cch
-	SET ConsumerCombinationID = p.ConsumerCombinationID
-	, RequiresSecondaryID = 1
+	SET [MIDI].[creditcardload_midiholding].[ConsumerCombinationID] = p.ConsumerCombinationID
+	, [MIDI].[creditcardload_midiholding].[RequiresSecondaryID] = 1
 FROM MIDI.creditcardload_midiholding cch
 INNER JOIN (
-	SELECT ConsumerCombinationID, LocationCountry, MCCID, OriginatorID
+	SELECT [Trans].[ConsumerCombination].[ConsumerCombinationID], [Trans].[ConsumerCombination].[LocationCountry], [Trans].[ConsumerCombination].[MCCID], [Trans].[ConsumerCombination].[OriginatorID]
 	FROM Trans.ConsumerCombination
-	WHERE PaymentGatewayStatusID = 1
+	WHERE [Trans].[ConsumerCombination].[PaymentGatewayStatusID] = 1
 ) P 
 	ON cch.LocationCountry = P.LocationCountry 
 	AND cch.MCCID = P.MCCID 
@@ -59,7 +59,7 @@ WHERE cch.Narrative LIKE 'PAYPAL%'
 
 
 UPDATE cch
-	SET SecondaryCombinationID = p.PaymentGatewayID
+	SET [MIDI].[creditcardload_midiholding].[SecondaryCombinationID] = p.PaymentGatewayID
 FROM MIDI.creditcardload_midiholding cch
 INNER JOIN MIDI.PaymentGatewaySecondaryDetail p 
 	ON cch.ConsumerCombinationID = p.ConsumerCombinationID
@@ -69,14 +69,14 @@ WHERE cch.SecondaryCombinationID IS NULL
 	AND cch.RequiresSecondaryID = 1
 
 
-INSERT INTO MIDI.PaymentGatewaySecondaryDetail (ConsumerCombinationID, MID, Narrative)
-SELECT ConsumerCombinationID, MID, Narrative
+INSERT INTO MIDI.PaymentGatewaySecondaryDetail ([MIDI].[PaymentGatewaySecondaryDetail].[ConsumerCombinationID], [MIDI].[PaymentGatewaySecondaryDetail].[MID], [MIDI].[PaymentGatewaySecondaryDetail].[Narrative])
+SELECT [MIDI].[creditcardload_midiholding].[ConsumerCombinationID], [MIDI].[creditcardload_midiholding].[MID], [MIDI].[creditcardload_midiholding].[Narrative]
 FROM MIDI.creditcardload_midiholding
-WHERE RequiresSecondaryID = 1
-	AND SecondaryCombinationID IS NULL
+WHERE [MIDI].[creditcardload_midiholding].[RequiresSecondaryID] = 1
+	AND [MIDI].[creditcardload_midiholding].[SecondaryCombinationID] IS NULL
 
 UPDATE cch
-	SET SecondaryCombinationID = p.PaymentGatewayID
+	SET [MIDI].[creditcardload_midiholding].[SecondaryCombinationID] = p.PaymentGatewayID
 FROM MIDI.creditcardload_midiholding cch
 INNER JOIN MIDI.PaymentGatewaySecondaryDetail p 
 	ON cch.ConsumerCombinationID = p.ConsumerCombinationID
@@ -88,19 +88,19 @@ WHERE cch.SecondaryCombinationID IS NULL
 
 -- EXEC Staging.CreditCardLoad_MIDIHolding_Matched_Fetch -->> Relational.ConsumerTransactionCreditCardHolding
 INSERT INTO MIDI.ConsumerTransaction_CreditCardHolding (
-	FileID, RowNum, Amount, TranDate, ConsumerCombinationID, SecondaryCombinationID, LocationID, CINID, FanID, 
-	IsOnline, 
-	CardholderPresentData)
+	[MIDI].[ConsumerTransaction_CreditCardHolding].[FileID], [MIDI].[ConsumerTransaction_CreditCardHolding].[RowNum], [MIDI].[ConsumerTransaction_CreditCardHolding].[Amount], [MIDI].[ConsumerTransaction_CreditCardHolding].[TranDate], [MIDI].[ConsumerTransaction_CreditCardHolding].[ConsumerCombinationID], [MIDI].[ConsumerTransaction_CreditCardHolding].[SecondaryCombinationID], [MIDI].[ConsumerTransaction_CreditCardHolding].[LocationID], [MIDI].[ConsumerTransaction_CreditCardHolding].[CINID], [MIDI].[ConsumerTransaction_CreditCardHolding].[FanID], 
+	[MIDI].[ConsumerTransaction_CreditCardHolding].[IsOnline], 
+	[MIDI].[ConsumerTransaction_CreditCardHolding].[CardholderPresentData])
 SELECT 
-	FileID, RowNum, Amount, TranDate, ConsumerCombinationID, SecondaryCombinationID, LocationID, CINID, FanID, 
-	IsOnline = CASE WHEN CardholderPresentMC = 5 THEN 1 ELSE 0 END, 
-	CardholderPresentData = CardholderPresentMC
+	[MIDI].[CreditCardLoad_MIDIHolding].[FileID], [MIDI].[CreditCardLoad_MIDIHolding].[RowNum], [MIDI].[CreditCardLoad_MIDIHolding].[Amount], [MIDI].[CreditCardLoad_MIDIHolding].[TranDate], [MIDI].[CreditCardLoad_MIDIHolding].[ConsumerCombinationID], [MIDI].[CreditCardLoad_MIDIHolding].[SecondaryCombinationID], [MIDI].[CreditCardLoad_MIDIHolding].[LocationID], [MIDI].[CreditCardLoad_MIDIHolding].[CINID], [MIDI].[CreditCardLoad_MIDIHolding].[FanID], 
+	IsOnline = CASE WHEN [MIDI].[CreditCardLoad_MIDIHolding].[CardholderPresentMC] = 5 THEN 1 ELSE 0 END, 
+	CardholderPresentData = [MIDI].[CreditCardLoad_MIDIHolding].[CardholderPresentMC]
 FROM MIDI.CreditCardLoad_MIDIHolding
-WHERE ConsumerCombinationID IS NOT NULL
+WHERE [MIDI].[CreditCardLoad_MIDIHolding].[ConsumerCombinationID] IS NOT NULL
 
 
 DELETE FROM MIDI.CreditCardLoad_MIDIHolding
-	WHERE ConsumerCombinationID IS NOT NULL
+	WHERE [MIDI].[CreditCardLoad_MIDIHolding].[ConsumerCombinationID] IS NOT NULL
 
 
 

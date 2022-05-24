@@ -32,8 +32,8 @@ Declare
 
 --Find Last record Imported (Find the last processed date so that we only import rows after this day)
 SELECT 
-	@AddedDate = Max(AddedDate), 
-	@ACA_ID = Max(AdditionalCashbackAwardID)
+	@AddedDate = Max([Derived].[AdditionalCashbackAward].[AddedDate]), 
+	@ACA_ID = Max([Derived].[AdditionalCashbackAward].[AdditionalCashbackAwardID])
 FROM Derived.AdditionalCashbackAward as aca				
 
 Set @AddedDate = Dateadd(day,1,@AddedDate)
@@ -88,7 +88,7 @@ WHERE t.VectorMajorID is not null
 
 -- Remove those records with a MatchID and no TRANS record ---------------------
 UPDATE aca
-	Set MatchID = m.ID
+	Set [Derived].[AdditionalCashbackAward].[MatchID] = m.ID
 FROM Derived.AdditionalCashbackAward as aca
 INNER JOIN SLC_Report..match as m with (nolock)
 	on	aca.FileID = m.VectorMajorID and
@@ -108,7 +108,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'AdditionalCashbackAward_V1_11_Append', 'F
 EXEC Monitor.ProcessLog_Insert 'WHB', 'AdditionalCashbackAward_CC_MonthlyAwards', 'Starting'
 --Find out number of last entry
 Declare @MaxRow int
-Select @MaxRow = Max(RowNum) From Staging.RBSGFundedCreditCardMonthlyOffers
+Select @MaxRow = Max([Staging].[RBSGFundedCreditCardMonthlyOffers].[RowNum]) From Staging.RBSGFundedCreditCardMonthlyOffers
 Set @MaxRow = coalesce(@MaxRow,0)
 
 
@@ -168,8 +168,8 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'AdditionalCashbackAward_ApplePay_V1_2', '
 DECLARE @MaxApplePayTran int, @HighestRowNo int
 
 SELECT 
-	@MaxApplePayTran = ISNULL(Max(TranID),0),
-	@HighestRowNo = ISNULL(Max(RowNum),0)
+	@MaxApplePayTran = ISNULL(Max([Staging].[AdditionalCashbackAward_ApplePay].[TranID]),0),
+	@HighestRowNo = ISNULL(Max([Staging].[AdditionalCashbackAward_ApplePay].[RowNum]),0)
 FROM Staging.AdditionalCashbackAward_ApplePay
 
 
@@ -185,30 +185,30 @@ WHERE Title Like '%Apple Pay%'
 
 INSERT INTO Staging.AdditionalCashbackAward_ApplePay
 SELECT 
-	t.ID as TranID,
+	#Types.[t].ID as TranID,
 	0 as FileID,
-	ROW_NUMBER() OVER (ORDER BY t.ID) + @HighestRowNo AS RowNum
+	ROW_NUMBER() OVER (ORDER BY #Types.[t].ID) + @HighestRowNo AS RowNum
 FROM SLC_Report.DBO.Trans t	
 INNER JOIN #Types tt 
-	ON tt.ItemID = t.ItemID 
-	AND tt.TransactionTypeID = t.TypeID
+	ON tt.ItemID = #Types.[t].ItemID 
+	AND tt.TransactionTypeID = #Types.[t].TypeID
 INNER JOIN Derived.Customer c 
-	ON t.FanID = c.FanID
-WHERE NOT EXISTS (SELECT 1 FROM Staging.AdditionalCashbackAward_ApplePay a WHERE t.ID = a.TranID)
+	ON #Types.[t].FanID = c.FanID
+WHERE NOT EXISTS (SELECT 1 FROM Staging.AdditionalCashbackAward_ApplePay a WHERE #Types.[t].ID = #Types.[a].TranID)
 
  
 --Find final customers
 INSERT INTO Derived.AdditionalCashbackAward
 SELECT	   
 	NULL as MatchID,
-	a.FileID as FileID,
-	a.RowNum as RowNum,
-	t.FanID,
-	Cast(t.[Date] as date) as TranDate,
-	Cast(t.ProcessDate as date) as AddedDate,
-	t.Price as Amount,
-	t.ClubCash*tt.Multiplier as CashbackEarned,
-	t.ActivationDays,
+	#Types.[a].FileID as FileID,
+	#Types.[a].RowNum as RowNum,
+	#Types.[t].FanID,
+	Cast(#Types.[t].[Date] as date) as TranDate,
+	Cast(#Types.[t].ProcessDate as date) as AddedDate,
+	#Types.[t].Price as Amount,
+	#Types.[t].ClubCash*tt.Multiplier as CashbackEarned,
+	#Types.[t].ActivationDays,
 	tt.AdditionalCashbackAwardTypeID,
 	1 as PaymentMethodID,
 	NULL as DirectDebitOriginatorID
@@ -216,9 +216,9 @@ FROM Staging.AdditionalCashbackAward_ApplePay as a
 INNER LOOP JOIN SLC_Report..Trans t 
 	on a.TranID = t.ID
 INNER JOIN #Types as tt
-	on tt.ItemID = t.ItemID 
-	and tt.TransactionTypeID = t.TypeID
-WHERE TranID > @MaxApplePayTran ---******INCREMENTAL LOAD ONLY
+	on tt.ItemID = #Types.[t].ItemID 
+	and tt.TransactionTypeID = #Types.[t].TypeID
+WHERE #Types.[TranID] > @MaxApplePayTran ---******INCREMENTAL LOAD ONLY
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'AdditionalCashbackAward_ApplePay_V1_2', 'Finished'
 
@@ -231,7 +231,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'AdditionalCashbackAward_ApplePay_V1_2', '
 EXEC Monitor.ProcessLog_Insert 'WHB', 'AdditionalCashbackAward_ItemAlterations_V1_0', 'Starting'
 
 UPDATE b
-SET AdditionalCashbackAwardTypeID = a.AdditionalCashbackAwardTypeID_New
+SET [Derived].[AdditionalCashbackAward].[AdditionalCashbackAwardTypeID] = a.AdditionalCashbackAwardTypeID_New
 FROM Warehouse.[Relational].[AdditionalCashbackAwardTypeAdjustments] as a
 INNER JOIN Derived.AdditionalCashbackAward as b
 	on a.AdditionalCashbackAwardTypeID_Original = b.AdditionalCashbackAwardTypeID
@@ -306,46 +306,46 @@ SELECT
 	a.ActivationDays,
 	Case
 		-- Amazon
-		When b.ItemID = 7236 and a.TypeID = 26 then 77 
-		When b.ItemID = 7238 and a.TypeID = 26 then 78
-		When b.ItemID = 7240 and a.TypeID = 26 then 79
-		When b.ItemID = 7236 and a.TypeID = 27 then 80
-		When b.ItemID = 7238 and a.TypeID = 27 then 81
-		When b.ItemID = 7240 and a.TypeID = 27 then 82
+		When #Trans.[b].ItemID = 7236 and a.TypeID = 26 then 77 
+		When #Trans.[b].ItemID = 7238 and a.TypeID = 26 then 78
+		When #Trans.[b].ItemID = 7240 and a.TypeID = 26 then 79
+		When #Trans.[b].ItemID = 7236 and a.TypeID = 27 then 80
+		When #Trans.[b].ItemID = 7238 and a.TypeID = 27 then 81
+		When #Trans.[b].ItemID = 7240 and a.TypeID = 27 then 82
 		-- M&S
-		When b.ItemID = 7242 and a.TypeID = 26 then 83
-		When b.ItemID = 7243 and a.TypeID = 26 then 84
-		When b.ItemID = 7244 and a.TypeID = 26 then 85
-		When b.ItemID = 7242 and a.TypeID = 27 then 86
-		When b.ItemID = 7243 and a.TypeID = 27 then 87
-		When b.ItemID = 7244 and a.TypeID = 27 then 88
+		When #Trans.[b].ItemID = 7242 and a.TypeID = 26 then 83
+		When #Trans.[b].ItemID = 7243 and a.TypeID = 26 then 84
+		When #Trans.[b].ItemID = 7244 and a.TypeID = 26 then 85
+		When #Trans.[b].ItemID = 7242 and a.TypeID = 27 then 86
+		When #Trans.[b].ItemID = 7243 and a.TypeID = 27 then 87
+		When #Trans.[b].ItemID = 7244 and a.TypeID = 27 then 88
 		-- B&Q
-		When b.ItemID = 7248 and a.TypeID = 26 then 95
-		When b.ItemID = 7249 and a.TypeID = 26 then 96
-		When b.ItemID = 7250 and a.TypeID = 26 then 97
-		When b.ItemID = 7248 and a.TypeID = 27 then 98
-		When b.ItemID = 7249 and a.TypeID = 27 then 99
-		When b.ItemID = 7250 and a.TypeID = 27 then 100
+		When #Trans.[b].ItemID = 7248 and a.TypeID = 26 then 95
+		When #Trans.[b].ItemID = 7249 and a.TypeID = 26 then 96
+		When #Trans.[b].ItemID = 7250 and a.TypeID = 26 then 97
+		When #Trans.[b].ItemID = 7248 and a.TypeID = 27 then 98
+		When #Trans.[b].ItemID = 7249 and a.TypeID = 27 then 99
+		When #Trans.[b].ItemID = 7250 and a.TypeID = 27 then 100
 		-- Argos
-		When b.ItemID = 7256 and a.TypeID = 26 then 101
-		When b.ItemID = 7257 and a.TypeID = 26 then 102
-		When b.ItemID = 7258 and a.TypeID = 26 then 103
-		When b.ItemID = 7256 and a.TypeID = 27 then 104
-		When b.ItemID = 7257 and a.TypeID = 27 then 105
-		When b.ItemID = 7258 and a.TypeID = 27 then 106
+		When #Trans.[b].ItemID = 7256 and a.TypeID = 26 then 101
+		When #Trans.[b].ItemID = 7257 and a.TypeID = 26 then 102
+		When #Trans.[b].ItemID = 7258 and a.TypeID = 26 then 103
+		When #Trans.[b].ItemID = 7256 and a.TypeID = 27 then 104
+		When #Trans.[b].ItemID = 7257 and a.TypeID = 27 then 105
+		When #Trans.[b].ItemID = 7258 and a.TypeID = 27 then 106
 		-- John Lewis
-		When b.ItemID = 7260 and a.TypeID = 26 then 107
-		When b.ItemID = 7261 and a.TypeID = 26 then 108
-		When b.ItemID = 7262 and a.TypeID = 26 then 109
-		When b.ItemID = 7260 and a.TypeID = 27 then 110
-		When b.ItemID = 7261 and a.TypeID = 27 then 111
-		When b.ItemID = 7262 and a.TypeID = 27 then 112
+		When #Trans.[b].ItemID = 7260 and a.TypeID = 26 then 107
+		When #Trans.[b].ItemID = 7261 and a.TypeID = 26 then 108
+		When #Trans.[b].ItemID = 7262 and a.TypeID = 26 then 109
+		When #Trans.[b].ItemID = 7260 and a.TypeID = 27 then 110
+		When #Trans.[b].ItemID = 7261 and a.TypeID = 27 then 111
+		When #Trans.[b].ItemID = 7262 and a.TypeID = 27 then 112
 
 		Else 0
 	End as [AdditionalCashbackAdjustmentTypeID]
 FROM #Trans as a
 INNER JOIN SLC_report.dbo.Trans as b 
-	on a.ItemID = b.ID
+	on a.ItemID = #Trans.[b].ID
 -- (104991 rows affected) / 00:00:01
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'AdditionalCashbackAward_Adjustment_AmazonRedemptions', 'Finished'

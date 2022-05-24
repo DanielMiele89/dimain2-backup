@@ -57,7 +57,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 			  , @SegmentationStartTime DateTime = GETDATE()
 			  , @SegmentationLength INT
 
-		Select @PartnerName = PartnerName, @BrandID = BrandID from [Derived].[Partner] Where PartnerID = @PartnerNo
+		Select @PartnerName = [Derived].[Partner].[PartnerName], @BrandID = [Derived].[Partner].[BrandID] from [Derived].[Partner] Where [Derived].[Partner].[PartnerID] = @PartnerNo
 
 		IF @WeeklyRun = 0
 			BEGIN
@@ -65,11 +65,11 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 				EXEC [Staging].[oo_TimerMessage] @msg, @time Output
 			END
 
-		SELECT @Acquire = Acquire 
-			 , @Lapsed = Lapsed
+		SELECT @Acquire = [Segmentation].[PartnerSettings_DD].[Acquire] 
+			 , @Lapsed = [Segmentation].[PartnerSettings_DD].[Lapsed]
 		FROM [Segmentation].[PartnerSettings_DD]
-		WHERE PartnerID = @PartnerID
-		AND EndDate IS NULL
+		WHERE [Segmentation].[PartnerSettings_DD].[PartnerID] = @PartnerID
+		AND [Segmentation].[PartnerSettings_DD].[EndDate] IS NULL
 	
 		--SET @BrandID = (SELECT BrandID FROM [Relational].[Partner] WHERE PartnerID = @PartnerID)
 
@@ -77,18 +77,18 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 		2. INSERT entry in to JobLog_Temp
 	*******************************************************************************************************************************************/
 
-		INSERT INTO [Segmentation].[Shopper_Segmentation_JobLog_Temp] (StoredProcedureName
-																	 , StartDate
-																	 , EndDate
-																	 , PartnerID
-																	 , ShopperCount
-																	 , LapsedCount
-																	 , AcquireCount
-																	 , IsRanked
-																	 , LapsedDate
-																	 , AcquireDate
-																	 , ErrorCode
-																	 , ErrorMessage)
+		INSERT INTO [Segmentation].[Shopper_Segmentation_JobLog_Temp] ([Segmentation].[Shopper_Segmentation_JobLog_Temp].[StoredProcedureName]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StartDate]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[PartnerID]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ShopperCount]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedCount]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireCount]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[IsRanked]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedDate]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireDate]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorCode]
+																	 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorMessage])
 		VALUES (@SPName
 			  , GETDATE()
 			  , NULL
@@ -169,11 +169,11 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 
 						IF OBJECT_ID('tempdb..#MinTran_DD') IS NOT NULL DROP TABLE #MinTran_DD
 						SELECT cu.BankAccountID
-							 , MIN(ct.TranDate) AS MinTranDate
+							 , MIN(#Customers.[ct].TranDate) AS MinTranDate
 						INTO #MinTran_DD
 						FROM #Customers cu
 						INNER JOIN [Relational].[ConsumerTransaction_DD] ct -- ################################## CHECK CHECK
-							ON cu.BankAccountID = ct.BankAccountID
+							ON cu.BankAccountID = #Customers.[ct].BankAccountID
 						GROUP BY cu.BankAccountID
 
 						IF @WeeklyRun = 0
@@ -206,14 +206,14 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 						FROM #Customers cu
 						WHERE EXISTS (SELECT 1
 									  FROM #MinTran mt
-									  WHERE cu.BankAccountID = mt.BankAccountID
+									  WHERE #MinTran.[cu].BankAccountID = mt.BankAccountID
 									  AND (mt.MinTranDate IS NULL OR mt.MinTranDate > @FirstTranExclusionDate))
 
 						DELETE cu
 						FROM #Customers cu
 						WHERE EXISTS (SELECT 1
 									  FROM #CustomersJoinedLastDays cjld
-									  WHERE cu.BankAccountID = cjld.BankAccountID)
+									  WHERE #CustomersJoinedLastDays.[cu].BankAccountID = cjld.BankAccountID)
 
 						IF @WeeklyRun = 0
 							BEGIN
@@ -231,10 +231,10 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 			***********************************************************************************************************************/
 
 				IF OBJECT_ID('tempdb..#CCIDs') IS NOT NULL DROP TABLE #CCIDs
-				SELECT ConsumerCombinationID_DD
+				SELECT [Relational].[ConsumerCombination_DD].[ConsumerCombinationID_DD]
 				INTO #CCIDs
 				FROM [Relational].[ConsumerCombination_DD] cc
-				WHERE BrandID = @BrandID
+				WHERE [Relational].[ConsumerCombination_DD].[BrandID] = @BrandID
 		
 				CREATE CLUSTERED INDEX CIX_CCID_CCID ON #CCIDs (ConsumerCombinationID_DD)
 
@@ -272,7 +272,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 					   END AS Segment
 				FROM #CCIDs CCs
 				INNER JOIN [Relational].[ConsumerTransaction_DD] ct
-					ON CCs.ConsumerCombinationID_DD = ct.ConsumerCombinationID_DD
+					ON CCs.ConsumerCombinationID_DD = #CCIDs.[ct].ConsumerCombinationID_DD
 				INNER JOIN #Customers cu
 					ON ct.BankAccountID = cu.BankAccountID
 				WHERE TranDate BETWEEN @AcquireDate AND @ShopperDate
@@ -317,20 +317,20 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 
 				-- Find the most recent email open for each FanID
 				IF OBJECT_ID('tempdb..#EmailOpenedDate') IS NOT NULL DROP TABLE #EmailOpenedDate
-				SELECT HouseholdID
-					 , MAX(EmailOpenedDate) AS EmailOpenedDate
+				SELECT [cu].[HouseholdID]
+					 , MAX(#Customers.[EmailOpenedDate]) AS EmailOpenedDate
 				INTO #EmailOpenedDate
 				FROM [Lion].[LionSend_Customers] lsc
 				INNER JOIN #Customers cu
-					ON lsc.FanID = cu.FanID
-				WHERE EmailOpened = 1
-				GROUP BY HouseholdID
+					ON #Customers.[lsc].FanID = cu.FanID
+				WHERE #Customers.[EmailOpened] = 1
+				GROUP BY [cu].[HouseholdID]
 
 				-- Rank each FanID based on most recent email open date
 				IF OBJECT_ID('tempdb..#EngagementRanking') IS NOT NULL DROP TABLE #EngagementRanking
-				SELECT HouseholdID
-					 , EmailOpenedDate
-					 , ROW_NUMBER() OVER (ORDER BY EmailOpenedDate) as EngagementRanking
+				SELECT #EmailOpenedDate.[HouseholdID]
+					 , #EmailOpenedDate.[EmailOpenedDate]
+					 , ROW_NUMBER() OVER (ORDER BY #EmailOpenedDate.[EmailOpenedDate]) as EngagementRanking
 				INTO #EngagementRanking
 				FROM #EmailOpenedDate
 
@@ -363,14 +363,14 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 	  					  ON camg.CAMEO_CODE_GROUP = cam.CAMEO_CODE_GROUP
 					  WHERE cu.CurrentlyActive = 1) cuc
 				INNER JOIN #Customers cu
-					ON cuc.FanID = cu.FanID
+					ON #Customers.[cuc].FanID = cu.FanID
 				LEFT JOIN [Relational].[HeatmapCombinations] hmc
-					ON cuc.Gender = hmc.Gender
-					AND cuc.HeatmapCameoGroup = hmc.HeatmapCameoGroup
-					AND cuc.HeatmapAgeGroup = hmc.HeatmapAgeGroup
+					ON #Customers.[cuc].Gender = #Customers.[hmc].Gender
+					AND #Customers.[cuc].HeatmapCameoGroup = #Customers.[hmc].HeatmapCameoGroup
+					AND #Customers.[cuc].HeatmapAgeGroup = #Customers.[hmc].HeatmapAgeGroup
 				LEFT JOIN [Relational].[DD_HeatmapScore] hms
-					ON hmc.ComboID = hms.ComboID
-					AND hms.BrandID = @BrandID
+					ON #Customers.[hmc].ComboID = #Customers.[hms].ComboID
+					AND #Customers.[hms].BrandID = @BrandID
 				LEFT JOIN #EngagementRanking er
 					ON cu.HouseholdID = er.HouseholdID
 				GROUP BY cu.BankAccountID
@@ -456,10 +456,10 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 				SET sm.EndDate = @EndDate
 				FROM #CustomerLevelSegmentation cls
 				INNER JOIN [Segmentation].[CustomerSegment_DD] sm
-					ON cls.FanID = sm.FanID
-					AND cls.Segment != sm.ShopperSegmentTypeID
-					AND sm.PartnerID = @PartnerID
-					AND sm.EndDate IS NULL
+					ON cls.FanID = #CustomerLevelSegmentation.[sm].FanID
+					AND cls.Segment != #CustomerLevelSegmentation.[sm].ShopperSegmentTypeID
+					AND #CustomerLevelSegmentation.[sm].PartnerID = @PartnerID
+					AND #CustomerLevelSegmentation.[sm].EndDate IS NULL
 
 				SET @RowCount = @@ROWCOUNT
 
@@ -483,10 +483,10 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 				FROM #CustomerLevelSegmentation cls
 				WHERE NOT EXISTS (SELECT 1
 								  FROM [Segmentation].[CustomerSegment_DD] sm
-								  WHERE cls.FanID = sm.FanID
-								  AND cls.Segment = sm.ShopperSegmentTypeID
-								  AND sm.PartnerID = @PartnerID
-								  AND sm.EndDate IS NULL)
+								  WHERE cls.FanID = #CustomerLevelSegmentation.[sm].FanID
+								  AND cls.Segment = #CustomerLevelSegmentation.[sm].ShopperSegmentTypeID
+								  AND #CustomerLevelSegmentation.[sm].PartnerID = @PartnerID
+								  AND #CustomerLevelSegmentation.[sm].EndDate IS NULL)
 
 				SET @RowCount = @@ROWCOUNT
 
@@ -502,13 +502,13 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 			***********************************************************************************************************************/
 
 				UPDATE sm
-				SET Enddate = @EndDate
+				SET [Segmentation].[CustomerSegment_DD].[Enddate] = @EndDate
 				FROM [Segmentation].[CustomerSegment_DD] sm
 				WHERE sm.EndDate IS NULL
 				AND sm.PartnerID = @PartnerID
 				AND NOT EXISTS (SELECT 1
 								FROM #CustomerLevelSegmentation cls
-								WHERE sm.FanID = cls.FanID)
+								WHERE #CustomerLevelSegmentation.[sm].FanID = cls.FanID)
 
 				SET @RowCount = @@ROWCOUNT
 
@@ -543,10 +543,10 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 					8.2.1. Store the Spenders spend information to be used in ranking procedure
 				*******************************************************************************************************************/
 
-					INSERT INTO [Segmentation].[Roc_Shopper_Segment_SpendInfo] (FanID
-																			  , PartnerID
-																			  , Spend
-																			  , Segment)
+					INSERT INTO [Segmentation].[Roc_Shopper_Segment_SpendInfo] ([Segmentation].[Roc_Shopper_Segment_SpendInfo].[FanID]
+																			  , [Segmentation].[Roc_Shopper_Segment_SpendInfo].[PartnerID]
+																			  , [Segmentation].[Roc_Shopper_Segment_SpendInfo].[Spend]
+																			  , [Segmentation].[Roc_Shopper_Segment_SpendInfo].[Segment])
 					SELECT FanID
 						 , @PartnerID AS PartnerID
 						 , AVG(Spend) AS Spend
@@ -566,9 +566,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 					8.2.2. Store all cusotmers heatmap information to be used in ranking procedure
 				*******************************************************************************************************************/
 
-					INSERT INTO [Segmentation].[Roc_Shopper_Segment_HeatmapInfo] (FanID
-																				, PartnerID
-																				, Index_RR)
+					INSERT INTO [Segmentation].[Roc_Shopper_Segment_HeatmapInfo] ([Segmentation].[Roc_Shopper_Segment_HeatmapInfo].[FanID]
+																				, [Segmentation].[Roc_Shopper_Segment_HeatmapInfo].[PartnerID]
+																				, [Segmentation].[Roc_Shopper_Segment_HeatmapInfo].[Index_RR])
 					SELECT FanID
 						 , @PartnerID AS PartnerID
 						 , MAX(Index_RR) AS Index_RR
@@ -618,24 +618,24 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 		*******************************************************************************************************************************************/
 
 			IF OBJECT_ID('tempdb..#SegmentCounts') IS NOT NULL DROP TABLE #SegmentCounts
-			SELECT Segment
+			SELECT #AllCustomers.[Segment]
 				 , Count(1) AS Customers
 			INTO #SegmentCounts
 			FROM #AllCustomers
-			GROUP BY Segment
+			GROUP BY #AllCustomers.[Segment]
 
-			SET @AcquireCount = (SELECT Customers
+			SET @AcquireCount = (SELECT #SegmentCounts.[Customers]
 								 FROM #SegmentCounts
-								 WHERE Segment = 7)
+								 WHERE #SegmentCounts.[Segment] = 7)
 
-			SET @LapsedCount = (SELECT Customers
+			SET @LapsedCount = (SELECT #SegmentCounts.[Customers]
 								FROM #SegmentCounts
-								WHERE Segment = 8)
+								WHERE #SegmentCounts.[Segment] = 8)
 	
 
-			SET @ShopperCount = (SELECT Customers
+			SET @ShopperCount = (SELECT #SegmentCounts.[Customers]
 								 FROM #SegmentCounts
-								 WHERE Segment = 9)
+								 WHERE #SegmentCounts.[Segment] = 9)
 
 
 		/*******************************************************************************************************************************************
@@ -668,39 +668,39 @@ END TRY
 	*******************************************************************************************************************************************/
 
 		UPDATE [Segmentation].[Shopper_Segmentation_JobLog_Temp]
-		SET ErrorCode = @ErrorCode
-		  , ErrorMessage = @ErrorMessage
-		  , EndDate = GETDATE()
-		  , ShopperCount = @ShopperCount
-		  , LapsedCount = @LapsedCount
-		  , AcquireCount = @AcquireCount
+		SET [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorCode] = @ErrorCode
+		  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorMessage] = @ErrorMessage
+		  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate] = GETDATE()
+		  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ShopperCount] = @ShopperCount
+		  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedCount] = @LapsedCount
+		  , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireCount] = @AcquireCount
 
-		INSERT INTO [Segmentation].[Shopper_Segmentation_JobLog] (StoredProcedureName
-																, StartDate
-																, EndDate
-																, Duration
-																, PartnerID
-																, ShopperCount
-																, LapsedCount
-																, AcquireCount
-																, IsRanked
-																, LapsedDate
-																, AcquireDate
-																, ErrorCode
-																, ErrorMessage)
-		SELECT StoredProcedureName
-			 , StartDate
-			 , EndDate
-			 , CONVERT(VARCHAR(3), DATEDiff(second, StartDate, EndDate) / 60) + ':' + Right('0' + CONVERT(VARCHAR(2), DATEDiff(second, StartDate, EndDate) % 60), 2) AS Duration
-			 , PartnerID
-			 , ShopperCount
-			 , LapsedCount
-			 , AcquireCount
-			 , IsRanked
-			 , LapsedDate
-			 , AcquireDate
-			 , ErrorCode
-			 , ErrorMessage
+		INSERT INTO [Segmentation].[Shopper_Segmentation_JobLog] ([Segmentation].[Shopper_Segmentation_JobLog].[StoredProcedureName]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[StartDate]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[EndDate]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[Duration]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[PartnerID]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[ShopperCount]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[LapsedCount]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[AcquireCount]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[IsRanked]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[LapsedDate]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[AcquireDate]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[ErrorCode]
+																, [Segmentation].[Shopper_Segmentation_JobLog].[ErrorMessage])
+		SELECT [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StoredProcedureName]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StartDate]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate]
+			 , CONVERT(VARCHAR(3), DATEDiff(second, [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StartDate], [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate]) / 60) + ':' + Right('0' + CONVERT(VARCHAR(2), DATEDiff(second, [Segmentation].[Shopper_Segmentation_JobLog_Temp].[StartDate], [Segmentation].[Shopper_Segmentation_JobLog_Temp].[EndDate]) % 60), 2) AS Duration
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[PartnerID]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ShopperCount]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedCount]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireCount]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[IsRanked]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[LapsedDate]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[AcquireDate]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorCode]
+			 , [Segmentation].[Shopper_Segmentation_JobLog_Temp].[ErrorMessage]
 		FROM [Segmentation].[Shopper_Segmentation_JobLog_Temp]
 
 		TRUNCATE TABLE [Segmentation].[Shopper_Segmentation_JobLog_Temp]

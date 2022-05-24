@@ -26,16 +26,16 @@ BEGIN
 		ON mnc.ID = ni.ID
 	
 	UPDATE mnc
-	SET IsHighVariance = 1
+	SET [mnc].[IsHighVariance] = 1
 	FROM [MIDI].[CTLoad_MIDINewCombo] mnc
-	WHERE OriginalNarrative != UpdatedNarrative
-	AND (UpdatedNarrative LIKE '%[%]%' OR UpdatedNarrative LIKE '%[_]%')
+	WHERE [mnc].[OriginalNarrative] != [mnc].[UpdatedNarrative]
+	AND ([mnc].[UpdatedNarrative] LIKE '%[%]%' OR [mnc].[UpdatedNarrative] LIKE '%[_]%')
 
 	--DECLARE @RunDate DATE = GETDATE()
 
 	DELETE
 	FROM [MIDI].[CTLoad_MIDINewCombo_Log]
-	WHERE RunDate = @RunDate
+	WHERE [MIDI].[CTLoad_MIDINewCombo_Log].[RunDate] = @RunDate
 
 	INSERT INTO [MIDI].[CTLoad_MIDINewCombo_Log]
 	SELECT *

@@ -1,10 +1,10 @@
 ﻿CREATE VIEW [Monitor].[vw_PackageLog_LatestRunID]
 AS
 	SELECT
-		PackageID
-		, SourceID
-		, MAX(RunID) AS LatestRunID
-		, MAX(RunStartDateTime) LatestRunStartDateTime
+		[Monitor].[Package_Log].[PackageID]
+		, [Monitor].[Package_Log].[SourceID]
+		, MAX([Monitor].[Package_Log].[RunID]) AS LatestRunID
+		, MAX([Monitor].[Package_Log].[RunStartDateTime]) LatestRunStartDateTime
 	FROM Monitor.Package_Log
-	GROUP BY PackageID, SourceID
+	GROUP BY [Monitor].[Package_Log].[PackageID], [Monitor].[Package_Log].[SourceID]
 

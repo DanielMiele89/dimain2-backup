@@ -16,7 +16,7 @@ BEGIN
 
 	SELECT
 		f.SourceUID AS CustomerID
-		, x.HydraOfferID
+		, #Fans.[x].HydraOfferID
 		, ow.StartDate
 		, ow.EndDate
 	FROM [Segmentation].[OfferMemberAddition] ow
@@ -34,7 +34,7 @@ BEGIN
 		WHERE ioc.ClubID = 166
 		AND io.IsSignedOff = 1'
 	) x
-		ON x.IronOfferID = ow.IronOfferID
+		ON #Fans.[x].IronOfferID = ow.IronOfferID
 	WHERE opl.IsUpdate = 0
 		AND opl.Processed = 0
 		AND opl.SignedOff = 1

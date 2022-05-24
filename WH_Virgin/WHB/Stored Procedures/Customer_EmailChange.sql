@@ -47,12 +47,12 @@ BEGIN
 
 			--DECLARE @RunDate DATE = GETDATE()
 
-			INSERT INTO [Derived].[Customer_EmailAddressChanges] (	FanID
-																,	Email
-																,	DateChanged)
+			INSERT INTO [Derived].[Customer_EmailAddressChanges] (	[Derived].[Customer_EmailAddressChanges].[FanID]
+																,	[Derived].[Customer_EmailAddressChanges].[Email]
+																,	[Derived].[Customer_EmailAddressChanges].[DateChanged])
 
-			SELECT FanID
-				 , CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', Email), 2)
+			SELECT [eac].[FanID]
+				 , CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', [eac].[Email]), 2)
 				 , @RunDate
 			FROM #EmailAddressChanges eac
 			WHERE NOT EXISTS (	SELECT 1
@@ -80,7 +80,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

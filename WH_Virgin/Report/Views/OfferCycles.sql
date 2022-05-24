@@ -1,1 +1,1 @@
-﻿CREATE VIEW Report.OfferCycles AS SELECT OfferCyclesID, StartDate, EndDate FROM WH_AllPublishers.Report.OfferCycles
+﻿CREATE VIEW Report.OfferCycles AS SELECT [WH_AllPublishers].[Report].[OfferCycles].[OfferCyclesID], [WH_AllPublishers].[Report].[OfferCycles].[StartDate], [WH_AllPublishers].[Report].[OfferCycles].[EndDate] FROM WH_AllPublishers.Report.OfferCycles

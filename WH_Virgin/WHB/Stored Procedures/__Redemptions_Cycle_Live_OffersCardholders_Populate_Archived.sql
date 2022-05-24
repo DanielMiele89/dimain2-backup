@@ -51,9 +51,9 @@ BEGIN TRY
 		FROM Derived.IronOffer io
 		OUTER APPLY ( -- Get cashback rates
 			SELECT 
-				MIN(CommissionRate) BaseRate
-				, MAX(CommissionRate) SpendStretchRate
-				, MAX(MinimumBasketSize) SpendStretch                           
+				MIN([pcr].[CommissionRate]) BaseRate
+				, MAX([pcr].[CommissionRate]) SpendStretchRate
+				, MAX([pcr].[MinimumBasketSize]) SpendStretch                           
 			FROM Derived.IronOffer_PartnerCommissionRule pcr
 			WHERE pcr.TypeID = 1
 				AND pcr.Status = 1
@@ -63,7 +63,7 @@ BEGIN TRY
 		LEFT JOIN Derived.IronOffer_Campaign_HTM camp
 			ON io.IronOfferID = camp.IronOfferID
 		LEFT JOIN 
-			(SELECT DISTINCT OfferID FROM Derived.PartnerOffers_Base) base
+			(SELECT DISTINCT [Derived].[PartnerOffers_Base].[OfferID] FROM Derived.PartnerOffers_Base) base
 				ON io.IronOfferID = base.OfferID
 		WHERE 
 			io.IsSignedOff = 1 -- Offers signed off
@@ -160,10 +160,10 @@ BEGIN TRY
 	INTO #Cardholders
 	FROM #Members m
 	INNER JOIN SLC_Report.dbo.Pan pan
-		ON m.CompositeID = pan.CompositeID
+		ON m.CompositeID = #Members.[pan].CompositeID
 		AND (	
-				pan.RemovalDate IS NULL -- Card not removed before offer-cycle overlap (card assumed to have already been added as of the day the report is run)
-				OR CAST(pan.RemovalDate AS date) >= @CycleStart 
+				#Members.[pan].RemovalDate IS NULL -- Card not removed before offer-cycle overlap (card assumed to have already been added as of the day the report is run)
+				OR CAST(#Members.[pan].RemovalDate AS date) >= @CycleStart 
 			)
 		--AND (
 				--pan.DuplicationDate IS NULL -- Card not duplicated before offer-cycle overlap
@@ -202,7 +202,7 @@ BEGIN TRY
 			, COUNT(DISTINCT(ch.FanID)) AS Cardholders
 		FROM #Offers o
 		INNER JOIN nFI.Relational.IronOfferMember iom
-			ON o.IronOfferID = iom.IronOfferID
+			ON o.IronOfferID = #Offers.[iom].IronOfferID
 		INNER JOIN #Cardholders ch
 			ON iom.FanID = ch.FanID
 		WHERE o.IsBaseOffer = 0 -- Non-base offer
@@ -228,21 +228,21 @@ BEGIN TRY
 	-- Union results and populate Warehouse.MI.Cycle_Live_OffersCardholders table
 	TRUNCATE TABLE Report.Cycle_Live_OffersCardholders;
  	INSERT INTO Report.Cycle_Live_OffersCardholders
-		(ReportDate
-		, CycleStart
-		, CycleEnd
-		, ClubID
-		, PartnerID
-		, IronOfferID
-		, IronOfferName
-		, OfferStartDate
-		, OfferEndDate
-		, BaseRate
-		, SpendStretch
-		, SpendStretchRate
-		, IsBaseOffer
-		, CampaignCode
-		, Cardholders
+		([Report].[Cycle_Live_OffersCardholders].[ReportDate]
+		, [Report].[Cycle_Live_OffersCardholders].[CycleStart]
+		, [Report].[Cycle_Live_OffersCardholders].[CycleEnd]
+		, [Report].[Cycle_Live_OffersCardholders].[ClubID]
+		, [Report].[Cycle_Live_OffersCardholders].[PartnerID]
+		, [Report].[Cycle_Live_OffersCardholders].[IronOfferID]
+		, [Report].[Cycle_Live_OffersCardholders].[IronOfferName]
+		, [Report].[Cycle_Live_OffersCardholders].[OfferStartDate]
+		, [Report].[Cycle_Live_OffersCardholders].[OfferEndDate]
+		, [Report].[Cycle_Live_OffersCardholders].[BaseRate]
+		, [Report].[Cycle_Live_OffersCardholders].[SpendStretch]
+		, [Report].[Cycle_Live_OffersCardholders].[SpendStretchRate]
+		, [Report].[Cycle_Live_OffersCardholders].[IsBaseOffer]
+		, [Report].[Cycle_Live_OffersCardholders].[CampaignCode]
+		, [Report].[Cycle_Live_OffersCardholders].[Cardholders]
 		)
 
 	SELECT 
@@ -288,7 +288,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

@@ -22,22 +22,22 @@ BEGIN
 		***********************************************************************************************************************/
 	
 			IF OBJECT_ID('tempdb..#SampleCustomers') IS NOT NULL DROP TABLE #SampleCustomers
-			SELECT CompositeID
-				 , MIN(LionSendID) AS LionSendID
+			SELECT [ls].[CompositeID]
+				 , MIN([ls].[LionSendID]) AS LionSendID
 			INTO #SampleCustomers
 			FROM [Email].[NominatedLionSendComponent] ls
-			GROUP BY CompositeID
-			HAVING COUNT(DISTINCT LionSendID) > 1
+			GROUP BY [ls].[CompositeID]
+			HAVING COUNT(DISTINCT [ls].[LionSendID]) > 1
 
 			INSERT INTO #SampleCustomers
-			SELECT CompositeID
-				 , MIN(LionSendID) AS LionSendID
+			SELECT [ls].[CompositeID]
+				 , MIN([ls].[LionSendID]) AS LionSendID
 			FROM [Email].[NominatedLionSendComponent_RedemptionOffers] ls
 			WHERE NOT EXISTS (	SELECT 1
 								FROM #SampleCustomers sc
-								WHERE ls.CompositeID = sc.CompositeID)
-			GROUP BY CompositeID
-			HAVING COUNT(DISTINCT LionSendID) > 1
+								WHERE #SampleCustomers.[ls].CompositeID = sc.CompositeID)
+			GROUP BY [ls].[CompositeID]
+			HAVING COUNT(DISTINCT [ls].[LionSendID]) > 1
 			
 
 		/***********************************************************************************************************************
@@ -68,13 +68,13 @@ BEGIN
 
 			TRUNCATE TABLE [Email].[SampleCustomerLinks];
 			WITH
-			SampleCustomers AS (SELECT DISTINCT FanID
+			SampleCustomers AS (SELECT DISTINCT #Customers.[FanID]
 								FROM #Customers
-								WHERE SampleCustomer = 1)
+								WHERE #Customers.[SampleCustomer] = 1)
 
 			INSERT INTO [Email].[SampleCustomerLinks] --** Insert new mapping
 			SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS SampleCustomerID
-				 , FanID AS RealCustomerFanID
+				 , [SampleCustomers].[FanID] AS RealCustomerFanID
 			FROM SampleCustomers
 			
 
@@ -115,10 +115,10 @@ BEGIN
 				 , pt.[8] AS Offer8
 				 , pt.[9] AS Offer9
 			INTO #OfferID
-			FROM (	SELECT LionSendID
-						 , FanID
-						 , Slot
-						 , IronOfferID
+			FROM (	SELECT #Customers.[LionSendID]
+						 , #Customers.[FanID]
+						 , #Customers.[Slot]
+						 , #Customers.[IronOfferID]
 					FROM #Customers) cu
 			PIVOT(AVG(IronOfferID) FOR Slot IN ([1], [2], [3], [4], [5], [6], [7], [8], [9])) AS pt
 
@@ -142,10 +142,10 @@ BEGIN
 				 , pt.[8] AS Offer8StartDate
 				 , pt.[9] AS Offer9StartDate
 			INTO #OfferStartDate
-			FROM (	SELECT LionSendID
-						 , FanID
-						 , Slot
-						 , StartDate
+			FROM (	SELECT #Customers.[LionSendID]
+						 , #Customers.[FanID]
+						 , #Customers.[Slot]
+						 , #Customers.[StartDate]
 					FROM #Customers) cu
 			PIVOT(MIN(StartDate) FOR Slot IN ([1], [2], [3], [4], [5], [6], [7], [8], [9])) AS pt
 
@@ -169,10 +169,10 @@ BEGIN
 				 , pt.[8] AS Offer8EndDate
 				 , pt.[9] AS Offer9EndDate
 			INTO #OfferEndDate
-			FROM (	SELECT LionSendID
-						 , FanID
-						 , Slot
-						 , EndDate
+			FROM (	SELECT #Customers.[LionSendID]
+						 , #Customers.[FanID]
+						 , #Customers.[Slot]
+						 , #Customers.[EndDate]
 					FROM #Customers) cu
 			PIVOT(MIN(EndDate) FOR Slot IN ([1], [2], [3], [4], [5], [6], [7], [8], [9])) AS pt
 

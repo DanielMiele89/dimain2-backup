@@ -61,7 +61,7 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			UPDATE [Derived].[Partner]
-			SET CurrentlyActive = 0
+			SET [Derived].[Partner].[CurrentlyActive] = 0
 
 
 		/*******************************************************************************************************************************************
@@ -74,7 +74,7 @@ BEGIN
 			SELECT	iof.IronOfferID
 				,	iof.PartnerID
 				,	CASE
-						WHEN IronOfferName like '%MFDD%' THEN 2
+						WHEN [iof].[IronOfferName] like '%MFDD%' THEN 2
 						ELSE 1
 					END AS OfferType
 				,	iof.IsSignedOff
@@ -93,14 +93,14 @@ BEGIN
 
 			IF OBJECT_ID('tempdb..#CurrentOffers') IS NOT NULL DROP TABLE #CurrentOffers
 			SELECT	DISTINCT
-					PartnerID
+					[iof].[PartnerID]
 			INTO #CurrentOffers
 			FROM #IronOffer iof
 			WHERE EXISTS (	SELECT 1
 							FROM [Derived].[IronOfferMember] iom
 							WHERE iof.IronOfferID = iom.IronOfferID)
-			AND IsSignedOff = 1
-			AND StartDate <= @Date
+			AND [iof].[IsSignedOff] = 1
+			AND [iof].[StartDate] <= @Date
 
 			CREATE CLUSTERED INDEX CIX_PartnerID on #CurrentOffers (PartnerID)
 
@@ -110,8 +110,8 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			UPDATE [Derived].[Partner]
-			SET CurrentlyActive = 1
-			WHERE PartnerID IN (SELECT PartnerID FROM #CurrentOffers)
+			SET [Derived].[Partner].[CurrentlyActive] = 1
+			WHERE [Derived].[Partner].[PartnerID] IN (SELECT #CurrentOffers.[PartnerID] FROM #CurrentOffers)
 
 
 		/*******************************************************************************************************************************************
@@ -119,7 +119,7 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			UPDATE pa
-			SET TransactionTypeID = OfferType
+			SET [pa].[TransactionTypeID] = [iof].[OfferType]
 			FROM [Derived].[Partner] pa
 			INNER JOIN #IronOffer iof 
 				ON pa.PartnerID = iof.PartnerID
@@ -131,7 +131,7 @@ BEGIN
 		*******************************************************************************************************************************************/
 		
 			UPDATE pa
-			SET AccountManager = ISNULL(am.AccountManager, 'Unassigned')
+			SET [pa].[AccountManager] = ISNULL(am.AccountManager, 'Unassigned')
 			FROM [Derived].[Partner] pa
 			LEFT JOIN [Warehouse].[Selections].[PartnerAccountManager] am
 				on pa.PartnerID = am.PartnerID
@@ -158,7 +158,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

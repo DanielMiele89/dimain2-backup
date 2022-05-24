@@ -1,7 +1,7 @@
 ﻿-- =============================================-- Author:  <Rory Francis>-- Create date: <2021-07-24>-- Description: < sProc to run preselection code per camapign >-- =============================================CREATE PROCEDURE [Selections].[MOR114_PreSelection_sProc_20211116]ASBEGIN
 
 IF OBJECT_ID('tempdb..#FB') IS NOT NULL DROP TABLE #FB
-SELECT	CINID ,FanID
+SELECT	[CL].[CINID] ,[C].[FanID]
 INTO #FB
 FROM	Derived.Customer  C
 JOIN	Derived.CINList CL ON CL.CIN = C.SourceUID
@@ -10,11 +10,11 @@ WHERE	C.CurrentlyActive = 1
 CREATE CLUSTERED INDEX CIX_CINID ON #FB (CINID)
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-SELECT ConsumerCombinationID
-		,BrandID
+SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
+		,[WH_Virgin].[trans].[ConsumerCombination].[BrandID]
 INTO #CC
 FROM	WH_Virgin.trans.ConsumerCombination  CC
-WHERE	BrandID IN     (292,21,379,425,2541,5,254)		-- Morrisons 292, Asda 21, Sainsburys 379, Tesco 425, Amazon Fresh 2541, Aldi 5, Lidl 254
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN     (292,21,379,425,2541,5,254)		-- Morrisons 292, Asda 21, Sainsburys 379, Tesco 425, Amazon Fresh 2541, Aldi 5, Lidl 254
 
 --						425,21,379,				-- Mainstream - Asda 21, Sainsburys 379, Tesco 425
 --						485,312,2541,			-- Premium - Ocado 312, Waitrose 485, Planet Organic 1124, Abel & Cole 1158, Whole Foods Market 1160, Marks & Spencer Simply Food 275, Amazon Fresh 2541
@@ -40,12 +40,12 @@ WHERE	TranDate >= @DATE_6
 GROUP BY F.CINID
 
 IF OBJECT_ID('Sandbox.rukank.VM_Morrisons_LoW_SoW_14102021') IS NOT NULL DROP TABLE Sandbox.rukank.VM_Morrisons_LoW_SoW_14102021
-SELECT	CINID
+SELECT	#Trans.[CINID]
 INTO Sandbox.rukank.VM_Morrisons_LoW_SoW_14102021
 FROM	#Trans
-WHERE BrandShopper = 1
-	  AND SoW < 0.60
-	  AND Transactions >= 45
-GROUP BY CINID
-If Object_ID('WH_Virgin.Selections.MOR114_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.MOR114_PreSelectionSelect FanIDInto WH_Virgin.Selections.MOR114_PreSelectionFROM  #FB fbWHERE EXISTS (	SELECT 1				FROM Sandbox.rukank.VM_Morrisons_LoW_SoW_14102021 st				WHERE fb.CINID = st.CINID)END
+WHERE #Trans.[BrandShopper] = 1
+	  AND #Trans.[SoW] < 0.60
+	  AND #Trans.[Transactions] >= 45
+GROUP BY #Trans.[CINID]
+If Object_ID('WH_Virgin.Selections.MOR114_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.MOR114_PreSelectionSelect [fb].[FanID]Into WH_Virgin.Selections.MOR114_PreSelectionFROM  #FB fbWHERE EXISTS (	SELECT 1				FROM Sandbox.rukank.VM_Morrisons_LoW_SoW_14102021 st				WHERE fb.CINID = #FB.[st].CINID)END
 

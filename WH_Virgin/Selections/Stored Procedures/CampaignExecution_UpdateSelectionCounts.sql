@@ -29,9 +29,9 @@ BEGIN
 
 		DECLARE @EmailDate DATE
 
-		SELECT @EmailDate = MIN(EmailDate)
+		SELECT @EmailDate = MIN([Selections].[CampaignSetup_POS].[EmailDate])
 		FROM [Selections].[CampaignSetup_POS]
-		WHERE StartDate > GETDATE()
+		WHERE [Selections].[CampaignSetup_POS].[StartDate] > GETDATE()
 			   
 		IF OBJECT_ID('tempdb..#CamapignCounts') IS NOT NULL DROP TABLE #CamapignCounts
 		SELECT	sc.EmailDate
@@ -43,7 +43,7 @@ BEGIN
 			,	sc.ClientServicesRef
 		INTO #CamapignCounts
 		FROM [Selections].[CampaignExecution_SelectionCounts] sc
-		WHERE EmailDate = @EmailDate
+		WHERE [sc].[EmailDate] = @EmailDate
 
 		IF OBJECT_ID('tempdb..#Camapigns') IS NOT NULL DROP TABLE #Camapigns
 		SELECT	DISTINCT 
@@ -57,10 +57,10 @@ BEGIN
 			 ,	cs.EndDate
 		INTO #Camapigns
 		FROM [Selections].[CampaignSetup_POS] cs
-		CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (OfferID, ',') io
+		CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] ([cs].[OfferID], ',') io
 		INNER JOIN [Derived].[IronOffer] iof
 			ON io.Item	 = iof.IronOfferID
-		WHERE EmailDate = @EmailDate
+		WHERE [cs].[EmailDate] = @EmailDate
 		AND io.Item != 0
 
 
@@ -109,17 +109,17 @@ BEGIN
 *******************************************************************************************************************************************/
 				
 		IF OBJECT_ID('tempdb..#MembershipsCount') IS NOT NULL DROP TABLE #MembershipsCount
-		SELECT	IronOfferID
-			,	ClientServicesRef
-			,	OutputTableName
-			,	CycleStartDate
-			,	COUNT(DISTINCT CompositeID) AS Entries
+		SELECT	[c].[IronOfferID]
+			,	[c].[ClientServicesRef]
+			,	[c].[OutputTableName]
+			,	[c].[CycleStartDate]
+			,	COUNT(DISTINCT [c].[CompositeID]) AS Entries
 		INTO #MembershipsCount
 		FROM #Memberships c
-		GROUP BY	IronOfferID
-				,	ClientServicesRef
-				,	OutputTableName
-				,	CycleStartDate
+		GROUP BY	[c].[IronOfferID]
+				,	[c].[ClientServicesRef]
+				,	[c].[OutputTableName]
+				,	[c].[CycleStartDate]
 
 
 /*******************************************************************************************************************************************
@@ -128,9 +128,9 @@ BEGIN
 
 		DECLARE @EmailDate2 DATE
 
-		SELECT @EmailDate2 = MIN(EmailDate)
+		SELECT @EmailDate2 = MIN([Selections].[CampaignSetup_POS].[EmailDate])
 		FROM [Selections].[CampaignSetup_POS]
-		WHERE StartDate > GETDATE()
+		WHERE [Selections].[CampaignSetup_POS].[StartDate] > GETDATE()
 
 		UPDATE ch
 		SET ch.CountSelected = mc.Entries

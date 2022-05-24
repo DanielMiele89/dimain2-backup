@@ -17,16 +17,16 @@ WHERE	C.CurrentlyActive = 1
 CREATE CLUSTERED INDEX ix_CINID on #FB_VM(CINID)
 
 IF OBJECT_ID('Sandbox.RukanK.VM_GymShark_age35_14032022') IS NOT NULL DROP TABLE Sandbox.RukanK.VM_GymShark_age35_14032022		-- 176,375
-SELECT	CINID
+SELECT	#FB_VM.[CINID]
 INTO	Sandbox.RukanK.VM_GymShark_age35_14032022
 FROM	#FB_VM
-GROUP BY CINID
+GROUP BY #FB_VM.[CINID]
 
 	IF OBJECT_ID('[WH_Virgin].[Selections].[GS011_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[GS011_PreSelection]
-	SELECT FanID
+	SELECT [fb].[FanID]
 	INTO [WH_Virgin].[Selections].[GS011_PreSelection]
 	FROM #FB_VM fb
-	WHERE EXISTS (SELECT 1 FROM Sandbox.RukanK.VM_GymShark_age35_14032022 s WHERE fb.CINID = s.CINID)
+	WHERE EXISTS (SELECT 1 FROM Sandbox.RukanK.VM_GymShark_age35_14032022 s WHERE fb.CINID = #FB_VM.[s].CINID)
 	
 END
 

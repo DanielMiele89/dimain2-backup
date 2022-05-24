@@ -101,8 +101,8 @@ BEGIN
 		FROM #RetailOutletHashed ro
 		WHERE NOT EXISTS (	SELECT 1
 							FROM #RetailOutlet ro2
-							WHERE ro.MerchantID = ro2.MerchantID
-							AND ro.PartnerID = ro2.PartnerID)
+							WHERE #RetailOutlet.[ro].MerchantID = ro2.MerchantID
+							AND #RetailOutlet.[ro].PartnerID = ro2.PartnerID)
 
 		CREATE CLUSTERED INDEX CIX_MerchantID ON #RetailOutlet (PartnerID, MerchantID)
 
@@ -199,7 +199,7 @@ BEGIN
 		
 		INSERT INTO [Staging].[SchemeTrans]
 		SELECT	ID = stt.ID
-			,	SchemeTransID = (ROW_NUMBER() OVER (ORDER BY stt.ID) + (SELECT COALESCE(MAX(SchemeTransID), 0) FROM [Staging].[SchemeTrans] WHERE SchemeTransID > 0))
+			,	SchemeTransID = (ROW_NUMBER() OVER (ORDER BY stt.ID) + (SELECT COALESCE(MAX([Staging].[SchemeTrans].[SchemeTransID]), 0) FROM [Staging].[SchemeTrans] WHERE [Staging].[SchemeTrans].[SchemeTransID] > 0))
 			,	Spend = stt.Spend
 			,	RetailerCashback = stt.RetailerCashback
 			,	TranDate = stt.TranDate
@@ -260,7 +260,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

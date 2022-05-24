@@ -26,7 +26,7 @@ BEGIN TRY
 		SELECT *
 		INTO #PartnerAccountManager
 		FROM [Selections].[PartnerAccountManager]
-		WHERE EndDate IS NULL
+		WHERE [Selections].[PartnerAccountManager].[EndDate] IS NULL
 
 
 		-- 2.2. Fetch partner details from [APW].[Retailer]
@@ -34,38 +34,38 @@ BEGIN TRY
 		SELECT *
 		INTO #Retailer
 		FROM Warehouse.[APW].[Retailer]
-		WHERE AccountManager != ''	
+		WHERE [Warehouse].[APW].[Retailer].[AccountManager] != ''	
 
 
 		-- 3.	Add missing retailers
 		IF OBJECT_ID('tempdb..#MissingRetailer') IS NOT NULL DROP TABLE #MissingRetailer
-		SELECT ID AS RetailerID
-				, RetailerName
-				, AccountManager
+		SELECT [Warehouse].[APW].[Retailer].[ID] AS RetailerID
+				, [Warehouse].[APW].[Retailer].[RetailerName]
+				, [Warehouse].[APW].[Retailer].[AccountManager]
 		INTO #MissingRetailer
 		FROM Warehouse.[APW].[Retailer] re
-		WHERE AccountManager != ''
+		WHERE [Warehouse].[APW].[Retailer].[AccountManager] != ''
 		AND NOT EXISTS (SELECT 1
 						FROM #PartnerAccountManager pam
-						WHERE re.ID = pam.PartnerID)	
+						WHERE #PartnerAccountManager.[re].ID = pam.PartnerID)	
 						
 		INSERT INTO #MissingRetailer
-		SELECT pa.ID
-				, pa.Name
+		SELECT #MissingRetailer.[pa].ID
+				, #MissingRetailer.[pa].Name
 				, mr.AccountManager
 		FROM #MissingRetailer mr
 		INNER JOIN Warehouse.[iron].[PrimaryRetailerIdentification] pri
-			ON mr.RetailerID = pri.PrimaryPartnerID
+			ON mr.RetailerID = #MissingRetailer.[pri].PrimaryPartnerID
 		INNER JOIN [SLC_Report].[dbo].[Partner] pa
-			ON pri.PartnerID = pa.ID
+			ON #MissingRetailer.[pri].PartnerID = #MissingRetailer.[pa].ID
 		WHERE NOT EXISTS (SELECT 1
 							FROM #PartnerAccountManager pam
-							WHERE pa.ID = pam.PartnerID)
+							WHERE #PartnerAccountManager.[pa].ID = pam.PartnerID)
 	
 		INSERT INTO [Selections].[PartnerAccountManager]
-		SELECT RetailerID
-				, RetailerName
-				, AccountManager
+		SELECT #MissingRetailer.[RetailerID]
+				, #MissingRetailer.[RetailerName]
+				, #MissingRetailer.[AccountManager]
 				, GETDATE()
 				, NULL
 			FROM #MissingRetailer
@@ -94,22 +94,22 @@ BEGIN TRY
 				, uam.NewAccountManager
 		FROM #UpdatedAccountManagers uam
 		INNER JOIN Warehouse.[iron].[PrimaryRetailerIdentification] pri
-			ON uam.RetailerID = pri.PrimaryPartnerID
+			ON uam.RetailerID = #UpdatedAccountManagers.[pri].PrimaryPartnerID
 		INNER JOIN [SLC_Report].[dbo].[Partner] pa
-			ON pri.PartnerID = pa.ID
+			ON #UpdatedAccountManagers.[pri].PartnerID = #UpdatedAccountManagers.[pa].ID
 		INNER JOIN #PartnerAccountManager pam
 			ON pa.ID = pam.PartnerID
 
 		UPDATE pam
-			SET EndDate = DATEADD(DAY, -1, GETDATE())
+			SET [Selections].[PartnerAccountManager].[EndDate] = DATEADD(DAY, -1, GETDATE())
 		FROM [Selections].[PartnerAccountManager] pam
 		INNER JOIN #UpdatedAccountManagers uam
-			ON pam.ID = uam.ID
+			ON #UpdatedAccountManagers.[pam].ID = uam.ID
 	
 		INSERT INTO [Selections].[PartnerAccountManager]
-		SELECT RetailerID
-				, RetailerName
-				, NewAccountManager
+		SELECT #UpdatedAccountManagers.[RetailerID]
+				, #UpdatedAccountManagers.[RetailerName]
+				, #UpdatedAccountManagers.[NewAccountManager]
 				, GETDATE()
 				, NULL
 		FROM #UpdatedAccountManagers
@@ -136,7 +136,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

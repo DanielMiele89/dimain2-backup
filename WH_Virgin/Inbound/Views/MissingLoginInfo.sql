@@ -1,7 +1,7 @@
 ﻿
 CREATE VIEW [Inbound].[MissingLoginInfo]
 AS
-	SELECT DISTINCT LoginInformation 
+	SELECT DISTINCT [DIMAIN].[WH_Virgin].[Inbound].[Login].[LoginInformation] 
 	FROM [DIMAIN].[WH_Virgin].[Inbound].[Login] td
 	WHERE NOT EXISTS (
 		SELECT 1

@@ -39,10 +39,10 @@ SET NOCOUNT ON
 	If Object_ID('tempdb..#CustomerRanking_ShopperLapsed') Is Not Null Drop Table #CustomerRanking_ShopperLapsed
 	Select ssi.FanID
 		 , ssi.Spend
-		 , Dense_Rank() Over (Partition by Segment Order by Spend Desc) as Ranking
+		 , Dense_Rank() Over (Partition by [ssi].[Segment] Order by [ssi].[Spend] Desc) as Ranking
 	Into #CustomerRanking_ShopperLapsed
 	From Segmentation.Roc_Shopper_Segment_SpendInfo ssi
-	Where PartnerID = @PartnerIDToBeRanked
+	Where [ssi].[PartnerID] = @PartnerIDToBeRanked
 
 	Create NonClustered index IX_CustomerRankingSL_FanIDSpend on #CustomerRanking_ShopperLapsed (FanID, Spend) Include (Ranking)
 		  
@@ -52,9 +52,9 @@ SET NOCOUNT ON
 *******************************************************************************************************************************************/
 	
 	If Object_ID('tempdb..#CustomerRanking_Acquire') Is Not Null Drop Table #CustomerRanking_Acquire
-	Select FanID
-		 , Index_RR
-		 , Dense_Rank() Over (Order by Index_RR Desc) as Ranking
+	Select [Segmentation].[Roc_Shopper_Segment_HeatmapInfo].[FanID]
+		 , [Segmentation].[Roc_Shopper_Segment_HeatmapInfo].[Index_RR]
+		 , Dense_Rank() Over (Order by [Segmentation].[Roc_Shopper_Segment_HeatmapInfo].[Index_RR] Desc) as Ranking
 	Into #CustomerRanking_Acquire
 	From Segmentation.Roc_Shopper_Segment_HeatmapInfo
 		  
@@ -73,7 +73,7 @@ SET NOCOUNT ON
 			End
 
 		Delete from Segmentation.Roc_Shopper_Segment_CustomerRanking
-		where PartnerID = @PartnerIDToBeRanked
+		where [Segmentation].[Roc_Shopper_Segment_CustomerRanking].[PartnerID] = @PartnerIDToBeRanked
 
 		EXEC Staging.oo_TimerMessage 'Previous ranking for partner deleted from Segmentation.Roc_Shopper_Segment_CustomerRanking', @Time OUTPUT
 		
@@ -84,9 +84,9 @@ SET NOCOUNT ON
 	***********************************************************************************************************************/
 	
 		Insert into Segmentation.Roc_Shopper_Segment_CustomerRanking
-		Select FanID
+		Select #CustomerRanking_ShopperLapsed.[FanID]
 			 , @PartnerIDToBeRanked [PartnerID]
-			 , Ranking [Ranking] 
+			 , #CustomerRanking_ShopperLapsed.[Ranking] [Ranking] 
 		from #CustomerRanking_ShopperLapsed
 
 		EXEC Staging.oo_TimerMessage 'Insert Shopper & Lapsed', @Time OUTPUT
@@ -97,7 +97,7 @@ SET NOCOUNT ON
 	***********************************************************************************************************************/
 
 		Insert into Segmentation.Roc_Shopper_Segment_CustomerRanking
-		Select FanID, @PartnerIDToBeRanked [PartnerID], Ranking [Ranking] 
+		Select #CustomerRanking_Acquire.[FanID], @PartnerIDToBeRanked [PartnerID], #CustomerRanking_Acquire.[Ranking] [Ranking] 
 		from #CustomerRanking_Acquire
 
 		EXEC Staging.oo_TimerMessage 'Insert acquire', @Time OUTPUT

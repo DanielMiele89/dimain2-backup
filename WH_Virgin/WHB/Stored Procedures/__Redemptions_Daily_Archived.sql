@@ -70,13 +70,13 @@ group by r.Privatedescription, r.ID
 
 --Deal with Problem redemption items--------------------------------
 UPDATE ri
-SET RedeemType = 'Trade Up',
-	TradeUP_WithValue = 1,
-	TradeUp_ClubcashRequired = r.TradeUp_ClubcashRequired,
-	TradeUp_Value = r.TradeUp_Value
+SET [ri].[RedeemType] = 'Trade Up',
+	[ri].[TradeUp_WithValue] = 1,
+	[ri].[TradeUp_ClubcashRequired] = #RedeemItems.[r].TradeUp_ClubcashRequired,
+	[ri].[TradeUp_Value] = #RedeemItems.[r].TradeUp_Value
 FROM #RedeemItems as ri
 INNER JOIN Derived.RedemptionItem_TradeUpValue  as r
-	on ri.RedeemID = r.RedeemID
+	on ri.RedeemID = #RedeemItems.[r].RedeemID
 
 
 --Deal with Problem redemption items--------------------------------
@@ -105,23 +105,23 @@ INNER JOIN Derived.Partner as p
 */
 
 UPDATE ri
-SET		PartnerID = p.PartnerID,
-		PartnerName = p.PartnerName
+SET		[ri].[PartnerID] = p.PartnerID,
+		[ri].[PartnerName] = p.PartnerName
 FROM #RedeemItems as ri
 INNER JOIN Derived.RedemptionItem_TradeUpValue as t
-	on	ri.RedeemID = t.RedeemID
+	on	ri.RedeemID = #RedeemItems.[t].RedeemID
 INNER JOIN Derived.partner as p
-	on  t.PartnerID = p.PartnerID
+	on  #RedeemItems.[t].PartnerID = p.PartnerID
 WHERE	ri.PartnerID is null and
-		t.partnerid is not null
+		#RedeemItems.[t].partnerid is not null
 
 --Create Relational.RedemptionItem lookup Table-------------------------
 TRUNCATE TABLE Derived.RedemptionItem
 INSERT INTO Derived.RedemptionItem
-SELECT RedeemID
-		, RedeemType
-		, PrivateDescription
-		, Status
+SELECT [ri].[RedeemID]
+		, [ri].[RedeemType]
+		, [ri].[Privatedescription]
+		, [ri].[Status]
 FROM #RedeemItems ri
 
 
@@ -137,7 +137,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Redemptions_Redemptions_V1_12', 'Starting
 
 -- Pull out a list of Cancelled redemptions --------------------------
 if object_id('tempdb..#Cancelled') is not null drop table #Cancelled
-select ItemID as TransID,1 as Cancelled
+select [SLC_Report].[dbo].[trans].[ItemID] as TransID,1 as Cancelled
 Into #Cancelled
 from SLC_Report.dbo.trans t2 where t2.typeid=4
 
@@ -145,17 +145,17 @@ Create Clustered index cix_Cancelled_ItemID on #Cancelled (TransID)
 
 --Pull out a list of redemptions including those later cancelled-----------------------
 if object_id('tempdb..#Redemptions') is not null drop table #Redemptions
-SELECT	t.FanID, -- 50% of overall sp cost
+SELECT	#Cancelled.[t].FanID, -- 50% of overall sp cost
 		c.CompositeID,
-		t.id as TranID,
-		Min(t.Date) as RedeemDate,
-		ri.RedeemType,
-		r.Description as PrivateDescription,
-		t.Price,
-		tuv.TradeUp_Value,
-		tuv.PartnerID,
+		#Cancelled.[t].id as TranID,
+		Min(#Cancelled.[t].Date) as RedeemDate,
+		#Cancelled.[ri].RedeemType,
+		#Cancelled.[r].Description as PrivateDescription,
+		#Cancelled.[t].Price,
+		#Cancelled.[tuv].TradeUp_Value,
+		#Cancelled.[tuv].PartnerID,
 		Coalesce(Cancelled.Cancelled,0) Cancelled, 
-		CAST(CASE WHEN t.[Option] = 'Yes I am a UK tax payer and eligible for gift aid' then 1 else 0 end AS BIT) AS GiftAid
+		CAST(CASE WHEN #Cancelled.[t].[Option] = 'Yes I am a UK tax payer and eligible for gift aid' then 1 else 0 end AS BIT) AS GiftAid
 INTO #Redemptions        
 FROM Derived.Customer c
 inner join SLC_Report.dbo.Trans t 
@@ -163,16 +163,16 @@ inner join SLC_Report.dbo.Trans t
 inner join SLC_Report.dbo.Redeem r 
 	on r.id = t.ItemID
 LEFT JOIN #Cancelled as Cancelled 
-	ON Cancelled.TransID = T.ID
+	ON Cancelled.TransID = #Cancelled.[T].ID
 inner join SLC_Report.dbo.RedeemAction ra 
-	on t.ID = ra.transid and ra.Status in (1,6)
+	on #Cancelled.[t].ID = #Cancelled.[ra].transid and #Cancelled.[ra].Status in (1,6)
 left join Derived.RedemptionItem as ri 
-	on t.ItemID = ri.RedeemID
+	on #Cancelled.[t].ItemID = #Cancelled.[ri].RedeemID
 left join Derived.RedemptionItem_TradeUpValue as tuv
-	on ri.RedeemID = tuv.RedeemID    
-WHERE t.TypeID = 3
-	AND T.Points > 0
-GROUP BY t.FanID, c.CompositeID, t.id, ri.RedeemType, r.[Description], t.Price, tuv.TradeUp_Value, Coalesce(Cancelled.Cancelled,0), tuv.PartnerID, t.[Option]
+	on #Cancelled.[ri].RedeemID = #Cancelled.[tuv].RedeemID    
+WHERE #Cancelled.[t].TypeID = 3
+	AND #Cancelled.[T].Points > 0
+GROUP BY #Cancelled.[t].FanID, c.CompositeID, #Cancelled.[t].id, #Cancelled.[ri].RedeemType, #Cancelled.[r].[Description], #Cancelled.[t].Price, #Cancelled.[tuv].TradeUp_Value, Coalesce(Cancelled.Cancelled,0), #Cancelled.[tuv].PartnerID, #Cancelled.[t].[Option]
 -- (12,720,878 rows affected) / 00:10:38
 
 
@@ -189,30 +189,30 @@ ALTER INDEX IDX_FanID ON Derived.Redemptions DISABLE
 TRUNCATE TABLE Derived.Redemptions
 INSERT INTO Derived.Redemptions
 SELECT	
-	FanID,
-	CompositeID,
-	TranID,
-	RedeemDate,
-	RedeemType,
+	[a].[FanID],
+	[a].[CompositeID],
+	[a].[TranID],
+	[a].[RedeemDate],
+	[a].[RedeemType],
 	replace(replace(replace(replace(
 	Case
-		When left(Ltrim(rtrim(PrivateDescription)),3) = '£5 ' and RedeemType = 'Charity' 
-					then 'D'+ right(ltrim(rtrim(PrivateDescription)),len(ltrim(rtrim(PrivateDescription)))-4)
-		When left(Ltrim(PrivateDescription),3) Like '£_0' and RedeemType = 'Charity' 
-					then 'D'+right(ltrim(PrivateDescription),len(ltrim(PrivateDescription))-5)
-		Else Ltrim(PrivateDescription)
+		When left(Ltrim(rtrim([a].[PrivateDescription])),3) = '£5 ' and [a].[RedeemType] = 'Charity' 
+					then 'D'+ right(ltrim(rtrim([a].[PrivateDescription])),len(ltrim(rtrim([a].[PrivateDescription])))-4)
+		When left(Ltrim([a].[PrivateDescription]),3) Like '£_0' and [a].[RedeemType] = 'Charity' 
+					then 'D'+right(ltrim([a].[PrivateDescription]),len(ltrim([a].[PrivateDescription]))-5)
+		Else Ltrim([a].[PrivateDescription])
 	End, '&pound;','£'),'{em}',''),'{/em}',''),'B&amp;Q','B&Q')
 	RedemptionDescription,
 	a.PartnerID,
 	Coalesce(p.PartnerName,'N/A') as PartnerName,
-	Price as CashbackUsed,
+	[a].[Price] as CashbackUsed,
 	Case
-		when TradeUp_Value > 0 then 1
+		when [a].[TradeUp_Value] > 0 then 1
 		Else 0
 	End as TradeUp_WithValue,
-	TradeUp_Value,
-	Cancelled,
-	GiftAid
+	[a].[TradeUp_Value],
+	[a].[Cancelled],
+	[a].[GiftAid]
 FROM #Redemptions a
 LEFT JOIN Derived.[partner] p
 	ON a.partnerid = p.partnerid
@@ -236,7 +236,7 @@ Declare @Date date = Getdate(),
 --Find entries for Issued E-Codes-----------------------
 IF OBJECT_ID ('tempdb..#eRed_Issues') IS NOT NULL DROP TABLE #eRed_Issues
 Select	e.ECodeID,
-		StatusChangeDate as IssuedDate
+		[SLC_Report].[Redemption].[ECodeStatusHistory].[StatusChangeDate] as IssuedDate
 INTO #eRed_Issues
 FROM SLC_Report.Redemption.ECodeStatusHistory as e
 WHERE e.Status = 1 
@@ -249,19 +249,19 @@ Create Clustered index cix_eRed_Issues_ECodeID on #eRed_Issues (ECodeID)
 
 --Find some details to fill out records--------------------
 IF OBJECT_ID ('tempdb..#RedsData') IS NOT NULL DROP TABLE #RedsData
-Select	t.FanID,
-		e.TransID as TranID,
+Select	#eRed_Issues.[t].FanID,
+		#eRed_Issues.[e].TransID as TranID,
 		r.IssuedDate as RedeemDate,
-		t.ClubCash as CashbackUsed,
+		#eRed_Issues.[t].ClubCash as CashbackUsed,
 		0 as Cancelled,
-		ItemID,
+		#eRed_Issues.[ItemID],
 		r.ECodeID
 Into	#RedsData
 From #eRed_Issues as r
 inner join SLC_report.Redemption.ECode as e
-	on r.ECodeID = e.ID
+	on r.ECodeID = #eRed_Issues.[e].ID
 inner join SLC_report.dbo.trans as t
-	on e.TransID = t.id
+	on #eRed_Issues.[e].TransID = #eRed_Issues.[t].id
 	
 Create Clustered index cix_RedsData_RedeemID on #RedsData (ItemID)
 
@@ -272,32 +272,32 @@ Select  rd.FanID,
 		c.CompositeID,
 		rd.TranID,
 		rd.RedeemDate,
-		r.RedeemType,
-		r.PrivateDescription as RedemptionDescription,
-		ri.PartnerID,
+		#RedsData.[r].RedeemType,
+		#RedsData.[r].PrivateDescription as RedemptionDescription,
+		#RedsData.[ri].PartnerID,
 		p.PartnerName,
 		rd.CashbackUsed,
 		1 as [TradeUp_WithValue],
-		ri.TradeUp_Value,
+		#RedsData.[ri].TradeUp_Value,
 		0 as Cancelled,
 		rd.ECodeID
 from #RedsData as rd
 Left Outer join Derived.RedemptionItem_TradeUpValue as ri
-	on rd.ItemID = ri.RedeemID
+	on rd.ItemID = #RedsData.[ri].RedeemID
 inner join Derived.RedemptionItem as r
-	on rd.ItemID = r.RedeemID
+	on rd.ItemID = #RedsData.[r].RedeemID
 inner join Derived.customer as c
 	on rd.FanID = c.FanID
 inner join Derived.Partner as p
-	on ri.partnerid = p.PartnerID
+	on #RedsData.[ri].partnerid = p.PartnerID
 Left Outer join [Staging].[Redemptions_ECodes] as e
-	on rd.TranID = e.TranID
-Where e.TranID is null
+	on rd.TranID = #RedsData.[e].TranID
+Where #RedsData.[e].TranID is null
 Order by c.CompositeID
 
 ----------------Find those subsequently cancelled in some form-----------------
 UPDATE a
-SET		Cancelled = 1
+SET		[Staging].[Redemptions_ECodes].[Cancelled] = 1
 FROM [Staging].[Redemptions_ECodes] as a 	
 inner join SLC_Report.Redemption.ECodeStatusHistory as e
 	on	a.ECodeID = e.ECodeID and

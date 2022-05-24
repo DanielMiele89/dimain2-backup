@@ -8,20 +8,20 @@ AS
 BEGIN
 
 IF OBJECT_ID('tempdb..#FB') IS NOT NULL DROP TABLE #FB
-SELECT	CINID
-		,FanID
-		,AgeCurrent
+SELECT	[CL].[CINID]
+		,[C].[FanID]
+		,[C].[AgeCurrent]
 INTO #FB
 FROM	Derived.Customer C
 JOIN	Derived.CINList CL ON CL.CIN = C.SourceUID
 WHERE	C.CurrentlyActive = 1
-AND		SourceUID NOT IN (SELECT SourceUID FROM Derived.Customer_DuplicateSourceUID) 
+AND		[C].[SourceUID] NOT IN (SELECT [Derived].[Customer_DuplicateSourceUID].[SourceUID] FROM Derived.Customer_DuplicateSourceUID) 
 
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
 SELECT	BrandName
 		,CC.BrandID
-		,ConsumerCombinationID
+		,[CC].[ConsumerCombinationID]
 INTO #CC
 FROM	Trans.ConsumerCombination CC
 JOIN	warehouse.Relational.Brand B ON B.BrandID = CC.BrandID
@@ -48,12 +48,12 @@ INTO Sandbox.vernon.VM_aspinal_comp_steal_090821
 FROM #shoppper F
 
 If Object_ID('WH_Virgin.Selections.ASP016_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.ASP016_PreSelection
-Select FanID
+Select [fb].[FanID]
 Into WH_Virgin.Selections.ASP016_PreSelection
 From #FB fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.vernon.VM_aspinal_comp_steal_090821 cs
-				WHERE fb.CINID = cs.CINID)
+				WHERE fb.CINID = #FB.[cs].CINID)
 
 
 END

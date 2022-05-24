@@ -26,7 +26,7 @@ BEGIN
 
 	BEGIN TRY
 
-	WHILE (SELECT COUNT(*) FROM [WHB].[Inbound_Files] f WHERE TableName = 'Accounts' AND FileProcessed = 0) > 0
+	WHILE (SELECT COUNT(*) FROM [WHB].[Inbound_Files] f WHERE [f].[TableName] = 'Accounts' AND [f].[FileProcessed] = 0) > 0
 		BEGIN
 
 		/*******************************************************************************************************************************************
@@ -35,14 +35,14 @@ BEGIN
 
 			IF OBJECT_ID('tempdb..#FilesToProcess') IS NOT NULL DROP TABLE #FilesToProcess
 			SELECT	TOP 1
-					ID AS FileID
-				,	LoadDate
-				,	FileName
+					[f].[ID] AS FileID
+				,	[f].[LoadDate]
+				,	[f].[FileName]
 			INTO #FilesToProcess
 			FROM [WHB].[Inbound_Files] f
-			WHERE TableName = 'Accounts'
-			AND FileProcessed = 0
-			ORDER BY ID
+			WHERE [f].[TableName] = 'Accounts'
+			AND [f].[FileProcessed] = 0
+			ORDER BY [f].[ID]
 
 
 		/*******************************************************************************************************************************************
@@ -55,8 +55,8 @@ BEGIN
 			FROM [Inbound].[Accounts] cu
 			WHERE EXISTS (	SELECT 1
 							FROM #FilesToProcess ftp
-							WHERE cu.FileName = ftp.FileName
-							AND cu.LoadDate = ftp.LoadDate)
+							WHERE #FilesToProcess.[cu].FileName = ftp.FileName
+							AND #FilesToProcess.[cu].LoadDate = ftp.LoadDate)
 
 
 		/*******************************************************************************************************************************************
@@ -78,15 +78,15 @@ BEGIN
 						,	target.[FileName]				= source.[FileName]
 
 			WHEN NOT MATCHED THEN															-- If not matched, add new rows
-				INSERT ([CustomerID]
-					,	[BankID]
-					,	[AccountID]
-					,	[AccountType]
-					,	[AccountStatus]
-					,	[CashbackNomineeID]
-					,	[AccountRelationship]
-					,	[LoadDate]
-					,	[FileName])
+				INSERT ([target].[CustomerID]
+					,	[target].[BankID]
+					,	[target].[AccountID]
+					,	[target].[AccountType]
+					,	[target].[AccountStatus]
+					,	[target].[CashbackNomineeID]
+					,	[target].[AccountRelationship]
+					,	[target].[LoadDate]
+					,	[target].[FileName])
 				VALUES (source.[CustomerID]
 					,	source.[BankID]
 					,	source.[AccountID]
@@ -106,12 +106,12 @@ BEGIN
 		*******************************************************************************************************************************************/
 
 			UPDATE f
-			SET FileProcessed = 1
+			SET [f].[FileProcessed] = 1
 			FROM [WHB].[Inbound_Files] f
 			WHERE EXISTS (	SELECT 1
 							FROM #FilesToProcess ftp
-							WHERE f.ID = ftp.FileID
-							AND f.LoadDate = ftp.LoadDate)
+							WHERE #FilesToProcess.[f].ID = ftp.FileID
+							AND #FilesToProcess.[f].LoadDate = ftp.LoadDate)
 
 		END	--	WHILE (SELECT COUNT(*) FROM [WHB].[Inbound_Files] f WHERE TableName = 'Accounts' AND FileProcessed = 0) > 0
 
@@ -135,7 +135,7 @@ BEGIN
 		IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-		INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+		INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 		VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

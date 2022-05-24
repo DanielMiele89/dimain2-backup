@@ -1,0 +1,1 @@
+﻿CREATE PROCEDURE [Selections].[DX020_PreSelection_sProc]  AS  BEGIN     IF OBJECT_ID('[Warehouse].[Selections].[DX020_PreSelection]') IS NOT NULL DROP TABLE [Warehouse].[Selections].[DX020_PreSelection]   SELECT CONVERT(INT, 0) AS FanID   INTO [Warehouse].[Selections].[DX020_PreSelection]   WHERE 1 = 2    END;

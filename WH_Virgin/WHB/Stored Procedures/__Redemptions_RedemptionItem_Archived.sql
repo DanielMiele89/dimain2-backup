@@ -70,13 +70,13 @@ group by r.Privatedescription, r.ID
 
 --Deal with Problem redemption items--------------------------------
 UPDATE ri
-SET RedeemType = 'Trade Up',
-	TradeUP_WithValue = 1,
-	TradeUp_ClubcashRequired = r.TradeUp_ClubcashRequired,
-	TradeUp_Value = r.TradeUp_Value
+SET [ri].[RedeemType] = 'Trade Up',
+	[ri].[TradeUp_WithValue] = 1,
+	[ri].[TradeUp_ClubcashRequired] = #RedeemItems.[r].TradeUp_ClubcashRequired,
+	[ri].[TradeUp_Value] = #RedeemItems.[r].TradeUp_Value
 FROM #RedeemItems as ri
 INNER JOIN Derived.RedemptionItem_TradeUpValue  as r
-	on ri.RedeemID = r.RedeemID
+	on ri.RedeemID = #RedeemItems.[r].RedeemID
 
 
 --Deal with Problem redemption items--------------------------------
@@ -105,23 +105,23 @@ INNER JOIN Derived.Partner as p
 */
 
 UPDATE ri
-SET		PartnerID = p.PartnerID,
-		PartnerName = p.PartnerName
+SET		[ri].[PartnerID] = p.PartnerID,
+		[ri].[PartnerName] = p.PartnerName
 FROM #RedeemItems as ri
 INNER JOIN Derived.RedemptionItem_TradeUpValue as t
-	on	ri.RedeemID = t.RedeemID
+	on	ri.RedeemID = #RedeemItems.[t].RedeemID
 INNER JOIN Derived.partner as p
-	on  t.PartnerID = p.PartnerID
+	on  #RedeemItems.[t].PartnerID = p.PartnerID
 WHERE	ri.PartnerID is null and
-		t.partnerid is not null
+		#RedeemItems.[t].partnerid is not null
 
 --Create Relational.RedemptionItem lookup Table-------------------------
 TRUNCATE TABLE Derived.RedemptionItem
 INSERT INTO Derived.RedemptionItem
-SELECT RedeemID
-		, RedeemType
-		, PrivateDescription
-		, Status
+SELECT [ri].[RedeemID]
+		, [ri].[RedeemType]
+		, [ri].[Privatedescription]
+		, [ri].[Status]
 FROM #RedeemItems ri
 
 
@@ -162,7 +162,7 @@ FROM #RedeemItems ri
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

@@ -14,17 +14,17 @@ CREATE CLUSTERED INDEX ix_CINID on #FB_VM(CINID)
 
 
 IF OBJECT_ID('tempdb..#CC_vm') IS NOT NULL DROP TABLE #CC_vm
-SELECT ConsumerCombinationID
+SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
 INTO	#CC_vm
 FROM	WH_Virgin.trans.ConsumerCombination  CC
-WHERE	BrandID IN (1458)																		-- Space NK
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN (1458)																		-- Space NK
 
 
 IF OBJECT_ID('tempdb..#Trans_vm') IS NOT NULL DROP TABLE #Trans_vm
 SELECT	F.CINID
 INTO	#Trans_vm
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB_VM F ON F.CINID = CT.CINID
+JOIN	#FB_VM F ON F.CINID = #FB_VM.[CT].CINID
 JOIN	#CC_vm C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	TranDate > DATEADD(MONTH, -9, GETDATE())
 		AND Amount > 0
@@ -36,7 +36,7 @@ IF OBJECT_ID('tempdb..#Trans_lapsed_vm') IS NOT NULL DROP TABLE #Trans_lapsed_vm
 SELECT	F.CINID
 INTO	#Trans_lapsed_vm
 FROM	#FB_VM F
-JOIN	WH_Virgin.trans.consumertransaction CT ON F.CINID = CT.CINID
+JOIN	WH_Virgin.trans.consumertransaction CT ON F.CINID = #FB_VM.[CT].CINID
 JOIN	#CC_vm	 C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	Amount > 0
 AND		TranDate BETWEEN DATEADD(MONTH,-24,GETDATE()) AND  DATEADD(MONTH,-9,GETDATE())
@@ -46,18 +46,18 @@ CREATE CLUSTERED INDEX ix_CINID on #Trans_lapsed_vm(CINID)
 
 
 IF OBJECT_ID('Sandbox.RukanK.VM_SpaceNK_Lapsed_Customers') IS NOT NULL DROP TABLE Sandbox.RukanK.VM_SpaceNK_Lapsed_Customers
-SELECT	CINID
+SELECT	#Trans_lapsed_vm.[CINID]
 INTO	Sandbox.RukanK.VM_SpaceNK_Lapsed_Customers
 FROM	#Trans_lapsed_vm
-WHERE	CINID NOT IN (SELECT CINID FROM #Trans_vm)
+WHERE	#Trans_lapsed_vm.[CINID] NOT IN (SELECT #Trans_vm.[CINID] FROM #Trans_vm)
 
 	IF OBJECT_ID('[WH_Virgin].[Selections].[SP023_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[SP023_PreSelection]
-	SELECT FanID
+	SELECT [fb].[FanID]
 	INTO [WH_Virgin].[Selections].[SP023_PreSelection]
 	FROM #FB_VM fb
 	WHERE EXISTS (	SELECT 1
 					FROM Sandbox.RukanK.VM_SpaceNK_Lapsed_Customers  st
-					WHERE fb.CINID = st.CINID)
+					WHERE fb.CINID = #FB_VM.[st].CINID)
 
 END
 

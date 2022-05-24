@@ -15,17 +15,17 @@ BEGIN
 	
 IF OBJECT_ID('tempdb..#ConsumerCombination') IS NOT NULL DROP TABLE #ConsumerCombination
 SELECT	DISTINCT 
-		UpdatedBrandID AS BrandID
-	,	MID
-	,	UpdatedNarrative
-	,	LocationCountry
-	,	MCCID
-	,	IsHighVariance
-	,	IsUKSpend
+		[mnc].[UpdatedBrandID] AS BrandID
+	,	[mnc].[MID]
+	,	[mnc].[UpdatedNarrative]
+	,	[mnc].[LocationCountry]
+	,	[mnc].[MCCID]
+	,	[mnc].[IsHighVariance]
+	,	[mnc].[IsUKSpend]
 	,	CASE
-			WHEN UpdatedBrandID = 943 THEN CONVERT(TINYINT, 2)
-			WHEN OriginalNarrative LIKE 'PP*%' THEN CONVERT(TINYINT, 2)
-			WHEN OriginalNarrative LIKE 'PayPal*%' THEN CONVERT(TINYINT, 2)
+			WHEN [mnc].[UpdatedBrandID] = 943 THEN CONVERT(TINYINT, 2)
+			WHEN [mnc].[OriginalNarrative] LIKE 'PP*%' THEN CONVERT(TINYINT, 2)
+			WHEN [mnc].[OriginalNarrative] LIKE 'PayPal*%' THEN CONVERT(TINYINT, 2)
 			ELSE CONVERT(TINYINT, 0)
 		END AS PaymentGatewayStatusID
 INTO #ConsumerCombination
@@ -46,7 +46,7 @@ SELECT	cc.BrandID
 	,	cc.IsUKSpend
 	,	cc.PaymentGatewayStatusID
 FROM #ConsumerCombination cc
-ORDER BY	(SELECT BrandName FROM [Warehouse].[Relational].[Brand] br WHERE cc.BrandID = br.BrandID)
+ORDER BY	(SELECT #ConsumerCombination.[BrandName] FROM [Warehouse].[Relational].[Brand] br WHERE cc.BrandID = #ConsumerCombination.[br].BrandID)
 		,	cc.MID
 		,	cc.UpdatedNarrative
 

@@ -18,7 +18,7 @@ DECLARE @DATE_12 DATE = DATEADD(MONTH, -12, GETDATE())
 If Object_ID('tempdb..#segmentAssignment') IS NOT NULL DROP TABLE #segmentAssignment
 Select	 cl.CINID			-- keep CINID and FANID
 		, cl.fanid			-- only need these two fields for forecasting / targetting everything else is dependant on requirements
-		, case when trans = 1 then 1 else 0 end as Shopped_Once
+		, case when [b].[trans] = 1 then 1 else 0 end as Shopped_Once
 Into		#segmentAssignment
 
 From		(	select CL.CINID
@@ -36,17 +36,17 @@ From		(	select CL.CINID
 				group by CL.CINID, cu.FanID
 			) CL
 
-left Join	(	Select		ct.CINID
+left Join	(	Select		#cc.[ct].CINID
 							
 							, count(1) as trans 
 
 									
 								
 				From		WH_Virgin.Trans.ConsumerTransaction ct with (nolock)
-				Join		#cc cc on cc.ConsumerCombinationID = ct.ConsumerCombinationID
-				Where		0 < ct.Amount
-							and TranDate > @DATE_12
-				group by ct.CINID ) b
+				Join		#cc cc on cc.ConsumerCombinationID = #cc.[ct].ConsumerCombinationID
+				Where		0 < #cc.[ct].Amount
+							and #cc.[TranDate] > @DATE_12
+				group by #cc.[ct].CINID ) b
 on	cl.CINID = b.CINID
 
 	if OBJECT_ID('tempdb..#Seg_asign') is not null drop table #Seg_asign
@@ -58,24 +58,24 @@ on	cl.CINID = b.CINID
 
 
 	if OBJECT_ID('tempdb..#Final') is not null drop table #Final
-	select	 CINID
-			, fanid
+	select	 #Seg_asign.[CINID]
+			, #Seg_asign.[FanID]
 	into	#Final
 	from	#Seg_asign
-	where Shopped_Once = 1
+	where #Seg_asign.[Shopped_Once] = 1
 
 
 
 	IF OBJECT_ID('sandbox.vernon.VM_STWC_single_trans_150420') IS NOT NULL DROP TABLE sandbox.vernon.VM_STWC_single_trans_150420
 
-	select	 CINID
-			, fanid
+	select	 #Final.[CINID]
+			, #Final.[fanid]
 	into	sandbox.vernon.VM_STWC_single_trans_150420
 	from	#Final
 
 	INSERT INTO sandbox.vernon.VM_STWC_single_trans_150420
-	SELECT 0, FanID
+	SELECT 0, [Segmentation].[Roc_Shopper_Segment_Members].[FanID]
 	FROM [Segmentation].[Roc_Shopper_Segment_Members]
-	WHERE PartnerID = 4778
-	AND EndDate IS NULL
-	AND ShopperSegmentTypeID IN(7, 8)If Object_ID('WH_Virgin.Selections.STW038_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.STW038_PreSelectionSelect FanIDInto WH_Virgin.Selections.STW038_PreSelectionFROM  sandbox.vernon.VM_STWC_single_trans_150420END
+	WHERE [Segmentation].[Roc_Shopper_Segment_Members].[PartnerID] = 4778
+	AND [Segmentation].[Roc_Shopper_Segment_Members].[EndDate] IS NULL
+	AND [Segmentation].[Roc_Shopper_Segment_Members].[ShopperSegmentTypeID] IN(7, 8)If Object_ID('WH_Virgin.Selections.STW038_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.STW038_PreSelectionSelect [sandbox].[vernon].[VM_STWC_single_trans_150420].[FanID]Into WH_Virgin.Selections.STW038_PreSelectionFROM  sandbox.vernon.VM_STWC_single_trans_150420END

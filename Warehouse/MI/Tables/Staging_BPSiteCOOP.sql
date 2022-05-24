@@ -1,0 +1,5 @@
+﻿CREATE TABLE [MI].[Staging_BPSiteCOOP] (
+    [SiteCode] VARCHAR (20) NOT NULL,
+    CONSTRAINT [PK_Staging_BPSiteCOOP] PRIMARY KEY CLUSTERED ([SiteCode] ASC)
+);
+

@@ -15,10 +15,10 @@ CREATE CLUSTERED INDEX ix_CINID on #FB(CINID)
 
 
 	IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-	SELECT ConsumerCombinationID
+	SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
 	INTO	#CC
 	FROM	WH_Virgin.trans.ConsumerCombination  CC
-	WHERE	BrandID IN (2107,2660,2665,2085,1651)							-- Kate Spade, Mulberry, Coach, Burberry and Smythson
+	WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN (2107,2660,2665,2085,1651)							-- Kate Spade, Mulberry, Coach, Burberry and Smythson
 	CREATE CLUSTERED INDEX ix_ConsumerCombinationID on #CC(ConsumerCombinationID)
 
 
@@ -26,7 +26,7 @@ CREATE CLUSTERED INDEX ix_CINID on #FB(CINID)
 	SELECT	F.CINID
 	INTO	#Trans
 	FROM	WH_Virgin.trans.consumertransaction CT
-	JOIN	#FB F ON F.CINID = CT.CINID
+	JOIN	#FB F ON F.CINID = #FB.[CT].CINID
 	JOIN	#CC C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 	WHERE	TranDate > DATEADD(MONTH, -24, GETDATE())
 			AND Amount > 0
@@ -35,17 +35,17 @@ CREATE CLUSTERED INDEX ix_CINID on #FB(CINID)
 
 
 	IF OBJECT_ID('Sandbox.LeoP.VM_Aspinal_CompSteal010422') IS NOT NULL DROP TABLE Sandbox.LeoP.VM_Aspinal_CompSteal010422
-	SELECT	CINID
+	SELECT	#Trans.[CINID]
 	INTO	Sandbox.LeoP.VM_Aspinal_CompSteal010422
 	FROM	#Trans
 
 	IF OBJECT_ID('[WH_Virgin].[Selections].[ASP023_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[ASP023_PreSelection]
-	SELECT FanID
+	SELECT [fb].[FanID]
 	INTO [WH_Virgin].[Selections].[ASP023_PreSelection]
 	FROM #FB fb
 	WHERE EXISTS (	SELECT 1
 					FROM Sandbox.LeoP.VM_Aspinal_CompSteal010422  st
-					WHERE fb.CINID = st.CINID)
+					WHERE fb.CINID = #FB.[st].CINID)
 
 END
 

@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [RewardBI]
+    AUTHORIZATION [dbo];
+

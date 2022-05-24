@@ -165,7 +165,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 			  , @TotalCustomers INT = (SELECT COUNT(*) FROM [Derived].[Customer])
 			  , @IsThrottleApplied INT = 0
 			  , @FreqStretch_TransDate DATE = DATEADD(day, -56, @StartDate)
-			  , @ControlGroupEndDate DATE = (SELECT MAX(EndDate) FROM [Selections].[CampaignSetup_POS] WHERE ClientServicesRef = @ClientServicesRef)
+			  , @ControlGroupEndDate DATE = (SELECT MAX([Selections].[CampaignSetup_POS].[EndDate]) FROM [Selections].[CampaignSetup_POS] WHERE [Selections].[CampaignSetup_POS].[ClientServicesRef] = @ClientServicesRef)
 			  
 
 	/*******************************************************************************************************************************************
@@ -187,9 +187,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 									   , @Throttling AS Throttling)
 
 
-				INSERT INTO #OfferIDs (ShopperSegmentTypeID
-									 , IronOfferID
-									 , Throttling)
+				INSERT INTO #OfferIDs (#OfferIDs.[ShopperSegmentTypeID]
+									 , #OfferIDs.[IronOfferID]
+									 , #OfferIDs.[Throttling])
 				SELECT sst.Item AS ShopperSegmentTypeID
 					 , iof.Item AS IronOfferID
 					 , CASE
@@ -197,7 +197,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 							ELSE thr.Item
 					   END AS Throttling
 				FROM OfferIDs
-				CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (ShopperSegmentTypeID, ',') sst
+				CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] ([OfferIDs].[ShopperSegmentTypeID], ',') sst
 				CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (IronOfferID, ',') iof
 				CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (Throttling, ',') thr
 				WHERE sst.ItemNumber = iof.ItemNumber
@@ -226,7 +226,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						2.1.2. Check whether there is any throttling
 					***********************************************************************************************************************/
 			
-						SELECT @IsThrottleApplied = CASE WHEN SUM(Throttling) = COUNT(*) * @TotalCustomers THEN 0 ELSE 1 END
+						SELECT @IsThrottleApplied = CASE WHEN SUM(#OfferIDs.[Throttling]) = COUNT(*) * @TotalCustomers THEN 0 ELSE 1 END
 						FROM #OfferIDs
 
 			/***********************************************************************************************************************
@@ -238,8 +238,8 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 
 				WITH Gender AS (SELECT @Gender AS Gender)
 				
-				INSERT INTO #Gender (Gender)
-				SELECT Item AS Gender
+				INSERT INTO #Gender (#Gender.[Gender])
+				SELECT [Warehouse].[dbo].[il_SplitDelimitedStringArray].[Item] AS Gender
 				FROM Gender
 				CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (Gender, ',') ge
 		
@@ -254,8 +254,8 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 
 				WITH MarketableByEmail AS (SELECT @MarketableByEmail AS MarketableByEmail)
 				
-				INSERT INTO #MarketableByEmail (MarketableByEmail)
-				SELECT Item AS MarketableByEmail
+				INSERT INTO #MarketableByEmail (#MarketableByEmail.[MarketableByEmail])
+				SELECT [Warehouse].[dbo].[il_SplitDelimitedStringArray].[Item] AS MarketableByEmail
 				FROM MarketableByEmail
 				CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (MarketableByEmail, ',') mbe
 				
@@ -311,7 +311,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						SELECT iof.IronOfferID
 						INTO #LiveOfferPerPartner
 						FROM [Derived].[IronOffer] iof
-						WHERE PartnerID = @PartnerID
+						WHERE [iof].[PartnerID] = @PartnerID
 						AND (iof.EndDate > @StartDate OR iof.EndDate IS NULL)
 						AND iof.IsSignedOff = 1
 
@@ -353,7 +353,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		***********************************************************************************************************************/
 			
 			IF OBJECT_ID ('tempdb..#ControlGroupCustomers') IS NOT NULL DROP TABLE #ControlGroupCustomers
-			SELECT CompositeID
+			SELECT [cu].[CompositeID]
 			INTO #ControlGroupCustomers
 			FROM [WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram] cg
 			INNER JOIN [Derived].[Customer] cu
@@ -401,8 +401,8 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 	
 						WITH SelectedInAnotherCampaign AS (SELECT @SelectedInAnotherCampaign AS ClientServicesRef)
 					
-						INSERT INTO #SelectedInAnotherCampaign (ClientServicesRef)
-						SELECT Item AS ClientServicesRef
+						INSERT INTO #SelectedInAnotherCampaign (#SelectedInAnotherCampaign.[ClientServicesRef])
+						SELECT [Warehouse].[dbo].[il_SplitDelimitedStringArray].[Item] AS ClientServicesRef
 						FROM SelectedInAnotherCampaign
 						CROSS APPLY [Warehouse].[dbo].[il_SplitDelimitedStringArray] (ClientServicesRef, ',') mbe
 	
@@ -422,7 +422,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 									  FROM #SelectedInAnotherCampaign siac
 									  INNER JOIN [Derived].[IronOffer_Campaign_HTM] htm
 										  ON siac.ClientServicesRef = htm.ClientServicesRef
-									  Where iom.IronOfferID = htm.IronOfferID)
+									  Where #SelectedInAnotherCampaign.[iom].IronOfferID = htm.IronOfferID)
 
 						SET @RowsAffected = @@ROWCOUNT
 
@@ -431,7 +431,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						3.4.3. Add in customers that have joined since that point if there's a welcome offer running
 					***********************************************************************************************************************/
 
-						IF EXISTS (SELECT 1 FROM #OfferIDs WHERE ShopperSegmentTypeID = 10)
+						IF EXISTS (SELECT 1 FROM #OfferIDs WHERE #OfferIDs.[ShopperSegmentTypeID] = 10)
 							BEGIN
 
 								INSERT INTO #SelectedInAnotherCampaignCustomers
@@ -484,8 +484,8 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						FROM [Selections].[CampaignExecution_ExistingUniverse] eu
 						WHERE EXISTS (	SELECT 1
 										FROM #ExistingUniverseOffers euo
-										WHERE eu.IronOfferID = euo.IronOfferID
-										AND @CustomerBaseOfferDate <= eu.StartDate)
+										WHERE #ExistingUniverseOffers.[eu].IronOfferID = euo.IronOfferID
+										AND @CustomerBaseOfferDate <= #ExistingUniverseOffers.[eu].StartDate)
 
 						SET @RowsAffected = @@ROWCOUNT
 	
@@ -494,7 +494,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						3.5.3. Add in customers that have joined since that point if there's a welcome offer running
 					***********************************************************************************************************************/
 
-						IF EXISTS (SELECT 1 FROM #OfferIDs WHERE ShopperSegmentTypeID = 10)
+						IF EXISTS (SELECT 1 FROM #OfferIDs WHERE #OfferIDs.[ShopperSegmentTypeID] = 10)
 							BEGIN
 
 								INSERT INTO #ExistingUniverse
@@ -531,7 +531,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						INTO #PostalSectors
 						FROM [Derived].[Outlet] o
 						WHERE o.PartnerID = @PartnerID
-						AND LEFT(MerchantID, 1) NOT IN ('a', 'x', '#')
+						AND LEFT([o].[MerchantID], 1) NOT IN ('a', 'x', '#')
 		
 					/***********************************************************************************************************************
 						3.6.2. Fetch all customers within desginated drive time of the previous postal sectors
@@ -545,8 +545,8 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						INNER JOIN [Warehouse].[Relational].[DriveTimeMatrix] dtm
 							ON cu.PostalSector = dtm.FROMSector
 						INNER JOIN #PostalSectors ps
-							ON dtm.ToSector = ps.PostalSector
-							AND dtm.DriveTimeMins <= @DriveTimeMins
+							ON #PostalSectors.[dtm].ToSector = ps.PostalSector
+							AND #PostalSectors.[dtm].DriveTimeMins <= @DriveTimeMins
 							
 						SET @RowsAffected = @@ROWCOUNT;
 						
@@ -741,7 +741,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 				4.4.2. Update birthday details
 			***********************************************************************************************************************/
 
-				IF EXISTS (SELECT 1 FROM #OfferIDs WHERE ShopperSegmentTypeID = 11)
+				IF EXISTS (SELECT 1 FROM #OfferIDs WHERE #OfferIDs.[ShopperSegmentTypeID] = 11)
 					BEGIN
 
 						UPDATE cb
@@ -761,7 +761,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 				4.4.3. Update homemover details
 			***********************************************************************************************************************/
 
-				IF EXISTS (SELECT 1 FROM #OfferIDs WHERE ShopperSegmentTypeID = 12)
+				IF EXISTS (SELECT 1 FROM #OfferIDs WHERE #OfferIDs.[ShopperSegmentTypeID] = 12)
 					BEGIN
 
 						UPDATE cb
@@ -772,8 +772,8 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						WHERE cb.ShopperSegmentTypeID NOT IN (10, 11, 12)
 						AND EXISTS (SELECT 1 
 									FROM [Derived].Homemover_Details hm
-									WHERE hm.LoadDate >= @HomemoverDate
-									AND cb.FanID = hm.FanID)
+									WHERE ##CustomerBase_Virgin.[hm].LoadDate >= @HomemoverDate
+									AND cb.FanID = ##CustomerBase_Virgin.[hm].FanID)
 
 						SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Update homemover details [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC [Monitor].[ProcessLogger] 'Selections', @Activity, @time OUTPUT, @SSMS OUTPUT
 
@@ -837,10 +837,10 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						END
 
 					IF OBJECT_ID('tempdb..#MustBeIn_TableName') IS NOT NULL DROP TABLE #MustBeIn_TableName
-					SELECT FanID
+					SELECT #MustBeIn_TableName_Temp.[FanID]
 					INTO #MustBeIn_TableName
 					FROM #MustBeIn_TableName_Temp
-					GROUP BY FanID
+					GROUP BY #MustBeIn_TableName_Temp.[FanID]
 					HAVING COUNT(1) = @MustBeIn_TableCount
 
 					CREATE CLUSTERED INDEX CIX_MustBeIn_FanID ON #MustBeIn_TableName (FanID)
@@ -853,7 +853,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 					FROM ##CustomerBase_Virgin cb
 					WHERE NOT EXISTS (SELECT 1
 									  FROM #MustBeIn_TableName mbi
-									  WHERE cb.FanID = mbi.FanID)
+									  WHERE #MustBeIn_TableName.[cb].FanID = mbi.FanID)
 					
 					SET @RowsAffected = @@ROWCOUNT;
 					SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Fetch customers from the MustBeIn tables [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC [Monitor].[ProcessLogger] 'Selections', @Activity, @time OUTPUT, @SSMS OUTPUT
@@ -910,7 +910,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 					FROM ##CustomerBase_Virgin cb
 					WHERE EXISTS (SELECT 1
 								  FROM #NotIn_TableName ni
-								  WHERE cb.FanID = ni.FanID)
+								  WHERE #NotIn_TableName.[cb].FanID = ni.FanID)
 					
 					SET @RowsAffected = @@ROWCOUNT;
 					SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Fetch customers from the NotIn tables [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC [Monitor].[ProcessLogger] 'Selections', @Activity, @time OUTPUT, @SSMS OUTPUT
@@ -930,14 +930,14 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 				SELECT pt.FanID
 					 , pt.IronOfferID
 					 , SUM(CASE
-								WHEN TransactionAmount > 0 THEN 1
+								WHEN [pt].[TransactionAmount] > 0 THEN 1
 								ELSE -1
 						   END) AS ValidTransactions
 				INTO #CustomersWithMultipleTrans
 				FROM [Derived].[PartnerTrans] pt
 				WHERE EXISTS (SELECT 1
 							  FROM #OfferIDs iof
-							  WHERE pt.IronOfferID = iof.IronOfferID)
+							  WHERE #OfferIDs.[pt].IronOfferID = iof.IronOfferID)
 				AND pt.TransactionDate > @FreqStretch_TransDate
 				GROUP BY pt.IronOfferID
 					   , pt.FanID
@@ -945,7 +945,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 
 				DELETE
 				FROM #CustomersWithMultipleTrans
-				WHERE ValidTransactions < @FreqStretch_TransCount
+				WHERE #CustomersWithMultipleTrans.[ValidTransactions] < @FreqStretch_TransCount
 
 				DELETE cb
 				FROM ##CustomerBase_Virgin cb
@@ -1028,7 +1028,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 							ON cb.FanID = cr.FanID
 						WHERE ControlGroupCustomer = 0
 						) cb
-				WHERE RowNum <= Throttling
+				WHERE [cb].[RowNum] <= Throttling
 			END
 
 			
@@ -1051,7 +1051,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						INNER JOIN #OfferIDs iof
 							ON cb.ShopperSegmentTypeID = iof.ShopperSegmentTypeID
 						WHERE ControlGroupCustomer = 0) cb
-				WHERE RowNum <= Throttling
+				WHERE [cb].[RowNum] <= Throttling
 			END
 			
 		SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Output to assign offers and apply throttling if required [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC [Monitor].[ProcessLogger] 'Selections', @Activity, @time OUTPUT, @SSMS OUTPUT
@@ -1064,12 +1064,12 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		IF @ControlGroupPercentage > 0
 			BEGIN
 
-				DECLARE @AcquireCount INT = ((SELECT COUNT(*) FROM #Selection WHERE ShopperSegmentTypeID = 7) * 1.0 / 100) * @ControlGroupPercentage
-					  , @LaspsedCount INT = ((SELECT COUNT(*) FROM #Selection WHERE ShopperSegmentTypeID = 8) * 1.0 / 100) * @ControlGroupPercentage
-					  , @ShopperCount INT = ((SELECT COUNT(*) FROM #Selection WHERE ShopperSegmentTypeID = 9) * 1.0 / 100) * @ControlGroupPercentage
-					  , @WelcomeCount INT = ((SELECT COUNT(*) FROM #Selection WHERE ShopperSegmentTypeID = 10) * 1.0 / 100) * @ControlGroupPercentage
-					  , @HomemoverCount INT = ((SELECT COUNT(*) FROM #Selection WHERE ShopperSegmentTypeID = 11) * 1.0 / 100) * @ControlGroupPercentage
-					  , @BirthdayCount INT = ((SELECT COUNT(*) FROM #Selection WHERE ShopperSegmentTypeID = 12) * 1.0 / 100) * @ControlGroupPercentage
+				DECLARE @AcquireCount INT = ((SELECT COUNT(*) FROM #Selection WHERE #Selection.[ShopperSegmentTypeID] = 7) * 1.0 / 100) * @ControlGroupPercentage
+					  , @LaspsedCount INT = ((SELECT COUNT(*) FROM #Selection WHERE #Selection.[ShopperSegmentTypeID] = 8) * 1.0 / 100) * @ControlGroupPercentage
+					  , @ShopperCount INT = ((SELECT COUNT(*) FROM #Selection WHERE #Selection.[ShopperSegmentTypeID] = 9) * 1.0 / 100) * @ControlGroupPercentage
+					  , @WelcomeCount INT = ((SELECT COUNT(*) FROM #Selection WHERE #Selection.[ShopperSegmentTypeID] = 10) * 1.0 / 100) * @ControlGroupPercentage
+					  , @HomemoverCount INT = ((SELECT COUNT(*) FROM #Selection WHERE #Selection.[ShopperSegmentTypeID] = 11) * 1.0 / 100) * @ControlGroupPercentage
+					  , @BirthdayCount INT = ((SELECT COUNT(*) FROM #Selection WHERE #Selection.[ShopperSegmentTypeID] = 12) * 1.0 / 100) * @ControlGroupPercentage
 
 					 
 				IF OBJECT_ID('tempdb..#ControlGroup_Setup') IS NOT NULL DROP TABLE #ControlGroup_Setup
@@ -1121,78 +1121,78 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 					  ON cb.FanID = cr.FanID
 				WHERE NOT EXISTS (SELECT 1
 								  FROM #Selection s
-								  WHERE cb.FanID = s.FanID)
+								  WHERE #Selection.[cb].FanID = s.FanID)
 				AND NOT EXISTS (SELECT 1
 								FROM #ControlGroup_Setup cgs
-								WHERE cb.FanID = cgs.FanID)
+								WHERE #ControlGroup_Setup.[cb].FanID = cgs.FanID)
 
 				INSERT INTO #ControlGroup_Setup
-				SELECT FanID
-					 , ShopperSegmentTypeID
-					 , IronOfferID
+				SELECT [s].[FanID]
+					 , [s].[ShopperSegmentTypeID]
+					 , [s].[IronOfferID]
 					 , CASE
-							WHEN ShopperSegmentTypeID = 7 THEN @AcquireCount
-							WHEN ShopperSegmentTypeID = 8 THEN @LaspsedCount
-							WHEN ShopperSegmentTypeID = 9 THEN @ShopperCount
-							WHEN ShopperSegmentTypeID = 10 THEN @WelcomeCount
-							WHEN ShopperSegmentTypeID = 11 THEN @HomemoverCount
-							WHEN ShopperSegmentTypeID = 12 THEN @BirthdayCount
+							WHEN [s].[ShopperSegmentTypeID] = 7 THEN @AcquireCount
+							WHEN [s].[ShopperSegmentTypeID] = 8 THEN @LaspsedCount
+							WHEN [s].[ShopperSegmentTypeID] = 9 THEN @ShopperCount
+							WHEN [s].[ShopperSegmentTypeID] = 10 THEN @WelcomeCount
+							WHEN [s].[ShopperSegmentTypeID] = 11 THEN @HomemoverCount
+							WHEN [s].[ShopperSegmentTypeID] = 12 THEN @BirthdayCount
 					   END AS ControlGroupCount
 					 , 3 AS ControlGroupOrder
 				FROM #Selection s
 				WHERE NOT EXISTS (	SELECT 1
 									FROM #ControlGroup_Setup cgs
-									WHERE s.FanID = cgs.FanID)
+									WHERE #ControlGroup_Setup.[s].FanID = cgs.FanID)
 
 				IF OBJECT_ID('tempdb..#ControlGroup') IS NOT NULL DROP TABLE #ControlGroup
 				SELECT @PartnerID AS PartnerID
 					 , @ClientServicesRef AS ClientServicesRef
-					 , IronOfferID
-					 , ShopperSegmentTypeID
+					 , [cg].[IronOfferID]
+					 , [cg].[ShopperSegmentTypeID]
 					 , @StartDate AS StartDate
 					 , @ControlGroupEndDate AS EndDate
-					 , FanID
+					 , [cg].[FanID]
 				INTO #ControlGroup
-				FROM (SELECT FanID
-						   , ShopperSegmentTypeID
-						   , IronOfferID
-						   , ControlGroupCount
-						   , ROW_NUMBER() OVER (PARTITION BY ShopperSegmentTypeID ORDER BY ControlGroupOrder, ABS(CHECKSUM(NEWID())) ASC) AS RowNum
+				FROM (SELECT #ControlGroup_Setup.[FanID]
+						   , #ControlGroup_Setup.[ShopperSegmentTypeID]
+						   , #ControlGroup_Setup.[IronOfferID]
+						   , #ControlGroup_Setup.[ControlGroupCount]
+						   , ROW_NUMBER() OVER (PARTITION BY #ControlGroup_Setup.[ShopperSegmentTypeID] ORDER BY #ControlGroup_Setup.[ControlGroupOrder], ABS(CHECKSUM(NEWID())) ASC) AS RowNum
 					  FROM #ControlGroup_Setup) cg
-				WHERE RowNum <= ControlGroupCount
+				WHERE [cg].[RowNum] <= [cg].[ControlGroupCount]
 
 				DELETE s
 				FROM #Selection s
 				WHERE EXISTS (SELECT 1
 							  FROM #ControlGroup cg
-							  WHERE s.FanID = cg.FanID)
+							  WHERE #ControlGroup.[s].FanID = cg.FanID)
 
 				
-				IF EXISTS (SELECT 1 FROM [WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram] WHERE [ClientServicesRef] = @ClientServicesRef)
+				IF EXISTS (SELECT 1 FROM [WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram] WHERE [WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[ClientServicesRef] = @ClientServicesRef)
 					BEGIN
 						DELETE ipcg
 						FROM [WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram] ipcg
 						WHERE EXISTS (	SELECT 1
 										FROM #ControlGroup cg
 										INNER JOIN [WH_AllPublishers].[Derived].[Offer] o
-											ON cg.IronOfferID = o.IronOfferID
-										WHERE ipcg.ClientServicesRef = cg.ClientServicesRef
-										AND ipcg.StartDate = cg.StartDate
-										AND ipcg.PublisherID = o.PublisherID)
+											ON cg.IronOfferID = #ControlGroup.[o].IronOfferID
+										WHERE #ControlGroup.[ipcg].ClientServicesRef = cg.ClientServicesRef
+										AND #ControlGroup.[ipcg].StartDate = cg.StartDate
+										AND #ControlGroup.[ipcg].PublisherID = #ControlGroup.[o].PublisherID)
 					END
 						
 						
-				INSERT INTO [WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram] (	[PublisherID]
-																							,	[PartnerID]
-																							,	[ClientServicesRef]
-																							,	[IronOfferID]
-																							,	[ShopperSegmentTypeID]
-																							,	[StartDate]
-																							,	[EndDate]
-																							,	[FanID]
-																							,	[PercentageTaken]
-																							,	[ExcludeFromAnalysis])
-				SELECT	o.PublisherID
+				INSERT INTO [WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram] (	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[PublisherID]
+																							,	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[PartnerID]
+																							,	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[ClientServicesRef]
+																							,	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[IronOfferID]
+																							,	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[ShopperSegmentTypeID]
+																							,	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[StartDate]
+																							,	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[EndDate]
+																							,	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[FanID]
+																							,	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[PercentageTaken]
+																							,	[WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram].[ExcludeFromAnalysis])
+				SELECT	#ControlGroup.[o].PublisherID
 					,	cgn.PartnerID
 					,	cgn.ClientServicesRef
 					,	cgn.IronOfferID
@@ -1204,12 +1204,12 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 					,	0
 				FROM #ControlGroup cgn
 				INNER JOIN [WH_AllPublishers].[Derived].[Offer] o
-					ON cgn.IronOfferID = o.IronOfferID
+					ON cgn.IronOfferID = #ControlGroup.[o].IronOfferID
 				WHERE NOT EXISTS (	SELECT 1
 									FROM [WH_AllPublishers].[Selections].[ControlGroupMembers_InProgram] cne
-									WHERE cgn.FanID = cne.FanID
-									AND cgn.ClientServicesRef = cne.ClientServicesRef
-									AND @StartDate BETWEEN cne.StartDate AND cne.EndDate)
+									WHERE cgn.FanID = #ControlGroup.[cne].FanID
+									AND cgn.ClientServicesRef = #ControlGroup.[cne].ClientServicesRef
+									AND @StartDate BETWEEN #ControlGroup.[cne].StartDate AND #ControlGroup.[cne].EndDate)
 				
 				SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Create in programme control group [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC [Monitor].[ProcessLogger] 'Selections', @Activity, @time OUTPUT, @SSMS OUTPUT
 
@@ -1255,7 +1255,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		16. Insert to [Selections].[CampaignExecution_TableNames]
 	*******************************************************************************************************************************************/
 	
-		INSERT INTO [Selections].[CampaignExecution_TableNames] (TableName, ClientServicesRef)
+		INSERT INTO [Selections].[CampaignExecution_TableNames] ([Selections].[CampaignExecution_TableNames].[TableName], [Selections].[CampaignExecution_TableNames].[ClientServicesRef])
 		SELECT @OutputTableName
 			 , @ClientServicesRef
 
@@ -1269,10 +1269,10 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		DECLARE @GETDATE DATETIME = GETDATE()
 
 		INSERT INTO [Segmentation].[OfferMemberAddition]
-		SELECT CompositeID
-			 , IronOfferID
-			 , StartDate
-			 , EndDate
+		SELECT #Selection.[CompositeID]
+			 , #Selection.[IronOfferID]
+			 , #Selection.[StartDate]
+			 , #Selection.[EndDate]
 			 , @GETDATE AS AddedDate
 		FROM #Selection
 			

@@ -73,10 +73,10 @@ CREATE NONCLUSTERED INDEX IX_CCID ON #FB_vm (FanID)
 
 
 IF OBJECT_ID('tempdb..#CC_vm') IS NOT NULL DROP TABLE #CC_vm
-SELECT ConsumerCombinationID
+SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
 INTO #CC_vm
 FROM	WH_Virgin.trans.ConsumerCombination  CC
-WHERE	BrandID IN (568,574,2434,2592,2777)						-- Competitors: Lu Lu Lemon, Gym shark and Fabletics
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN (568,574,2434,2592,2777)						-- Competitors: Lu Lu Lemon, Gym shark and Fabletics
 
 CREATE CLUSTERED INDEX CIX_CCID ON #CC_vm (ConsumerCombinationID)
 
@@ -86,7 +86,7 @@ IF OBJECT_ID('tempdb..#Trans_vm') IS NOT NULL DROP TABLE #Trans_vm
 SELECT	F.CINID
 INTO #Trans_vm
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB_VM F ON F.CINID = CT.CINID
+JOIN	#FB_VM F ON F.CINID = #FB_VM.[CT].CINID
 JOIN	#CC_vm C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	TranDate > @DATE_36
 		AND Amount > 0
@@ -94,7 +94,7 @@ GROUP BY F.CINID
 
 
 IF OBJECT_ID('Sandbox.bastienc.sweatyBetty_Virgin') IS NOT NULL DROP TABLE Sandbox.bastienc.sweatyBetty_Virgin
-SELECT	CINID
+SELECT	#Trans_vm.[CINID]
 INTO Sandbox.bastienc.sweatyBetty_Virgin
 FROM  #Trans_vm
 
@@ -104,6 +104,6 @@ INTO [WH_Virgin].[Selections].[SWB019_PreSelection]
 FROM #FB_vm fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.bastienc.sweatyBetty_Virgin st
-				WHERE fb.CINID = st.CINID)
+				WHERE fb.CINID = #FB_vm.[st].CINID)
 
 END

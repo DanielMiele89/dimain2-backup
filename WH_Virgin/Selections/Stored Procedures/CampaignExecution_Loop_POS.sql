@@ -61,7 +61,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 				SELECT	*
 				INTO #AllCampaigns
 				FROM [Selections].[CampaignSetup_POS]
-				WHERE EmailDate = @EmailDate
+				WHERE [Selections].[CampaignSetup_POS].[EmailDate] = @EmailDate
 								
 				SET @RowsAffected = @@ROWCOUNT;
 				SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Store all camapigns to be run in this cycle [' + CAST(@RowsAffected AS VARCHAR(10)) + ']';
@@ -73,12 +73,12 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 			***********************************************************************************************************************/
 
 				IF OBJECT_ID('tempdb..#PartnersWithNewCampaign') IS NOT NULL DROP TABLE #PartnersWithNewCampaign
-				SELECT	PartnerID
-					,	MAX(CONVERT(INT, NewCampaign)) AS NewCampaign_Partner
+				SELECT	#AllCampaigns.[PartnerID]
+					,	MAX(CONVERT(INT, #AllCampaigns.[NewCampaign])) AS NewCampaign_Partner
 				INTO #PartnersWithNewCampaign
 				FROM #AllCampaigns
-				WHERE NewCampaign = 1
-				GROUP BY PartnerID
+				WHERE #AllCampaigns.[NewCampaign] = 1
+				GROUP BY #AllCampaigns.[PartnerID]
 
 			/***********************************************************************************************************************
 				2.3.	Store all camapigns to be run in this execution
@@ -95,34 +95,34 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 				AND SelectionRun = 0
 				AND ReadyToRun = 1
 
-				SELECT StartDate
-					 , EndDate
-					 , CampaignName
-					 , ClientServicesRef
-					 , OfferID
-					 , Gender
-					 , AgeRange
-					 , DriveTimeMins
-					 , LiveNearAnyStore
-					 , SocialClass
-					 , sProcPreSelection
-					 , OutputTableName
-					 , NotIn_TableName1
-					 , NotIn_TableName2
-					 , MustBeIn_TableName1
-					 , MustBeIn_TableName2
-					 , MarketableByEmail
-					 , CustomerBaseOfferDate
-					 , SelectedInAnotherCampaign
-					 , DeDupeAgainstCampaigns
-					 , CampaignID_Include
-					 , CampaignID_Exclude
-					 , Throttling
-					 , ThrottleType
-					 , RandomThrottle
-					 , PriorityFlag
+				SELECT [ctr].[StartDate]
+					 , [ctr].[EndDate]
+					 , [ctr].[CampaignName]
+					 , [ctr].[ClientServicesRef]
+					 , [ctr].[OfferID]
+					 , [ctr].[Gender]
+					 , [ctr].[AgeRange]
+					 , [ctr].[DriveTimeMins]
+					 , [ctr].[LiveNearAnyStore]
+					 , [ctr].[SocialClass]
+					 , [ctr].[sProcPreSelection]
+					 , [ctr].[OutputTableName]
+					 , [ctr].[NotIn_TableName1]
+					 , [ctr].[NotIn_TableName2]
+					 , [ctr].[MustBeIn_TableName1]
+					 , [ctr].[MustBeIn_TableName2]
+					 , [ctr].[MarketableByEmail]
+					 , [ctr].[CustomerBaseOfferDate]
+					 , [ctr].[SelectedInAnotherCampaign]
+					 , [ctr].[DeDupeAgainstCampaigns]
+					 , [ctr].[CampaignID_Include]
+					 , [ctr].[CampaignID_Exclude]
+					 , [ctr].[Throttling]
+					 , [ctr].[ThrottleType]
+					 , [ctr].[RandomThrottle]
+					 , [ctr].[PriorityFlag]
 				FROM #CampaignsToRun ctr
-				ORDER BY RunID
+				ORDER BY [ctr].[RunID]
 								
 				SET @RowsAffected = @@ROWCOUNT;
 				SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Store all camapigns to be run in this execution [' + CAST(@RowsAffected AS VARCHAR(10)) + ']';
@@ -150,7 +150,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 
 		--When no records are matched, insert the incoming records from source table to target table
 		WHEN NOT MATCHED BY TARGET
-		THEN INSERT (PreSelection_ALS_ID, PartnerID, OutputTableName, PriorityFlag, InPartnerDedupe, RowNumber)
+		THEN INSERT ([TARGET].[PreSelection_ALS_ID], [TARGET].[PartnerID], [TARGET].[OutputTableName], [TARGET].[PriorityFlag], [TARGET].[InPartnerDedupe], [TARGET].[RowNumber])
 		VALUES (	SOURCE.ID
 				,	SOURCE.PartnerID
 				,	SOURCE.OutputTableName
@@ -166,12 +166,12 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Add campaigns to table to allow partner dedupe [' + CAST(@RowsAffected AS VARCHAR(10)) + ']';
 		EXEC [Monitor].[ProcessLogger] 'Selections', @Activity, @time OUTPUT, @SSMS OUTPUT
 
-		;WITH Updater AS (	SELECT	RowNumber
-								,	ROW_NUMBER() OVER (ORDER BY PartnerID, PriorityFlag) AS NewRowNumber
+		;WITH Updater AS (	SELECT	[Selections].[CampaignExecution_OutputTables].[RowNumber]
+								,	ROW_NUMBER() OVER (ORDER BY [Selections].[CampaignExecution_OutputTables].[PartnerID], [Selections].[CampaignExecution_OutputTables].[PriorityFlag]) AS NewRowNumber
 							FROM [Selections].[CampaignExecution_OutputTables])
 
 		UPDATE Updater
-		SET RowNumber = NewRowNumber
+		SET [Selections].[CampaignExecution_OutputTables].[RowNumber] = NewRowNumber
 
 		SET @RowsAffected = @@ROWCOUNT;
 		SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Renumber rows in Partner dedupe table [' + CAST(@RowsAffected AS VARCHAR(10)) + ']';
@@ -182,7 +182,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 		4.	Prepare variable to input into individual Selection sProc
 	*******************************************************************************************************************************************/
 
-		SELECT @MaxID = MAX(RunID)
+		SELECT @MaxID = MAX(#CampaignsToRun.[RunID])
 			 , @Today = GETDATE()
 			 , @RunID = 1
 		FROM #CampaignsToRun
@@ -245,49 +245,49 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 				5.1.	Parametrise entries from CampaignSetup_DD
 			***********************************************************************************************************************/
 
-				IF EXISTS (SELECT 1 FROM #CampaignsToRun WHERE RunID = @RunID)
+				IF EXISTS (SELECT 1 FROM #CampaignsToRun WHERE #CampaignsToRun.[RunID] = @RunID)
 					BEGIN
 
-						SELECT	 @PartnerID = PartnerID
-							,	 @StartDate = StartDate 
-							,	 @EndDate = EndDate
-							,	 @CampaignName = CampaignName
-							,	 @ClientServicesRef = ClientServicesRef
-							,	 @OfferID = OfferID
-							,	 @PriorityFlag = PriorityFlag
-							,	 @Throttling = Throttling
-							,	 @ThrottleType = ThrottleType
-							,	 @RandomThrottle = RandomThrottle
-							,	 @MarketableByEmail = MarketableByEmail
-							,	 @Gender = Gender
-							,	 @AgeRange = AgeRange
-							,	 @DriveTimeMins = DriveTimeMins
-							,	 @LiveNearAnyStore = LiveNearAnyStore
-							,	 @SocialClass = SocialClass
-							,	 @CustomerBaseOfferDate = CustomerBaseOfferDate
-							,	 @SelectedInAnotherCampaign = SelectedInAnotherCampaign
-							,	 @DeDupeAgainstCampaigns = DeDupeAgainstCampaigns
-							,	 @CampaignID_Include = CampaignID_Include
-							,	 @CampaignID_Exclude = CampaignID_Exclude
-							,	 @sProcPreSelection = sProcPreSelection
-							,	 @OutputTableName = OutputTableName
-							,	 @NotIn_TableName1 = NotIn_TableName1
-							,	 @NotIn_TableName2 = NotIn_TableName2
-							,	 @NotIn_TableName3 = NotIn_TableName3
-							,	 @NotIn_TableName4 = NotIn_TableName4
-							,	 @MustBeIn_TableName1 = MustBeIn_TableName1
-							,	 @MustBeIn_TableName2 = MustBeIn_TableName2
-							,	 @MustBeIn_TableName3 = MustBeIn_TableName3
-							,	 @MustBeIn_TableName4 = MustBeIn_TableName4
-							,	 @NewCampaign = NewCampaign
-							,	 @FreqStretch_TransCount = FreqStretch_TransCount
-							,	 @ControlGroupPercentage = ControlGroupPercentage
+						SELECT	 @PartnerID = #CampaignsToRun.[PartnerID]
+							,	 @StartDate = #CampaignsToRun.[StartDate] 
+							,	 @EndDate = #CampaignsToRun.[EndDate]
+							,	 @CampaignName = #CampaignsToRun.[CampaignName]
+							,	 @ClientServicesRef = #CampaignsToRun.[ClientServicesRef]
+							,	 @OfferID = #CampaignsToRun.[OfferID]
+							,	 @PriorityFlag = #CampaignsToRun.[PriorityFlag]
+							,	 @Throttling = #CampaignsToRun.[Throttling]
+							,	 @ThrottleType = #CampaignsToRun.[ThrottleType]
+							,	 @RandomThrottle = #CampaignsToRun.[RandomThrottle]
+							,	 @MarketableByEmail = #CampaignsToRun.[MarketableByEmail]
+							,	 @Gender = #CampaignsToRun.[Gender]
+							,	 @AgeRange = #CampaignsToRun.[AgeRange]
+							,	 @DriveTimeMins = #CampaignsToRun.[DriveTimeMins]
+							,	 @LiveNearAnyStore = #CampaignsToRun.[LiveNearAnyStore]
+							,	 @SocialClass = #CampaignsToRun.[SocialClass]
+							,	 @CustomerBaseOfferDate = #CampaignsToRun.[CustomerBaseOfferDate]
+							,	 @SelectedInAnotherCampaign = #CampaignsToRun.[SelectedInAnotherCampaign]
+							,	 @DeDupeAgainstCampaigns = #CampaignsToRun.[DeDupeAgainstCampaigns]
+							,	 @CampaignID_Include = #CampaignsToRun.[CampaignID_Include]
+							,	 @CampaignID_Exclude = #CampaignsToRun.[CampaignID_Exclude]
+							,	 @sProcPreSelection = #CampaignsToRun.[sProcPreSelection]
+							,	 @OutputTableName = #CampaignsToRun.[OutputTableName]
+							,	 @NotIn_TableName1 = #CampaignsToRun.[NotIn_TableName1]
+							,	 @NotIn_TableName2 = #CampaignsToRun.[NotIn_TableName2]
+							,	 @NotIn_TableName3 = #CampaignsToRun.[NotIn_TableName3]
+							,	 @NotIn_TableName4 = #CampaignsToRun.[NotIn_TableName4]
+							,	 @MustBeIn_TableName1 = #CampaignsToRun.[MustBeIn_TableName1]
+							,	 @MustBeIn_TableName2 = #CampaignsToRun.[MustBeIn_TableName2]
+							,	 @MustBeIn_TableName3 = #CampaignsToRun.[MustBeIn_TableName3]
+							,	 @MustBeIn_TableName4 = #CampaignsToRun.[MustBeIn_TableName4]
+							,	 @NewCampaign = #CampaignsToRun.[NewCampaign]
+							,	 @FreqStretch_TransCount = #CampaignsToRun.[FreqStretch_TransCount]
+							,	 @ControlGroupPercentage = #CampaignsToRun.[ControlGroupPercentage]
 							,	 @AlternatePartnerOutputTable = CASE
-																	WHEN RIGHT(OutputTableName, 1) = ']' THEN LEFT(OutputTableName, LEN(OutputTableName) - 1) + '_APR]'
-																	ELSE OutputTableName + '_APR'
+																	WHEN RIGHT(#CampaignsToRun.[OutputTableName], 1) = ']' THEN LEFT(#CampaignsToRun.[OutputTableName], LEN(#CampaignsToRun.[OutputTableName]) - 1) + '_APR]'
+																	ELSE #CampaignsToRun.[OutputTableName] + '_APR'
 																END
 						FROM #CampaignsToRun
-						WHERE @RunID = RunID
+						WHERE @RunID = #CampaignsToRun.[RunID]
 
 						IF @PartnerID = 4825 SET @AlternatePartnerOutputTable = REPLACE(@AlternatePartnerOutputTable, 'KIT', 'FAN')
 												
@@ -301,14 +301,14 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 				IF @PartnerID != @PreviouslyRanPartnerID AND @PreviouslyRanPartnerID > 0
 					BEGIN
 
-						SELECT @Qry1 = Name
+						SELECT @Qry1 = [DIMAIN_TR].[SLC_REPL].[dbo].[Partner].[Name]
 						FROM [DIMAIN_TR].[SLC_REPL].[dbo].[Partner] pa
-						WHERE ID = @PreviouslyRanPartnerID
+						WHERE [DIMAIN_TR].[SLC_REPL].[dbo].[Partner].[ID] = @PreviouslyRanPartnerID
 
 						TRUNCATE TABLE [Selections].[CampaignExecution_PartnerDedupe]
 
 						UPDATE [Selections].[CampaignExecution_OutputTables]
-						SET InPartnerDedupe = 0
+						SET [Selections].[CampaignExecution_OutputTables].[InPartnerDedupe] = 0
 
 						SET @RowsAffected = @@ROWCOUNT;
 						SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' ' + @Qry1 + ' has had entries removed from the [Selections].[CampaignExecution_PartnerDedupe] table [' + CAST(@RowsAffected AS VARCHAR(10)) + ']';
@@ -322,19 +322,19 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 			***********************************************************************************************************************/
 
 				IF OBJECT_ID('tempdb..#CampaignSetup_OutputTables') IS NOT NULL DROP TABLE #CampaignSetup_OutputTables
-				SELECT	OutputTableName
-					,	RowNumber
+				SELECT	[Selections].[CampaignExecution_OutputTables].[OutputTableName]
+					,	[Selections].[CampaignExecution_OutputTables].[RowNumber]
 				INTO #CampaignSetup_OutputTables
 				FROM [Selections].[CampaignExecution_OutputTables]
-				WHERE PartnerID = @PartnerID
-				AND PriorityFlag < @PriorityFlag
-				AND InPartnerDedupe = 0
+				WHERE [Selections].[CampaignExecution_OutputTables].[PartnerID] = @PartnerID
+				AND [Selections].[CampaignExecution_OutputTables].[PriorityFlag] < @PriorityFlag
+				AND [Selections].[CampaignExecution_OutputTables].[InPartnerDedupe] = 0
 
 				DECLARE @TableLoop INT
 					  , @MaxTableLoop INT
 
-				SELECT	@TableLoop = MIN(RowNumber)
-					,	@MaxTableLoop = MAX(RowNumber)
+				SELECT	@TableLoop = MIN(#CampaignSetup_OutputTables.[RowNumber])
+					,	@MaxTableLoop = MAX(#CampaignSetup_OutputTables.[RowNumber])
 				FROM #CampaignSetup_OutputTables
 
 				ALTER INDEX [IX_CompositeID] ON [Selections].[CampaignExecution_PartnerDedupe] DISABLE
@@ -342,9 +342,9 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 				WHILE @TableLoop <= @MaxTableLoop
 					BEGIN
 						SET @OutputTableNamePartnerDedupe = (SELECT	DISTINCT
-																	OutputTableName
+																	#CampaignSetup_OutputTables.[OutputTableName]
 															 FROM #CampaignSetup_OutputTables
-															 WHERE RowNumber = @TableLoop)
+															 WHERE #CampaignSetup_OutputTables.[RowNumber] = @TableLoop)
 
 						SET @Qry1 = '
 						INSERT INTO [Selections].[CampaignExecution_PartnerDedupe] (PartnerID
@@ -360,10 +360,10 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 						EXEC [Monitor].[ProcessLogger] 'Selections', @Activity, @time OUTPUT, @SSMS OUTPUT
 
 						UPDATE [Selections].[CampaignExecution_OutputTables]
-						SET InPartnerDedupe = 1
-						WHERE RowNumber = @TableLoop
+						SET [Selections].[CampaignExecution_OutputTables].[InPartnerDedupe] = 1
+						WHERE [Selections].[CampaignExecution_OutputTables].[RowNumber] = @TableLoop
 
-						SET @TableLoop = (SELECT MIN(RowNumber) FROM #CampaignSetup_OutputTables WHERE RowNumber > @TableLoop)
+						SET @TableLoop = (SELECT MIN(#CampaignSetup_OutputTables.[RowNumber]) FROM #CampaignSetup_OutputTables WHERE #CampaignSetup_OutputTables.[RowNumber] > @TableLoop)
 
 					END	--	WHILE @TableLoop <= @MaxTableLoop
 
@@ -525,7 +525,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 			***********************************************************************************************************************/
 
 				UPDATE cs
-				SET SelectionRun = 1
+				SET [cs].[SelectionRun] = 1
 				FROM #CampaignsToRun ctr
 				INNER JOIN [Selections].[CampaignSetup_POS] cs
 					ON ctr.ID = cs.ID
@@ -655,7 +655,7 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 					TRUNCATE TABLE [Selections].[CampaignExecution_PartnerDedupe]
 
 					UPDATE [Selections].[CampaignExecution_OutputTables]
-					SET InPartnerDedupe = 0
+					SET [Selections].[CampaignExecution_OutputTables].[InPartnerDedupe] = 0
 
 			END	--	8. WHILE @RunID <= @MaxID
 
@@ -673,11 +673,11 @@ DECLARE @ProcessName VARCHAR(50), @Activity VARCHAR(200), @time DATETIME = GETDA
 
 		SELECT *
 		FROM [Selections].[CampaignExecution_SelectionCounts]
-		WHERE EmailDate = @EmailDate
-		ORDER BY RunDateTime
-			   , EmailDate
-			   , OutputTableName
-			   , IronOfferID
+		WHERE [Selections].[CampaignExecution_SelectionCounts].[EmailDate] = @EmailDate
+		ORDER BY [Selections].[CampaignExecution_SelectionCounts].[RunDateTime]
+			   , [Selections].[CampaignExecution_SelectionCounts].[EmailDate]
+			   , [Selections].[CampaignExecution_SelectionCounts].[OutputTableName]
+			   , [Selections].[CampaignExecution_SelectionCounts].[IronOfferID]
 END
 
 RETURN 0

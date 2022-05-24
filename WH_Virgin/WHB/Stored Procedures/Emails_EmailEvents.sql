@@ -35,7 +35,7 @@ BEGIN TRY
 		1.1.	Fetch all new Email Events
 	***************************************************************************************************************************************/
 	
-		DECLARE @StartRow BIGINT = (SELECT COALESCE(MAX(EventID), 754373679) FROM [Derived].[EmailEvent])	--	754373679 Max ID day before Virgin go live
+		DECLARE @StartRow BIGINT = (SELECT COALESCE(MAX([Derived].[EmailEvent].[EventID]), 754373679) FROM [Derived].[EmailEvent])	--	754373679 Max ID day before Virgin go live
 
 		IF OBJECT_ID('tempdb..#EmailEvent') IS NOT NULL DROP TABLE #EmailEvent
 		SELECT	ee.ID AS EventID
@@ -57,18 +57,18 @@ BEGIN TRY
 	
 		ALTER INDEX [CSX_All] ON [Derived].[EmailEvent] DISABLE
 
-		INSERT INTO [Derived].[EmailEvent] (EventID, EventDateTime, EventDate, FanID, CompositeID, CampaignKey, EmailEventCodeID)
+		INSERT INTO [Derived].[EmailEvent] ([Derived].[EmailEvent].[EventID], [Derived].[EmailEvent].[EventDateTime], [Derived].[EmailEvent].[EventDate], [Derived].[EmailEvent].[FanID], [Derived].[EmailEvent].[CompositeID], [Derived].[EmailEvent].[CampaignKey], [Derived].[EmailEvent].[EmailEventCodeID])
 		SELECT ee.EventID
 			 , ee.EventDateTime
 			 , ee.EventDateTime AS EventDate
 			 , ee.FanID
-			 , fa.CompositeID
+			 , #EmailEvent.[fa].CompositeID
 			 , ee.CampaignKey
 			 , ee.EmailEventCodeID
 		FROM #EmailEvent ee
 		INNER JOIN [DIMAIN_TR].[SLC_REPL].[dbo].[Fan] fa
-			ON ee.FanID = fa.ID
-			AND fa.ClubID IN (166)	--	Virgin Loyalty ClubID
+			ON ee.FanID = #EmailEvent.[fa].ID
+			AND #EmailEvent.[fa].ClubID IN (166)	--	Virgin Loyalty ClubID
 
 		-- log it
 		SET @RowsAffected = @@ROWCOUNT;SET @msg = 'Loaded rows to [Derived].[EmailEvent] [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'
@@ -87,13 +87,13 @@ BEGIN TRY
 
 	SET IDENTITY_INSERT [Derived].[EmailCampaign] ON
 
-	INSERT INTO	[Derived].[EmailCampaign] (	ID
-										,	CampaignKey
-										,	EmailKey
-										,	CampaignName
-										,	[Subject]
-										,	SendDateTime
-										,	SendDate)
+	INSERT INTO	[Derived].[EmailCampaign] (	[Derived].[EmailCampaign].[ID]
+										,	[Derived].[EmailCampaign].[CampaignKey]
+										,	[Derived].[EmailCampaign].[EmailKey]
+										,	[Derived].[EmailCampaign].[CampaignName]
+										,	[Derived].[EmailCampaign].[Subject]
+										,	[Derived].[EmailCampaign].[SendDateTime]
+										,	[Derived].[EmailCampaign].[SendDate])
 	SELECT	ec.ID
 		,	ec.CampaignKey
 		,	ec.EmailKey
@@ -118,10 +118,10 @@ BEGIN TRY
 	
 	TRUNCATE TABLE [Derived].[EmailEventCode]
 
-	INSERT INTO	[Derived].[EmailEventCode] (EmailEventCodeID
-										,	EmailEventDesc)	
-	SELECT	[ID]
-		,	[Name]
+	INSERT INTO	[Derived].[EmailEventCode] ([Derived].[EmailEventCode].[EmailEventCodeID]
+										,	[Derived].[EmailEventCode].[EmailEventDesc])	
+	SELECT	[DIMAIN_TR].[SLC_REPL].[dbo].[EmailEventCode].[ID]
+		,	[DIMAIN_TR].[SLC_REPL].[dbo].[EmailEventCode].[Name]
 	FROM [DIMAIN_TR].[SLC_REPL].[dbo].[EmailEventCode] eec
 	WHERE EXISTS (	SELECT 1
 					FROM [Derived].[EmailEvent] ee
@@ -151,7 +151,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error INTO the ErrorLog
-	INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

@@ -40,8 +40,8 @@ BEGIN
 	SELECT
 		CAST(vpl.ID AS VARCHAR(10))							  AS ID
 	  , CAST(vpl.RunID AS VARCHAR(10))						  AS RunID
-	  , PackageID
-	  , SourceID
+	  , [vpl].[PackageID]
+	  , [vpl].[SourceID]
 	  , vpl.SourceName
 	  , FORMAT(vpl.RunStartDateTime, 'dd/MM/yyyy hh\:mm\:ss') AS RunStartDateTime
 	  , FORMAT(vpl.RunEndDateTime, 'dd/MM/yyyy hh\:mm\:ss')	  AS RunEndDateTime
@@ -58,9 +58,9 @@ BEGIN
 	WHERE @PackageID = @PackageID
 
 	-- Default subject if NULL
-	SELECT @Subject = COALESCE(@Subject, SourceName + ' Failed')
+	SELECT @Subject = COALESCE(@Subject, ##ErrorEmail_Perturbation.[SourceName] + ' Failed')
 	FROM ##ErrorEmail_Perturbation
-	WHERE SourceID = PackageID
+	WHERE ##ErrorEmail_Perturbation.[SourceID] = ##ErrorEmail_Perturbation.[PackageID]
 
 	----------------------------------------------------------------------
 	-- Build HTML Tables
@@ -70,15 +70,15 @@ BEGIN
 	(
 		SELECT
 			'<td>'
-			+ SourceType + '</td><td>'
-			+ SourceName + '</td><td>'
+			+ [vpl].[SourceType] + '</td><td>'
+			+ [vpl].[SourceName] + '</td><td>'
 			+ vpl.RunStartDateTime + '</td><td>'
 			+ vpl.RunEndDateTime + '</td><td>'
 			+ vpl.[DD HH:MM:SS] + '</td><td>'
 			+ vpl.ErrorDetails + '</td>'
 		FROM ##ErrorEmail_Perturbation vpl
 		WHERE vpl.sourceHasError = 1
-		ORDER BY ID
+		ORDER BY [vpl].[ID]
 		FOR XML PATH ('tr'), TYPE
 	)
 	AS VARCHAR(MAX)
@@ -88,15 +88,15 @@ BEGIN
 	(
 		SELECT
 			'<td>'
-			+ SourceType + '</td><td>'
-			+ SourceName + '</td><td>'
+			+ [vpl].[SourceType] + '</td><td>'
+			+ [vpl].[SourceName] + '</td><td>'
 			+ vpl.RunStartDateTime + '</td><td>'
 			+ vpl.RunEndDateTime + '</td><td>'
 			+ vpl.[DD HH:MM:SS] + '</td><td>'
 			+ vpl.ErrorDetails + '</td>'
 		FROM ##ErrorEmail_Perturbation vpl
 		WHERE vpl.traceHasError = 1
-		ORDER BY ID
+		ORDER BY [vpl].[ID]
 		FOR XML PATH ('tr'), TYPE
 	)
 	AS VARCHAR(MAX)
@@ -107,15 +107,15 @@ BEGIN
 	(
 		SELECT
 			'<td>'
-			+ SourceType + '</td><td>'
-			+ SourceName + '</td><td>'
+			+ [vpl].[SourceType] + '</td><td>'
+			+ [vpl].[SourceName] + '</td><td>'
 			+ vpl.RunStartDateTime + '</td><td>'
 			+ vpl.RunEndDateTime + '</td><td>'
 			+ vpl.RowCnt + '</td><td>'
 			+ vpl.[DD HH:MM:SS] + '</td><td>'
 			+ vpl.ErrorDetails + '</td>'
 		FROM ##ErrorEmail_Perturbation vpl
-		ORDER BY ID
+		ORDER BY [vpl].[ID]
 		FOR XML PATH ('tr'), TYPE
 	)
 	AS VARCHAR(MAX)

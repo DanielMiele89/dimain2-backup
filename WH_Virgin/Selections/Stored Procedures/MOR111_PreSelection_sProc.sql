@@ -61,7 +61,7 @@ SELECT DISTINCT CT.CINID
 		,COUNT(1) as Transactions
 INTO	#shoppper_sow
 FROM	[Warehouse].[Relational].[ConsumerTransaction_MyRewards] CT
-JOIN	#CC CC	ON CT.ConsumerCombinationID = CC.ConsumerCombinationID AND cc.DataSource = 'Warehouse'
+JOIN	#CC CC	ON #CC.[CT].ConsumerCombinationID = CC.ConsumerCombinationID AND cc.DataSource = 'Warehouse'
 JOIN	#FB FB	ON CT.CINID = FB.CINID
 WHERE	TranDate >= DATEADD(MONTH,-6,GETDATE())
 		AND Amount > 0
@@ -74,7 +74,7 @@ SELECT DISTINCT CT.CINID
 		,MAX(CASE WHEN BrandID = 292 AND TranDate >= DATEADD(MONTH,-3,GETDATE()) THEN 1 ELSE 0 END) BrandShopper
 		,COUNT(1) as Transactions
 FROM	[WH_Virgin].[Trans].[ConsumerTransaction] CT
-JOIN	#CC CC	ON CT.ConsumerCombinationID = CC.ConsumerCombinationID AND cc.DataSource = 'WH_Virgin'
+JOIN	#CC CC	ON #CC.[CT].ConsumerCombinationID = CC.ConsumerCombinationID AND cc.DataSource = 'WH_Virgin'
 JOIN	#FB FB	ON CT.CINID = FB.CINID
 WHERE	TranDate >= DATEADD(MONTH,-6,GETDATE())
 		AND Amount > 0
@@ -87,7 +87,7 @@ SELECT DISTINCT CT.CINID
 		,MAX(CASE WHEN BrandID = 292 AND TranDate >= DATEADD(MONTH,-3,GETDATE()) THEN 1 ELSE 0 END) BrandShopper
 		,COUNT(1) as Transactions
 FROM	[WH_Visa].[Trans].[ConsumerTransaction] CT
-JOIN	#CC CC	ON CT.ConsumerCombinationID = CC.ConsumerCombinationID AND cc.DataSource = 'WH_Visa'
+JOIN	#CC CC	ON #CC.[CT].ConsumerCombinationID = CC.ConsumerCombinationID AND cc.DataSource = 'WH_Visa'
 JOIN	#FB FB	ON CT.CINID = FB.CINID
 WHERE	TranDate >= DATEADD(MONTH,-6,GETDATE())
 		AND Amount > 0
@@ -98,9 +98,9 @@ IF OBJECT_ID('Sandbox.rukank.Morrisons_LoW_SoW_17082021') IS NOT NULL DROP TABLE
 SELECT	F.CINID
 INTO Sandbox.rukank.Morrisons_LoW_SoW_17082021
 FROM #shoppper_sow F
-WHERE BrandShopper = 1
-	  AND SoW < 0.3
-	  AND Transactions >= 55
+WHERE [F].[BrandShopper] = 1
+	  AND [F].[SoW] < 0.3
+	  AND [F].[Transactions] >= 55
 GROUP BY F.CINID
-If Object_ID('WH_Virgin.Selections.MOR111_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.MOR111_PreSelectionSelect FanIDInto WH_Virgin.Selections.MOR111_PreSelectionFROM  #FB fbWHERE EXISTS (	SELECT 1				FROM Sandbox.rukank.Morrisons_LoW_SoW_17082021 st				WHERE fb.CINID = st.CINID)END
+If Object_ID('WH_Virgin.Selections.MOR111_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.MOR111_PreSelectionSelect [fb].[FanID]Into WH_Virgin.Selections.MOR111_PreSelectionFROM  #FB fbWHERE EXISTS (	SELECT 1				FROM Sandbox.rukank.Morrisons_LoW_SoW_17082021 st				WHERE fb.CINID = #FB.[st].CINID)END
 

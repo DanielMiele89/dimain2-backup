@@ -102,7 +102,7 @@ FROM	WH_Virgin.Derived.Customer C
 JOIN	WH_Virgin.Derived.CINList CL ON CL.CIN = C.SourceUID
 LEFT JOIN Warehouse.InsightArchive.EngagementScore E ON E.FanID = C.FanID
 WHERE	C.CurrentlyActive = 1
-AND		C.SourceUID NOT IN (SELECT SourceUID FROM Derived.Customer_DuplicateSourceUID)
+AND		C.SourceUID NOT IN (SELECT [Derived].[Customer_DuplicateSourceUID].[SourceUID] FROM Derived.Customer_DuplicateSourceUID)
 GROUP BY c.FanID
 	,	CL.CINID, Classification, Engagement_Score
 		,CASE WHEN Classification = 'Gold' THEN 1
@@ -135,41 +135,41 @@ SELECT  F.CINID as CINID,
 		max(case when brandid in (56,105,1724) then 1 else 0 end) as comp_shoppers		
 INTO	#ct
 FROM	#FB F
-LEFT JOIN	WH_Virgin.trans.consumertransaction CT	ON CT.CINID = F.CINID
+LEFT JOIN	WH_Virgin.trans.consumertransaction CT	ON #FB.[CT].CINID = F.CINID
 JOIN #CC CC ON CC.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	TranDate >= @DATE_24
 GROUP BY F.CINID, Classification, Classification_Score, Engagement_Score
 
 
 IF OBJECT_ID('tempdb..#Txn2') IS NOT NULL DROP TABLE #Txn2
-SELECT  CINID, Classification, Engagement_Score, Classification_Score
+SELECT  #fb.[CINID], #fb.[Classification], #fb.[Engagement_Score], #fb.[Classification_Score]
 INTO	#Txn2
 FROM	#fb
-where cinid in (select cinid from #ct where comp_shoppers =1 or (debenhams_mS = 1 and fashion_shopper = 1))
+where #fb.[CINID] in (select #ct.[CINID] from #ct where #ct.[comp_shoppers] =1 or (#ct.[debenhams_mS] = 1 and #ct.[fashion_shopper] = 1))
 
 
 
 IF OBJECT_ID('tempdb..#NtileEngaged') IS NOT NULL DROP TABLE #NtileEngaged		-- to get 20% of the most engaged customers = 5 tiles, pick 1
-SELECT	  CINID, Classification, Classification_Score, Engagement_Score
-		, NTILE(2) OVER (ORDER BY Classification_Score ASC, Engagement_Score DESC) AS NTILE_5
+SELECT	  [T].[CINID], [T].[Classification], [T].[Classification_Score], [T].[Engagement_Score]
+		, NTILE(2) OVER (ORDER BY [T].[Classification_Score] ASC, [T].[Engagement_Score] DESC) AS NTILE_5
 INTO	#NtileEngaged
 FROM	#Txn2 T 
 
 -- ACQUIRE 15% OFFER
 IF OBJECT_ID('Sandbox.bastienc.VM_landsend_top50pct') IS NOT NULL DROP TABLE Sandbox.bastienc.VM_landsend_top50pct
-SELECT	CINID
+SELECT	#NtileEngaged.[CINID]
 INTO	Sandbox.bastienc.VM_landsend_top50pct
 FROM	#NtileEngaged
-WHERE	NTILE_5 IN (1)
-GROUP BY CINID
+WHERE	#NtileEngaged.[NTILE_5] IN (1)
+GROUP BY #NtileEngaged.[CINID]
 
 -- ACQUIRE 10% OFFER
 IF OBJECT_ID('Sandbox.bastienc.VM_landsend_bottom50pct') IS NOT NULL DROP TABLE Sandbox.bastienc.VM_landsend_bottom50pct
-SELECT	CINID
+SELECT	#NtileEngaged.[CINID]
 INTO	Sandbox.bastienc.VM_landsend_bottom50pct
 FROM	#NtileEngaged
-WHERE	NTILE_5 IN (2)
-GROUP BY CINID
+WHERE	#NtileEngaged.[NTILE_5] IN (2)
+GROUP BY #NtileEngaged.[CINID]
 
 
 IF OBJECT_ID('[WH_Virgin].[Selections].[LE034_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[LE034_PreSelection]
@@ -178,7 +178,7 @@ INTO [WH_Virgin].[Selections].[LE034_PreSelection]
 FROM #FB fb
 WHERE EXISTS (	SELECT 1
 				FROM Sandbox.bastienc.VM_landsend_top50pct sb
-				WHERE fb.CINID = sb.CINID)
+				WHERE fb.CINID = #FB.[sb].CINID)
 
 
 END;

@@ -12,17 +12,17 @@ BEGIN
 	DECLARE @RunID INT
 	SELECT @RunID = NEXT VALUE FOR WHB.LoginInfo_Log_RunID
 
-	INSERT INTO WHB.LoginInfo_Log (Msg, isError, CreatedDateTime, RunID)
+	INSERT INTO WHB.LoginInfo_Log ([WHB].[LoginInfo_Log].[Msg], [WHB].[LoginInfo_Log].[isError], [WHB].[LoginInfo_Log].[CreatedDateTime], [WHB].[LoginInfo_Log].[RunID])
 	SELECT 
 		o.line
-		, x.isError
+		, #output.[x].isError
 		, GETDATE()
 		, @RunID
 	FROM #output o
 	CROSS APPLY (
 		SELECT CAST(COALESCE(MAX(1), 0) AS BIT)
 		FROM #output
-		WHERE line like '%Traceback%'
+		WHERE #output.[line] like '%Traceback%'
 	) x(isError)
 END
 

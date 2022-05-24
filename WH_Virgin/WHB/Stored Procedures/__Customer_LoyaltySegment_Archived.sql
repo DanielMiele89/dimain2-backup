@@ -81,7 +81,7 @@ BEGIN TRY
 
 		--Update old segments----------------------------------------
 		UPDATE cs
-		SET EndDate = dateadd(day,-1,c.StartDate)
+		SET [cs].[EndDate] = dateadd(day,-1,c.StartDate)
 		FROM Derived.Customer_LoyaltySegment cs
 		INNER JOIN #CS as c
 			ON cs.fanid = c.fanid 
@@ -118,7 +118,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

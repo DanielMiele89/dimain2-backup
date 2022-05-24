@@ -15,17 +15,17 @@ AND		Region IN ('London','South East')
 CREATE CLUSTERED INDEX ix_CINID on #FB_VM(CINID)
 
 IF OBJECT_ID('Sandbox.RukanK.VM_AmbassadorTG_17032022') IS NOT NULL DROP TABLE Sandbox.RukanK.VM_AmbassadorTG_17032022			-- 69,834
-SELECT	CINID
+SELECT	#FB_VM.[CINID]
 INTO	Sandbox.RukanK.VM_AmbassadorTG_17032022
 FROM	#FB_VM
-GROUP BY CINID
+GROUP BY #FB_VM.[CINID]
 
 	IF OBJECT_ID('[WH_Virgin].[Selections].[AT043_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[AT043_PreSelection]
-	SELECT FanID
+	SELECT [fb].[FanID]
 	INTO [WH_Virgin].[Selections].[AT043_PreSelection]
 	FROM #FB_VM fb
 	WHERE EXISTS (	SELECT 1
 					FROM Sandbox.RukanK.VM_AmbassadorTG_17032022  st
-					WHERE fb.CINID = st.CINID)
+					WHERE fb.CINID = #FB_VM.[st].CINID)
 
 END

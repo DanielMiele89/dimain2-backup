@@ -23,10 +23,10 @@ BEGIN
 
 	IF @LSID IS NULL
 		BEGIN
-			SELECT @LSID = MIN(LionSendID)
+			SELECT @LSID = MIN([nr].[LionSendID])
 			FROM [Email].[NewsletterReporting] nr
-			WHERE ReportSent = 0
-			AND ReportName = 'SSRS_V0002_FullSample_OfferSlotData'
+			WHERE [nr].[ReportSent] = 0
+			AND [nr].[ReportName] = 'SSRS_V0002_FullSample_OfferSlotData'
 		END
 		
 /*******************************************************************************************************************************************
@@ -34,46 +34,46 @@ BEGIN
 *******************************************************************************************************************************************/
 
 		IF OBJECT_ID('tempdb..#SmartEmailDailyData') IS NOT NULL DROP TABLE #SmartEmailDailyData
-		SELECT	LastName + ' - ' + Email AS Email
+		SELECT	[sedd].[LastName] + ' - ' + [sedd].[Email] AS Email
 			,	sedd.FanID
-			,	LionSendID
-			,	EarnOfferID_Hero
-			,	EarnOfferID_1
-			,	EarnOfferID_2
-			,	EarnOfferID_3
-			,	EarnOfferID_4
-			,	EarnOfferID_5
-			,	EarnOfferID_6
-			,	EarnOfferID_7
-			,	EarnOfferID_8
-			,	EarnOfferStartDate_Hero
-			,	EarnOfferStartDate_1
-			,	EarnOfferStartDate_2
-			,	EarnOfferStartDate_3
-			,	EarnOfferStartDate_4
-			,	EarnOfferStartDate_5
-			,	EarnOfferStartDate_6
-			,	EarnOfferStartDate_7
-			,	EarnOfferStartDate_8
-			,	EarnOfferEndDate_Hero
-			,	EarnOfferEndDate_1
-			,	EarnOfferEndDate_2
-			,	EarnOfferEndDate_3
-			,	EarnOfferEndDate_4
-			,	EarnOfferEndDate_5
-			,	EarnOfferEndDate_6
-			,	EarnOfferEndDate_7
-			,	EarnOfferEndDate_8
-			,	BurnOfferID_Hero
-			,	BurnOfferID_1
-			,	BurnOfferID_2
-			,	BurnOfferID_3
-			,	BurnOfferID_4
-			,	BurnOfferEndDate_Hero
-			,	BurnOfferEndDate_1
-			,	BurnOfferEndDate_2
-			,	BurnOfferEndDate_3
-			,	BurnOfferEndDate_4
+			,	[sedd].[LionSendID]
+			,	[sedd].[EarnOfferID_Hero]
+			,	[sedd].[EarnOfferID_1]
+			,	[sedd].[EarnOfferID_2]
+			,	[sedd].[EarnOfferID_3]
+			,	[sedd].[EarnOfferID_4]
+			,	[sedd].[EarnOfferID_5]
+			,	[sedd].[EarnOfferID_6]
+			,	[sedd].[EarnOfferID_7]
+			,	[sedd].[EarnOfferID_8]
+			,	[sedd].[EarnOfferStartDate_Hero]
+			,	[sedd].[EarnOfferStartDate_1]
+			,	[sedd].[EarnOfferStartDate_2]
+			,	[sedd].[EarnOfferStartDate_3]
+			,	[sedd].[EarnOfferStartDate_4]
+			,	[sedd].[EarnOfferStartDate_5]
+			,	[sedd].[EarnOfferStartDate_6]
+			,	[sedd].[EarnOfferStartDate_7]
+			,	[sedd].[EarnOfferStartDate_8]
+			,	[sedd].[EarnOfferEndDate_Hero]
+			,	[sedd].[EarnOfferEndDate_1]
+			,	[sedd].[EarnOfferEndDate_2]
+			,	[sedd].[EarnOfferEndDate_3]
+			,	[sedd].[EarnOfferEndDate_4]
+			,	[sedd].[EarnOfferEndDate_5]
+			,	[sedd].[EarnOfferEndDate_6]
+			,	[sedd].[EarnOfferEndDate_7]
+			,	[sedd].[EarnOfferEndDate_8]
+			,	[sedd].[BurnOfferID_Hero]
+			,	[sedd].[BurnOfferID_1]
+			,	[sedd].[BurnOfferID_2]
+			,	[sedd].[BurnOfferID_3]
+			,	[sedd].[BurnOfferID_4]
+			,	[sedd].[BurnOfferEndDate_Hero]
+			,	[sedd].[BurnOfferEndDate_1]
+			,	[sedd].[BurnOfferEndDate_2]
+			,	[sedd].[BurnOfferEndDate_3]
+			,	[sedd].[BurnOfferEndDate_4]
 		INTO #SmartEmailDailyData 
 		From [Email].[vw_EmailDailyData] sedd
 		INNER JOIN [Email].[SampleCustomersList] scli
@@ -169,24 +169,24 @@ BEGIN
 			,	Email
 			,	OfferType
 			,	ItemID
-			,	OfferName
-			,	OfferStartDate
-			,	OfferEndDate
-			,	Slot
-			,	CONVERT(VARCHAR(30), OfferAge) AS OfferAge
-			,	DENSE_RANK() OVER (PARTITION BY OfferType, ItemID ORDER BY NewOfferCount DESC, FanID, Slot) AS OfferRank
-			,	DENSE_RANK() OVER (PARTITION BY OfferType, ItemID ORDER BY NewOfferCount DESC, FanID, Slot) AS OfferRankPerSegment
+			,	[all].[OfferName]
+			,	#Offers.[OfferStartDate]
+			,	#Offers.[OfferEndDate]
+			,	[all].[Slot]
+			,	CONVERT(VARCHAR(30), [all].[OfferAge]) AS OfferAge
+			,	DENSE_RANK() OVER (PARTITION BY OfferType, ItemID ORDER BY [all].[NewOfferCount] DESC, FanID, [all].[Slot]) AS OfferRank
+			,	DENSE_RANK() OVER (PARTITION BY OfferType, ItemID ORDER BY [all].[NewOfferCount] DESC, FanID, [all].[Slot]) AS OfferRankPerSegment
 		INTO #SSRS_V0002_FullSample_OfferSlotData_v2
 		FROM (	SELECT	o.FanID
 					,	o.Email
 					,	o.OfferType
 					,	o.ItemID
 					,	COALESCE(iof.IronOfferName, 'Redmeption') as OfferName
-					,	OfferStartDate
-					,	OfferEndDate
+					,	[o].[OfferStartDate]
+					,	[o].[OfferEndDate]
 					,	CASE
-							WHEN OfferType = 'Earn' THEN Slot
-							WHEN OfferType = 'Burn' THEN Slot
+							WHEN [o].[OfferType] = 'Earn' THEN [o].[Slot]
+							WHEN [o].[OfferType] = 'Burn' THEN [o].[Slot]
 						END AS Slot
 					,	CASE
 							WHEN iof.StartDate > @Today THEN 'New'
@@ -194,7 +194,7 @@ BEGIN
 						END AS OfferAge
 					,	COUNT(	CASE
 									WHEN iof.StartDate > @Today THEN 1
-								END) OVER (PARTITION BY FanID) AS NewOfferCount
+								END) OVER (PARTITION BY [o].[FanID]) AS NewOfferCount
 				From #Offers o
 				LEFT JOIN [Derived].[IronOffer] iof
 					ON o.ItemID = iof.IronOfferID
@@ -206,16 +206,16 @@ BEGIN
 
 	IF OBJECT_ID('tempdb..#OffersRan') IS NOT NULL DROP TABLE #OffersRan
 	SELECT	DISTINCT
-			ItemID
-		,	TypeID
+			[ls].[ItemID]
+		,	[ls].[TypeID]
 	INTO #OffersRan
 	FROM [Email].[Newsletter_Offers] ls
 	WHERE ls.EmailSendDate < GETDATE()
 
 	IF OBJECT_ID('tempdb..#OffersNotCheckedPreviously') IS NOT NULL DROP TABLE #OffersNotCheckedPreviously
 	SELECT	DISTINCT
-			ItemID
-		,	OfferType
+			[osd].[ItemID]
+		,	[osd].[OfferType]
 		,	StartDate
 	INTO #OffersNotCheckedPreviously
 	FROM #SSRS_V0002_FullSample_OfferSlotData_v2 osd
@@ -223,15 +223,15 @@ BEGIN
 		ON osd.ItemID = iof.IronOfferID
 	WHERE NOT EXISTS (	SELECT 1
 						FROM #OffersRan ls
-						WHERE osd.ItemID = ls.ItemID
-						AND osd.OfferType =	CASE
+						WHERE #OffersRan.[osd].ItemID = ls.ItemID
+						AND #OffersRan.[osd].OfferType =	CASE
 												WHEN ls.TypeID = 1 THEN 'Earn'
 												ELSE 'Burn'
 											END)
 
 
 	UPDATE osd
-	SET OfferAge = 'Existing - Not Checked'
+	SET [osd].[OfferAge] = 'Existing - Not Checked'
 	FROM #SSRS_V0002_FullSample_OfferSlotData_v2 osd
 	INNER JOIN #OffersNotCheckedPreviously onc
 		ON osd.ItemID = onc.ItemID
@@ -242,63 +242,63 @@ BEGIN
 	5. Output for report
 *******************************************************************************************************************************************/
 
-	SELECT	Email
-		,	ClubSegment
-		,	OfferType
-		,	ItemID
-		,	OfferName
-		,	OfferStartDate
-		,	OfferEndDate
-		,	Slot
-		,	OfferSlot
-		,	OfferAge
-		,	OfferRank
-		,	OfferRankPerSegment
-		,	OfferColour
-		,	ROW_NUMBER() OVER (ORDER BY OfferRank_Sum DESC, OfferRankPerSegment_Sum DESC, FanID, OfferType DESC, Slot) AS ReportOrder
-	FROM (	Select	FanID
-				,	Email
+	SELECT	[a].[Email]
+		,	[a].[ClubSegment]
+		,	[a].[OfferType]
+		,	[a].[ItemID]
+		,	[a].[OfferName]
+		,	[a].[OfferStartDate]
+		,	[a].[OfferEndDate]
+		,	[a].[Slot]
+		,	[a].[OfferSlot]
+		,	[a].[OfferAge]
+		,	[a].[OfferRank]
+		,	[a].[OfferRankPerSegment]
+		,	[a].[OfferColour]
+		,	ROW_NUMBER() OVER (ORDER BY [a].[OfferRank_Sum] DESC, [a].[OfferRankPerSegment_Sum] DESC, [a].[FanID], [a].[OfferType] DESC, [a].[Slot]) AS ReportOrder
+	FROM (	Select	#SSRS_V0002_FullSample_OfferSlotData_v2.[FanID]
+				,	#SSRS_V0002_FullSample_OfferSlotData_v2.[Email]
 				,	'All Customers' AS ClubSegment
-				,	OfferType
-				,	ItemID
-				,	OfferName
-				,	OfferStartDate
-				,	OfferEndDate
-				,	Slot
+				,	#SSRS_V0002_FullSample_OfferSlotData_v2.[OfferType]
+				,	#SSRS_V0002_FullSample_OfferSlotData_v2.[ItemID]
+				,	#SSRS_V0002_FullSample_OfferSlotData_v2.[OfferName]
+				,	#SSRS_V0002_FullSample_OfferSlotData_v2.[OfferStartDate]
+				,	#SSRS_V0002_FullSample_OfferSlotData_v2.[OfferEndDate]
+				,	#SSRS_V0002_FullSample_OfferSlotData_v2.[Slot]
 				,	CASE
-						WHEN Slot = 1 THEN 'Hero'
-						ELSE CONVERT(VARCHAR(1), Slot - 1)
+						WHEN #SSRS_V0002_FullSample_OfferSlotData_v2.[Slot] = 1 THEN 'Hero'
+						ELSE CONVERT(VARCHAR(1), #SSRS_V0002_FullSample_OfferSlotData_v2.[Slot] - 1)
 					End AS OfferSlot
 				,	CASE
-						WHEN OfferAge = 'Existing' THEN 'Existing'
+						WHEN #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferAge] = 'Existing' THEN 'Existing'
 						ELSE 'New'
 					END AS OfferAge
-				,	OfferRank
-				,	OfferRankPerSegment
+				,	#SSRS_V0002_FullSample_OfferSlotData_v2.[OfferRank]
+				,	#SSRS_V0002_FullSample_OfferSlotData_v2.[OfferRankPerSegment]
 				,	CASE
-						WHEN OfferAge = 'New' AND OfferRank = 1 THEN '#fffe00'
-						WHEN OfferAge = 'New' AND OfferRankPerSegment = 1 THEN '#ffa500'
-						WHEN OfferAge = 'Existing - Not Checked' AND OfferRank = 1 THEN '#00ff00'
-						WHEN OfferAge = 'Existing - Not Checked' AND OfferRankPerSegment = 1 THEN '#00ffc0'
+						WHEN #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferAge] = 'New' AND #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferRank] = 1 THEN '#fffe00'
+						WHEN #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferAge] = 'New' AND #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferRankPerSegment] = 1 THEN '#ffa500'
+						WHEN #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferAge] = 'Existing - Not Checked' AND #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferRank] = 1 THEN '#00ff00'
+						WHEN #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferAge] = 'Existing - Not Checked' AND #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferRankPerSegment] = 1 THEN '#00ffc0'
 					END AS OfferColour
-				,	ROW_NUMBER() OVER (ORDER BY FanID, OfferType DESC, Slot) as ReportOrder
+				,	ROW_NUMBER() OVER (ORDER BY #SSRS_V0002_FullSample_OfferSlotData_v2.[FanID], #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferType] DESC, #SSRS_V0002_FullSample_OfferSlotData_v2.[Slot]) as ReportOrder
 				,	SUM(CASE
-							WHEN OfferAge = 'New' AND OfferRank = 1 THEN 1
-						END) OVER (PARTITION BY Email) AS OfferRank_Sum
+							WHEN #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferAge] = 'New' AND #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferRank] = 1 THEN 1
+						END) OVER (PARTITION BY #SSRS_V0002_FullSample_OfferSlotData_v2.[Email]) AS OfferRank_Sum
 				,	SUM(CASE
-							WHEN OfferAge = 'New' AND OfferRankPerSegment = 1 THEN 1
-						END) OVER (PARTITION BY Email) as OfferRankPerSegment_Sum
+							WHEN #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferAge] = 'New' AND #SSRS_V0002_FullSample_OfferSlotData_v2.[OfferRankPerSegment] = 1 THEN 1
+						END) OVER (PARTITION BY #SSRS_V0002_FullSample_OfferSlotData_v2.[Email]) as OfferRankPerSegment_Sum
 			FROM #SSRS_V0002_FullSample_OfferSlotData_v2) a
-	WHERE OfferType = 'Earn'
-	ORDER BY	ROW_NUMBER() OVER (ORDER BY OfferRank_Sum DESC, OfferRankPerSegment_Sum DESC, FanID, OfferType DESC, Slot)
-			,	OfferType DESC
-			,	Slot
+	WHERE [a].[OfferType] = 'Earn'
+	ORDER BY	ROW_NUMBER() OVER (ORDER BY [a].[OfferRank_Sum] DESC, [a].[OfferRankPerSegment_Sum] DESC, [a].[FanID], [a].[OfferType] DESC, [a].[Slot])
+			,	[a].[OfferType] DESC
+			,	[a].[Slot]
 
 	UPDATE [Email].[NewsletterReporting]
-	SET ReportSent = 1
-	WHERE ReportSent = 0
-	AND ReportName = 'SSRS_V0002_FullSample_OfferSlotData'
-	AND LionSendID = @LSID
+	SET [Email].[NewsletterReporting].[ReportSent] = 1
+	WHERE [Email].[NewsletterReporting].[ReportSent] = 0
+	AND [Email].[NewsletterReporting].[ReportName] = 'SSRS_V0002_FullSample_OfferSlotData'
+	AND [Email].[NewsletterReporting].[LionSendID] = @LSID
 			   
 END
 

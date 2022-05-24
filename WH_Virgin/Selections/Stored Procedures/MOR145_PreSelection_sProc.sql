@@ -17,10 +17,10 @@ CREATE CLUSTERED INDEX ix_CINID on #FB_VM(CINID)
 
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-SELECT  ConsumerCombinationID	,BrandID
+SELECT  [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]	,[WH_Virgin].[trans].[ConsumerCombination].[BrandID]
 INTO	#CC_vm
 FROM	WH_Virgin.trans.ConsumerCombination  CC
-WHERE	BrandID IN     (292,21,379,425,2541,5,254,485)		-- Morrisons 292, Asda 21, Sainsburys 379, Tesco 425, Amazon Fresh 2541, Aldi 5, Lidl 254, Waitrose 485
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN     (292,21,379,425,2541,5,254,485)		-- Morrisons 292, Asda 21, Sainsburys 379, Tesco 425, Amazon Fresh 2541, Aldi 5, Lidl 254, Waitrose 485
 
 
 IF OBJECT_ID('tempdb..#Trans') IS NOT NULL DROP TABLE #Trans
@@ -30,7 +30,7 @@ SELECT	F.CINID
 		,COUNT(1) as Transactions
 INTO	#Trans_vm
 FROM	#FB_VM F
-JOIN	WH_Virgin.trans.consumertransaction CT ON F.CINID = CT.CINID
+JOIN	WH_Virgin.trans.consumertransaction CT ON F.CINID = #FB_VM.[CT].CINID
 JOIN	#CC_vm C ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 WHERE	TranDate >= DATEADD(MONTH,-6,GETDATE())
 		AND Amount > 0
@@ -39,16 +39,16 @@ CREATE CLUSTERED INDEX ix_CINID on #Trans_vm(CINID)
 
 
 IF OBJECT_ID('Sandbox.rukank.VM_Morrisons_LoW_SoW_01042022') IS NOT NULL DROP TABLE Sandbox.rukank.VM_Morrisons_LoW_SoW_01042022		-- 9,946
-SELECT	CINID
+SELECT	#Trans_vm.[CINID]
 INTO	Sandbox.rukank.VM_Morrisons_LoW_SoW_01042022
 FROM	#Trans_vm
-WHERE	BrandShopper = 1
-		AND SoW < 0.30
-		AND Transactions >= 15
+WHERE	#Trans_vm.[BrandShopper] = 1
+		AND #Trans_vm.[SoW] < 0.30
+		AND #Trans_vm.[Transactions] >= 15
 
 
 	IF OBJECT_ID('[WH_Virgin].[Selections].[MOR145_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[MOR145_PreSelection]
-	SELECT FanID
+	SELECT [fb].[FanID]
 	INTO [WH_Virgin].[Selections].[MOR145_PreSelection]
 	FROM #FB_VM fb
 	WHERE EXISTS (	SELECT 1
@@ -59,11 +59,11 @@ WHERE	BrandShopper = 1
 					AND sg.ShopperSegmentTypeID IN (7, 8))
 					
 	INSERT INTO [WH_Virgin].[Selections].[MOR145_PreSelection]
-	SELECT FanID
+	SELECT [fb].[FanID]
 	FROM #FB_VM fb
 	WHERE EXISTS (	SELECT 1
 					FROM Sandbox.rukank.VM_Morrisons_LoW_SoW_01042022  st
-					WHERE fb.CINID = st.CINID)
+					WHERE fb.CINID = #FB_VM.[st].CINID)
 	AND EXISTS (	SELECT 1
 					FROM Segmentation.Roc_Shopper_Segment_Members sg
 					WHERE fb.FanID = sg.FanID

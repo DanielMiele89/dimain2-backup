@@ -24,20 +24,20 @@ BEGIN TRY
 
 		IF OBJECT_ID ('tempdb..#InitialBrandIDs') IS NOT NULL DROP TABLE #InitialBrandIDs;
 		;WITH FilteredSet AS (
-			SELECT PartnerID, PrimaryPartnerID, GroupNo = DENSE_RANK() OVER(ORDER BY PrimaryPartnerID) 
+			SELECT [Warehouse].[Iron].[PrimaryRetailerIdentification].[PartnerID], [Warehouse].[Iron].[PrimaryRetailerIdentification].[PrimaryPartnerID], GroupNo = DENSE_RANK() OVER(ORDER BY [Warehouse].[Iron].[PrimaryRetailerIdentification].[PrimaryPartnerID]) 
 			FROM Warehouse.Iron.PrimaryRetailerIdentification 
-			WHERE PrimaryPartnerID is not null
+			WHERE [Warehouse].[Iron].[PrimaryRetailerIdentification].[PrimaryPartnerID] is not null
 		),
 		MultiplePartners AS (
-			SELECT PartnerID, PrimaryPartnerID, GroupNo
+			SELECT [Warehouse].[Iron].[PrimaryRetailerIdentification].[PartnerID], [Warehouse].[Iron].[PrimaryRetailerIdentification].[PrimaryPartnerID], [FilteredSet].[GroupNo]
 			FROM FilteredSet 
 			UNION ALL
-			SELECT PartnerID = PrimaryPartnerID, PrimaryPartnerID, GroupNo
+			SELECT PartnerID = [Warehouse].[Iron].[PrimaryRetailerIdentification].[PrimaryPartnerID], [Warehouse].[Iron].[PrimaryRetailerIdentification].[PrimaryPartnerID], [FilteredSet].[GroupNo]
 			FROM FilteredSet
-			GROUP BY PrimaryPartnerID, GroupNo
+			GROUP BY [Warehouse].[Iron].[PrimaryRetailerIdentification].[PrimaryPartnerID], [FilteredSet].[GroupNo]
 		)
 		SELECT	mp.*,
-			BrandID 
+			[Warehouse].[MI].[PartnerBrand].[BrandID] 
 		INTO #InitialBrandIDs
 		FROM MultiplePartners mp
 		LEFT JOIN Warehouse.MI.PartnerBrand pb
@@ -57,7 +57,7 @@ BEGIN TRY
 
 		--Delete Rows that could not be matched
 		DELETE FROM #InitialBrandIDs
-		WHERE BrandID is null
+		WHERE #InitialBrandIDs.[BrandID] is null
 
 
 		--Create Table with contents of MI table and this new data combined
@@ -66,7 +66,7 @@ BEGIN TRY
 		SELECT * 
 		FROM Warehouse.MI.PartnerBrand as pb
 		UNION
-		SELECT	PartnerID, BrandID
+		SELECT	#InitialBrandIDs.[PartnerID], #InitialBrandIDs.[BrandID]
 		FROM	#InitialBrandIDs
 		
 	EXEC [Monitor].[ProcessLog_Insert] 'PartnersOffers_PartnerVsBrandsLookup', 'Finished'
@@ -90,7 +90,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO Staging.ErrorLog (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO Staging.ErrorLog ([Staging].[ErrorLog].[ErrorDate], [Staging].[ErrorLog].[ProcedureName], [Staging].[ErrorLog].[ErrorLine], [Staging].[ErrorLog].[ErrorMessage], [Staging].[ErrorLog].[ErrorNumber], [Staging].[ErrorLog].[ErrorSeverity], [Staging].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

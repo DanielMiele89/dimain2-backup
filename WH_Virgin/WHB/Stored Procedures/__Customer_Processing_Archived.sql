@@ -123,7 +123,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_Registrations', 'Starting'
 --Field set to 0 initially this overwrites with correct value
 
 UPDATE c
-	SET Registered = 1
+	SET [Derived].[customer].[Registered] = 1
 FROM Derived.customer as c
 INNER JOIN SLC_Report..FanCredentials as r
 	ON c.fanid = r.FanID
@@ -156,10 +156,10 @@ Where sfu.enddate is null
 -----------------------------------------update customer records------------------------------------
 ----------------------------------------------------------------------------------------------------*/
 UPDATE c SET 
-	MarketableByEmail = CASE WHEN c.MarketableByEmail = 1 THEN 0 ELSE c.MarketableByEmail END,
-	Unsubscribed = CASE WHEN c.Unsubscribed = 0 THEN 1 ELSE c.Unsubscribed END
+	[c].[MarketableByEmail] = CASE WHEN c.MarketableByEmail = 1 THEN 0 ELSE c.MarketableByEmail END,
+	[c].[Unsubscribed] = CASE WHEN c.Unsubscribed = 0 THEN 1 ELSE c.Unsubscribed END
 FROM Derived.customer c
-WHERE EXISTS (SELECT 1 FROM #Deactivations sfu WHERE sfu.fanid = c.fanid)
+WHERE EXISTS (SELECT 1 FROM #Deactivations sfu WHERE sfu.fanid = #Deactivations.[c].fanid)
 	AND (c.MarketableByEmail = 1 OR c.Unsubscribed = 0)
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_SmartFocusUnsubscribes_V1_3', 'Finished'
@@ -175,7 +175,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_SmartFocusUnsubscribes_Part2', '
 --Find customers Marked as ContactByPost using modern website-----------------------
 --Mark customers as not MarketableByEmail------------------------------
 UPDATE c
-	SET MarketableByEmail = 0
+	SET [c].[MarketableByEmail] = 0
 FROM Derived.Customer c
 INNER JOIN SLC_Report..Fan f
 	ON c.FanID = f.ID
@@ -205,15 +205,15 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_HardbounceEmailChangePart2', 'St
 
 -- Take Static list who changed emails in early 2015 and check they are valid ------------
 if object_id('tempdb..#ChangedEmailAddress') is not null drop table #ChangedEmailAddress
-select Distinct c.FaniD, DateChanged as EmailchangeDate
+select Distinct c.FaniD, [eac].[DateChanged] as EmailchangeDate
 Into #ChangedEmailAddress
 from Derived.Customer_EmailAddressChanges as eac
 inner join Derived.customer as c
 	on eac.FanID = c.FanID
-Where	hardbounced = 1 and 
+Where	[c].[Hardbounced] = 1 and 
 		eac.email = c.email and
-		CurrentlyActive = 1 and
-		EmailStructureValid = 1 and
+		[c].[CurrentlyActive] = 1 and
+		[c].[EmailStructureValid] = 1 and
 		c.Unsubscribed = 0
 
 -- Check if they have bounced since email address was changed ----------------
@@ -228,25 +228,25 @@ Where	EmailEventCodeID = 702 and
 
 -- Update Hardbounced Flag -----------------------------------
 Update Derived.Customer
-Set Hardbounced = 0
-Where fanid in (
+Set [Derived].[Customer].[Hardbounced] = 0
+Where [Derived].[Customer].[fanid] in (
 	Select cea.FanID 
 	from #ChangedEmailAddress as cea
-	WHERE NOT EXISTS (SELECT 1 FROM #BouncedSince as bs WHERE cea.fanid = bs.FanID)
+	WHERE NOT EXISTS (SELECT 1 FROM #BouncedSince as bs WHERE #BouncedSince.[cea].fanid = bs.FanID)
 )
 
 -- Update MarketableByEmail Flag -------------------------------
 UPDATE Relational.Customer
-SET MarketableByEmail = 1
-WHERE (LaunchGroup is not null or ActivatedDate >= 'Aug 08, 2013')	
-	and CurrentlyActive = 1 
-	and Unsubscribed = 0 
-	and Hardbounced = 0 
-	and EmailStructureValid = 1 
-	and ActivatedOffline = 0 
-	and Len(Postcode) >= 3 
-	and SourceUID not in (SELECT SourceUID FROM Staging.Customer_DuplicateSourceUID) 
-	and Marketablebyemail = 0
+SET [Relational].[Customer].[MarketableByEmail] = 1
+WHERE ([Relational].[Customer].[LaunchGroup] is not null or [Relational].[Customer].[ActivatedDate] >= 'Aug 08, 2013')	
+	and [Relational].[Customer].[CurrentlyActive] = 1 
+	and [Relational].[Customer].[Unsubscribed] = 0 
+	and [Relational].[Customer].[Hardbounced] = 0 
+	and [Relational].[Customer].[EmailStructureValid] = 1 
+	and [Relational].[Customer].[ActivatedOffline] = 0 
+	and Len([Relational].[Customer].[Postcode]) >= 3 
+	and [Relational].[Customer].[SourceUID] not in (SELECT SourceUID FROM Staging.Customer_DuplicateSourceUID) 
+	and [Relational].[Customer].[Marketablebyemail] = 0
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_HardbounceEmailChangePart2', 'Finished'
 
@@ -259,19 +259,19 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_HardbounceEmailChangePart2', 'Fi
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_InvalidEmail', 'Starting'
 
 UPDATE c
-	SET MarketableByEmail = 0
+	SET [c].[MarketableByEmail] = 0
 FROM Derived.Customer c
-WHERE MarketableByEmail = 1
-	and EmailStructureValid = 1
+WHERE [c].[MarketableByEmail] = 1
+	and [c].[EmailStructureValid] = 1
 	and (       
-		email like '%com[a-z]' or 
-		email like '%com[a-z][a-z]' or
-		email like '%co[a-z][a-z]' or
-		email like '%hotmali%'
+		[Derived].[Customer].[email] like '%com[a-z]' or 
+		[Derived].[Customer].[email] like '%com[a-z][a-z]' or
+		[Derived].[Customer].[email] like '%co[a-z][a-z]' or
+		[Derived].[Customer].[email] like '%hotmali%'
 		) 
-	and email not like '%comp' 
-	and email not like '%coop' 
-	and email not like '%come' 
+	and [Derived].[Customer].[email] not like '%comp' 
+	and [Derived].[Customer].[email] not like '%coop' 
+	and [Derived].[Customer].[email] not like '%come' 
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_InvalidEmail', 'Finished'
 
@@ -287,7 +287,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_Marketable_ButDeceased', 'Starti
 ------Find a list of customers who are currently active but deemed Deceased-------
 -----------------------------------------------------------------------------------
 UPDATE  c
-	SET MarketableByEmail = 0
+	SET [c].[MarketableByEmail] = 0
 FROM Derived.Customer as c
 INNER JOIN SLC_Report.dbo.Fan as f
 	ON f.ID = c.FanID
@@ -333,7 +333,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_Deactivations_V1_2', 'Finished'
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_WebLogins_V1_1', 'Starting'
 
 DELETE FROM Derived.WebLogins  
-WHERE trackdate > DATEADD(DAY,-2,CAST(GETDATE() AS DATE))
+WHERE [Derived].[WebLogins].[trackdate] > DATEADD(DAY,-2,CAST(GETDATE() AS DATE))
 --(166 row(s) affected)
 
 
@@ -373,10 +373,10 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_DuplicateSourceUID_V1_2', 'Start
 ----------------------------------Find duplicate SourceUIDs-----------------------------------------
 ----------------------------------------------------------------------------------------------------*/
 if object_id('tempdb..#DuplicateSourceUID') is not null drop table #DuplicateSourceUID
-SELECT SourceUID 
+SELECT [Derived].[Customer].[SourceUID] 
 INTO #DuplicateSourceUID
 FROM Derived.Customer 
-GROUP BY SourceUID
+GROUP BY [Derived].[Customer].[SourceUID]
 HAVING COUNT(*) > 1
 
 /*--------------------------------------------------------------------------------------------------
@@ -389,17 +389,17 @@ SELECT	d.SourceUID,
 FROM #DuplicateSourceUID as d
 WHERE NOT EXISTS (
 	SELECT 1 FROM Staging.Customer_DuplicateSourceUID c
-	WHERE d.SourceUID = c.SourceUID
-		AND c.enddate is null)
+	WHERE d.SourceUID = #DuplicateSourceUID.[c].SourceUID
+		AND #DuplicateSourceUID.[c].enddate is null)
 
 /*--------------------------------------------------------------------------------------------------
 ------------------------------Add EndDates when a sourceUID is resolved-----------------------------
 ----------------------------------------------------------------------------------------------------*/
-UPDATE c SET EndDate = dateadd(day,-1,Cast(getdate() as date))
+UPDATE c SET [Staging].[Customer_DuplicateSourceUID].[EndDate] = dateadd(day,-1,Cast(getdate() as date))
 FROM Staging.Customer_DuplicateSourceUID as c
 WHERE NOT EXISTS (
 	SELECT 1 FROM #DuplicateSourceUID d
-	WHERE c.SourceUID = d.SourceUID)
+	WHERE #DuplicateSourceUID.[c].SourceUID = d.SourceUID)
 AND c.EndDate is null
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_DuplicateSourceUID_V1_2', 'Finished'
@@ -414,16 +414,16 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_Cashback_Balances_V1_2', 'Starti
 
 IF NOT EXISTS (SELECT 1 FROM Derived.Customer_CashbackBalances ccb WHERE ccb.[Date] = CAST(GETDATE() AS DATE))
 INSERT INTO Derived.Customer_CashbackBalances WITH (TABLOCKX) 
-	(FanID, ClubCashPending, ClubCashAvailable, [Date])
+	([Derived].[Customer_CashbackBalances].[FanID], [Derived].[Customer_CashbackBalances].[ClubCashPending], [Derived].[Customer_CashbackBalances].[ClubCashAvailable], [Derived].[Customer_CashbackBalances].[Date])
 SELECT	
 	f.ID as FanID,
-	ClubCashPending,
-	ClubCashAvailable,
+	[SLC_Report].[dbo].[Fan].[ClubCashPending],
+	[SLC_Report].[dbo].[Fan].[ClubCashAvailable],
 	[Date] = CAST(GETDATE() AS DATE)
 FROM SLC_Report.dbo.Fan f
-WHERE AgreedTCs = 1 
-	AND [Status] = 1 
-	AND clubid in (132,138);
+WHERE [SLC_Report].[dbo].[Fan].[AgreedTCs] = 1 
+	AND [SLC_Report].[dbo].[Fan].[Status] = 1 
+	AND [SLC_Report].[dbo].[Fan].[clubid] in (132,138);
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_Cashback_Balances_V1_2', 'Finished'
 
@@ -446,7 +446,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_Unsubscribes_V1_2', 'Finished'
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_UnsubscribeCampaigns_V1_1', 'Starting'
 
 TRUNCATE TABLE Staging.Customer_LastEmailReceived
-INSERT INTO Staging.Customer_LastEmailReceived (FanID, SendDate, CampaignKey, RowNo)
+INSERT INTO Staging.Customer_LastEmailReceived ([Staging].[Customer_LastEmailReceived].[FanID], [Staging].[Customer_LastEmailReceived].[SendDate], [Staging].[Customer_LastEmailReceived].[CampaignKey], [Staging].[Customer_LastEmailReceived].[RowNo])
 SELECT * 
 FROM (
 	SELECT	c.FanID,
@@ -462,7 +462,7 @@ FROM (
 		on ee.CampaignKey = ec.CampaignKey
 	WHERE c.unsubscribed = 1
 ) a
-WHERE RowNo = 1
+WHERE [a].[RowNo] = 1
 
 TRUNCATE TABLE Relational.Customer_UnsubscribeDates
 INSERT INTO Derived.Customer_UnsubscribeDates
@@ -488,11 +488,11 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_PaymentMethodsAvailable_V1_1', '
 	----------------------------------------------------------------------------------------------------*/
 
 	if object_id('tempdb..#CardTypes') is not null drop table #CardTypes
-	Select FanID,
+	Select [a].[FanID],
 			Case
-				When IsCredit = 1 and IsDebit = 1 then 2 -- Both
-				When IsCredit = 1 then 1 -- Credit Only
-				When IsDebit =  1 then 0 -- Debit Only
+				When [a].[IsCredit] = 1 and [a].[IsDebit] = 1 then 2 -- Both
+				When [a].[IsCredit] = 1 then 1 -- Credit Only
+				When [a].[IsDebit] =  1 then 0 -- Debit Only
 				Else 3 -- No Active Cards
 			End as PaymentMethodsAvailableID
 	INTO #CardTypes
@@ -513,12 +513,12 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_PaymentMethodsAvailable_V1_1', '
 	-----------------------Close off any no longer valid entries-------------------------------
 	---------------------------------------------------------------------------------------
 	Update cpm
-		set EndDate = Dateadd(day,-1,CAST(getdate() as DATE))
+		set [Derived].[CustomerPaymentMethodsAvailable].[EndDate] = Dateadd(day,-1,CAST(getdate() as DATE))
 	from Derived.CustomerPaymentMethodsAvailable as cpm
 	inner join #CardTypes as ct
-		on cpm.FanID = ct.FanID
-	Where cpm.EndDate is null 
-		and cpm.PaymentMethodsAvailableID <> ct.PaymentMethodsAvailableID
+		on #CardTypes.[cpm].FanID = ct.FanID
+	Where #CardTypes.[cpm].EndDate is null 
+		and #CardTypes.[cpm].PaymentMethodsAvailableID <> ct.PaymentMethodsAvailableID
 
 	---------------------------------------------------------------------------------------
 	----------------------------------Add new entries--------------------------------------
@@ -530,10 +530,10 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_PaymentMethodsAvailable_V1_1', '
 			Null as EndDate
 	FROM #CardTypes as dc
 	LEFT JOIN Derived.CustomerPaymentMethodsAvailable as a
-		on	dc.FanID = a.FanID 
-		and dc.PaymentMethodsAvailableID = a.PaymentMethodsAvailableID 
-		and a.EndDate is null
-	WHERE a.FanID is null
+		on	dc.FanID = #CardTypes.[a].FanID 
+		and dc.PaymentMethodsAvailableID = #CardTypes.[a].PaymentMethodsAvailableID 
+		and #CardTypes.[a].EndDate is null
+	WHERE #CardTypes.[a].FanID is null
 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_PaymentMethodsAvailable_V1_1', 'Finished'
 
@@ -546,8 +546,8 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_PaymentMethodsAvailable_V1_1', '
 Declare @RowCount int
 
 UPDATE c
-	SET	CurrentlyActive = 0,
-		DeactivatedDate = (Case	
+	SET	[c].[CurrentlyActive] = 0,
+		[c].[DeactivatedDate] = (Case	
 							When d.DeceasedDate <= c.ActivatedDate then Dateadd(day,1,c.ActivatedDate)
 							Else d.DeceasedDate
 						End)
@@ -572,7 +572,7 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_Deactivate_Deceased_Customers', 
 EXEC Monitor.ProcessLog_Insert 'WHB', 'Customer_WGUpdate_V1_0', 'Starting'
 
 UPDATE c 
-	SET Rainbow_Customer = a.WG
+	SET [Derived].[Customer].[Rainbow_Customer] = a.WG
 FROM Derived.Customer as c
 INNER JOIN Staging.SLC_Report_DailyLoad_Phase2DataFields as a
 	ON c.FanID = a.FanID

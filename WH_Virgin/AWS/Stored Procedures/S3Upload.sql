@@ -23,17 +23,17 @@ BEGIN
 	DECLARE @RunID INT
 	SELECT @RunID = NEXT VALUE FOR AWS.S3Upload_RunID
 
-	INSERT INTO AWS.S3Upload_Log (Msg, isError, RunID)
+	INSERT INTO AWS.S3Upload_Log ([AWS].[S3Upload_Log].[Msg], [AWS].[S3Upload_Log].[isError], [AWS].[S3Upload_Log].[RunID])
 	SELECT 
 		o.line
-		, x.isError
+		, #output.[x].isError
 		, @RunID
 	FROM #output o
 	CROSS APPLY (
 		SELECT CAST(COALESCE(MAX(1), 0) AS BIT)
 		FROM #output
-		WHERE line like '%Traceback%'
-			or line like '%ERROR:%'
+		WHERE #output.[line] like '%Traceback%'
+			or #output.[line] like '%ERROR:%'
 	) x(isError)
 END
 

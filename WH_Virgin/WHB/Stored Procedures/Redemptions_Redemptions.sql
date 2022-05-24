@@ -25,8 +25,8 @@ BEGIN
 		SELECT *
 		INTO #FilesToProcess
 		FROM [WHB].[Inbound_Files]
-		WHERE TableName = 'Redemptions'
-		AND FileProcessed = 0
+		WHERE [WHB].[Inbound_Files].[TableName] = 'Redemptions'
+		AND [WHB].[Inbound_Files].[FileProcessed] = 0
 
 	/*******************************************************************************************************************************************
 			2.		Fetch latest redemptions
@@ -38,8 +38,8 @@ BEGIN
 		FROM [Inbound].[Redemptions] re
 		WHERE EXISTS (	SELECT 1
 						FROM #FilesToProcess ftp
-						WHERE re.FileName = ftp.FileName
-						AND re.LoadDate = ftp.LoadDate)
+						WHERE #FilesToProcess.[re].FileName = ftp.FileName
+						AND #FilesToProcess.[re].LoadDate = ftp.LoadDate)
 
 
 	/*******************************************************************************************************************************************
@@ -70,19 +70,19 @@ BEGIN
 	*******************************************************************************************************************************************/
 	
 		INSERT INTO [Derived].[Redemptions]
-		SELECT	FanID
+		SELECT	[ti].[FanID]
 			,	CASE
-					WHEN RedemptionType = 'B'
+					WHEN [ti].[RedemptionType] = 'B'
 						THEN 'Bank'
-					WHEN RedemptionType = 'C'
+					WHEN [ti].[RedemptionType] = 'C'
 						THEN 'Credit'
 				END AS RedemptionType
-			,	RedemptionAmount
-			,	RedemptionDate
-			,	Cancelled
-			,	FileID
-			,	FileName
-			,	LoadDate
+			,	[ti].[RedemptionAmount]
+			,	[ti].[RedemptionDate]
+			,	[ti].[Cancelled]
+			,	[ti].[FileID]
+			,	[ti].[FileName]
+			,	[ti].[LoadDate]
 		FROM #ToInsert ti
 		WHERE NOT EXISTS (	SELECT 1
 							FROM [Derived].[Redemptions] r
@@ -99,12 +99,12 @@ BEGIN
 	*******************************************************************************************************************************************/
 
 		UPDATE inf
-		SET FileProcessed = 1
+		SET [inf].[FileProcessed] = 1
 		FROM [WHB].[Inbound_Files] inf
 		WHERE EXISTS (	SELECT 1
 						FROM #FilesToProcess ftp
-						WHERE inf.ID = ftp.ID
-						AND inf.LoadDate = ftp.LoadDate)
+						WHERE #FilesToProcess.[inf].ID = ftp.ID
+						AND #FilesToProcess.[inf].LoadDate = ftp.LoadDate)
 
 
 		EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Finished'
@@ -127,7 +127,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

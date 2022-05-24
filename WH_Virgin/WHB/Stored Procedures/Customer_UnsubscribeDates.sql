@@ -33,13 +33,13 @@ BEGIN
 			1.	Fetch all customers who have Unsubscribed via links in their email
 		*******************************************************************************************************************************************/
 		
-			DECLARE @MaxUnsubscribeDate_Email DATE = (SELECT MAX(UnsubscribeDate) FROM [Derived].[Customer_UnsubscribeDates] WHERE UnsubscribeType = 'Email')
+			DECLARE @MaxUnsubscribeDate_Email DATE = (SELECT MAX([Derived].[Customer_UnsubscribeDates].[UnsubscribeDate]) FROM [Derived].[Customer_UnsubscribeDates] WHERE [Derived].[Customer_UnsubscribeDates].[UnsubscribeType] = 'Email')
 
 			IF OBJECT_ID('tempdb..#EmailUnsubscribed') IS NOT NULL DROP TABLE #EmailUnsubscribed
-			SELECT	FanID
-				,	EventDate AS UnsubscribeDate
+			SELECT	[ee].[FanID]
+				,	[ee].[EventDate] AS UnsubscribeDate
 				,	'Email' AS UnsubscribeType
-				,	CampaignKey
+				,	[ee].[CampaignKey]
 			INTO #EmailUnsubscribed
 			FROM [Derived].[EmailEvent] ee
 			WHERE ee.EmailEventCodeID = 301
@@ -55,14 +55,14 @@ BEGIN
 			2.	Insert all customers who have Unsubscribed via links in their email to [Derived].[Customer_UnsubscribeDates]
 		*******************************************************************************************************************************************/
 
-			INSERT INTO [Derived].[Customer_UnsubscribeDates] (FanID
-															 , UnsubscribeDate
-															 , UnsubscribeType
-															 , CampaignKey)
-			SELECT	FanID
-				,	UnsubscribeDate
-				,	UnsubscribeType
-				,	CampaignKey
+			INSERT INTO [Derived].[Customer_UnsubscribeDates] ([Derived].[Customer_UnsubscribeDates].[FanID]
+															 , [Derived].[Customer_UnsubscribeDates].[UnsubscribeDate]
+															 , [Derived].[Customer_UnsubscribeDates].[UnsubscribeType]
+															 , [Derived].[Customer_UnsubscribeDates].[CampaignKey])
+			SELECT	[eu].[FanID]
+				,	[eu].[UnsubscribeDate]
+				,	[eu].[UnsubscribeType]
+				,	[eu].[CampaignKey]
 			FROM #EmailUnsubscribed eu
 			WHERE NOT EXISTS (	SELECT 1
 								FROM [Derived].[Customer_UnsubscribeDates] ud
@@ -79,7 +79,7 @@ BEGIN
 			--DECLARE @RunDate DATE = GETDATE()
 
 			IF OBJECT_ID('tempdb..#AccountUnsubscribed') IS NOT NULL DROP TABLE #AccountUnsubscribed
-			SELECT	FanID
+			SELECT	[cu].[FanID]
 				,	@RunDate AS UnsubscribeDate
 				,	'Account' AS UnsubscribeType
 			INTO #AccountUnsubscribed
@@ -91,7 +91,7 @@ BEGIN
 							AND cu.Unsubscribed = c.Unsubscribed)
 			AND NOT EXISTS (SELECT 1
 							FROM #EmailUnsubscribed eu
-							WHERE cu.FanID = eu.FanID)
+							WHERE #EmailUnsubscribed.[cu].FanID = eu.FanID)
 
 			CREATE CLUSTERED INDEX CIX_FanIDDateCampaignKey ON #AccountUnsubscribed (FanID, UnsubscribeDate, UnsubscribeType)
 
@@ -100,12 +100,12 @@ BEGIN
 			4.	Insert all customers who have Unsubscribed via marketing preferences to [Derived].[Customer_UnsubscribeDates]
 		*******************************************************************************************************************************************/
 
-			INSERT INTO [Derived].[Customer_UnsubscribeDates] (	FanID
-															,	UnsubscribeDate
-															,	UnsubscribeType)
-			SELECT	FanID
-				,	UnsubscribeDate
-				,	UnsubscribeType
+			INSERT INTO [Derived].[Customer_UnsubscribeDates] (	[Derived].[Customer_UnsubscribeDates].[FanID]
+															,	[Derived].[Customer_UnsubscribeDates].[UnsubscribeDate]
+															,	[Derived].[Customer_UnsubscribeDates].[UnsubscribeType])
+			SELECT	[au].[FanID]
+				,	[au].[UnsubscribeDate]
+				,	[au].[UnsubscribeType]
 			FROM #AccountUnsubscribed au
 			WHERE NOT EXISTS (	SELECT 1
 								FROM [Derived].[Customer_UnsubscribeDates] ud
@@ -133,7 +133,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

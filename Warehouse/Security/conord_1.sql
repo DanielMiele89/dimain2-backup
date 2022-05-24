@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [conord]
+    WITH PASSWORD = N'fpRh5|s{krRcN|XRv|jwdlktmsFT7_&#$!~<!n0cjpB0k|wz', SID = 0xECEF1E09C8799647BE10C1CEDB301EA2, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

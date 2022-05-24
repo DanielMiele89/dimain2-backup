@@ -55,87 +55,87 @@ BEGIN
 		*******************************************************************************************************************************************/
 		
 			TRUNCATE TABLE [Derived].[Customer]
-			INSERT INTO [Derived].[Customer] (	FanID
-											,	ClubID
-											,	CompositeID
-											,	SourceUID
-											,	AccountType
-											,	EmailStructureValid
-											,	Title
-											,	City
-											,	County
-											,	Region
-											,	PostCodeDistrict
-											,	PostArea
-											,	PostalSector
-											,	CAMEOCode
-											,	AgeCurrent
-											,	AgeCurrentBandText
-											,	Gender
-											,	CashbackAvailable
-											,	CashbackPending
-											,	CashbackLTV
-											,	MarketableByEmail
-											,	MarketableByPush
-											,	CurrentlyActive
-											,	Hardbounced
-											,	Unsubscribed
-											,	RegistrationDate
-											,	DeactivatedDate)
-			SELECT	FanID
-				,	ClubID
-				,	CompositeID
-				,	SourceUID
-				,	AccountType
-				,	EmailStructureValid
-				,	Title
-				,	City
-				,	County
-				,	Region
-				,	PostCodeDistrict
-				,	PostArea
-				,	PostalSector
-				,	CAMEOCode
-				,	AgeCurrent
-				,	AgeCurrentBandText
-				,	Gender
-				,	CashbackAvailable
-				,	CashbackPending
-				,	CashbackLTV
-				,	MarketableByEmail
-				,	MarketableByPush
-				,	CurrentlyActive
-				,	Hardbounced
-				,	Unsubscribed
-				,	RegistrationDate
-				,	COALESCE(DeactivatedDate, ClosedDate) AS DeactivatedDate
+			INSERT INTO [Derived].[Customer] (	[Derived].[Customer].[FanID]
+											,	[Derived].[Customer].[ClubID]
+											,	[Derived].[Customer].[CompositeID]
+											,	[Derived].[Customer].[SourceUID]
+											,	[Derived].[Customer].[AccountType]
+											,	[Derived].[Customer].[EmailStructureValid]
+											,	[Derived].[Customer].[Title]
+											,	[Derived].[Customer].[City]
+											,	[Derived].[Customer].[County]
+											,	[Derived].[Customer].[Region]
+											,	[Derived].[Customer].[PostCodeDistrict]
+											,	[Derived].[Customer].[PostArea]
+											,	[Derived].[Customer].[PostalSector]
+											,	[Derived].[Customer].[CAMEOCode]
+											,	[Derived].[Customer].[AgeCurrent]
+											,	[Derived].[Customer].[AgeCurrentBandText]
+											,	[Derived].[Customer].[Gender]
+											,	[Derived].[Customer].[CashbackAvailable]
+											,	[Derived].[Customer].[CashbackPending]
+											,	[Derived].[Customer].[CashbackLTV]
+											,	[Derived].[Customer].[MarketableByEmail]
+											,	[Derived].[Customer].[MarketableByPush]
+											,	[Derived].[Customer].[CurrentlyActive]
+											,	[Derived].[Customer].[Hardbounced]
+											,	[Derived].[Customer].[Unsubscribed]
+											,	[Derived].[Customer].[RegistrationDate]
+											,	[Derived].[Customer].[DeactivatedDate])
+			SELECT	[cu].[FanID]
+				,	[cu].[ClubID]
+				,	[cu].[CompositeID]
+				,	[cu].[SourceUID]
+				,	[cu].[AccountType]
+				,	[cu].[EmailStructureValid]
+				,	[cu].[Title]
+				,	[cu].[City]
+				,	[cu].[County]
+				,	[cu].[Region]
+				,	[cu].[PostCodeDistrict]
+				,	[cu].[PostArea]
+				,	[cu].[PostalSector]
+				,	[cu].[CAMEOCode]
+				,	[cu].[AgeCurrent]
+				,	[cu].[AgeCurrentBandText]
+				,	[cu].[Gender]
+				,	[cu].[CashbackAvailable]
+				,	[cu].[CashbackPending]
+				,	[cu].[CashbackLTV]
+				,	[cu].[MarketableByEmail]
+				,	[cu].[MarketableByPush]
+				,	[cu].[CurrentlyActive]
+				,	[cu].[Hardbounced]
+				,	[cu].[Unsubscribed]
+				,	[cu].[RegistrationDate]
+				,	COALESCE([cu].[DeactivatedDate], [cu].[ClosedDate]) AS DeactivatedDate
 			FROM [WHB].[Customer] cu
 		
 			TRUNCATE TABLE [Derived].[Customer_PII]
-			INSERT INTO [Derived].[Customer_PII] (	FanID
-												,	ClubID
-												,	CompositeID
-												,	SourceUID
-												,	Email
-												,	MobileTelephone
-												,	FirstName
-												,	LastName
-												,	Address1
-												,	Address2
-												,	Postcode
-												,	DOB)
-			SELECT	FanID
-				,	ClubID
-				,	CompositeID
-				,	SourceUID
-				,	Email
-				,	MobileTelephone
-				,	FirstName
-				,	LastName
-				,	Address1
-				,	Address2
-				,	Postcode
-				,	DOB
+			INSERT INTO [Derived].[Customer_PII] (	[Derived].[Customer_PII].[FanID]
+												,	[Derived].[Customer_PII].[ClubID]
+												,	[Derived].[Customer_PII].[CompositeID]
+												,	[Derived].[Customer_PII].[SourceUID]
+												,	[Derived].[Customer_PII].[Email]
+												,	[Derived].[Customer_PII].[MobileTelephone]
+												,	[Derived].[Customer_PII].[FirstName]
+												,	[Derived].[Customer_PII].[LastName]
+												,	[Derived].[Customer_PII].[Address1]
+												,	[Derived].[Customer_PII].[Address2]
+												,	[Derived].[Customer_PII].[Postcode]
+												,	[Derived].[Customer_PII].[DOB])
+			SELECT	[cu].[FanID]
+				,	[cu].[ClubID]
+				,	[cu].[CompositeID]
+				,	[cu].[SourceUID]
+				,	[cu].[Email]
+				,	[cu].[MobileTelephone]
+				,	[cu].[FirstName]
+				,	[cu].[LastName]
+				,	[cu].[Address1]
+				,	[cu].[Address2]
+				,	[cu].[PostCode]
+				,	[cu].[DOB]
 			FROM [WHB].[Customer] cu
 
 			EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Finished'
@@ -158,7 +158,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

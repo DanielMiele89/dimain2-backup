@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [MIDI]
+    AUTHORIZATION [dbo];
+

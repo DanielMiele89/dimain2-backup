@@ -48,14 +48,14 @@ ELSE
 -- loop step [Set Column Values] EXEC gas.CTLoad_SetInitialColumnValues
 ----------------------------------------------------------------------------------------------------
 -- Collect previously-unseen MCCs from the new data
-INSERT INTO Warehouse.Relational.MCCList (MCC, MCCGroup, MCCCategory, MCCDesc, SectorID)
-SELECT DISTINCT MCC, '', '', '', 1
+INSERT INTO Warehouse.Relational.MCCList ([Warehouse].[Relational].[MCCList].[MCC], [Warehouse].[Relational].[MCCList].[MCCGroup], [Warehouse].[Relational].[MCCList].[MCCCategory], [Warehouse].[Relational].[MCCList].[MCCDesc], [Warehouse].[Relational].[MCCList].[SectorID])
+SELECT DISTINCT [cis].[MCC], '', '', '', 1
 FROM MIDI.CTLoad_InitialStage cis
-WHERE NOT EXISTS (SELECT 1 FROM Warehouse.Relational.MCCList mcc WHERE mcc.MCC = cis.MCC)
+WHERE NOT EXISTS (SELECT 1 FROM Warehouse.Relational.MCCList mcc WHERE [MIDI].[CTLoad_InitialStage].[mcc].MCC = cis.MCC)
 -- 0 / 00:00:02
 
 -- Collect previously-unseen CINs from the new data
-INSERT INTO Derived.CINList (CIN)
+INSERT INTO Derived.CINList ([Derived].[CINList].[CIN])
 SELECT DISTINCT ic.SourceUID
 FROM MIDI.CTLoad_InitialStage cis
 INNER JOIN SLC_Report.dbo.IssuerPaymentCard ipc 
@@ -63,19 +63,19 @@ INNER JOIN SLC_Report.dbo.IssuerPaymentCard ipc
 INNER JOIN SLC_Report.dbo.IssuerCustomer ic 
 	ON ipc.IssuerCustomerID = ic.ID
 EXCEPT
-SELECT CIN
+SELECT [Derived].[CINList].[CIN]
 FROM Derived.CINList
 -- (1056 rows affected) / 00:02:58
 SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Collect previously-unseen CINs [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
 UPDATE cis SET 
-	MCCID = m.MCCID,
-	PostStatusID = p.PostStatusID,
-	CIN = ic.SourceUID,
-	BankID = b.BankID,
-	InputModeID = c.InputModeID,
-	CINID = cl.CINID,
-	LocationID = 0
+	[cis].[MCCID] = m.MCCID,
+	[MIDI].[CTLoad_InitialStage].[PostStatusID] = p.PostStatusID,
+	[cis].[CIN] = ic.SourceUID,
+	[cis].[BankID] = b.BankID,
+	[cis].[InputModeID] = c.InputModeID,
+	[cis].[CINID] = cl.CINID,
+	[cis].[LocationID] = 0
 FROM MIDI.CTLoad_InitialStage cis
 INNER JOIN SLC_Report.dbo.IssuerPaymentCard ipc
 	ON ipc.PaymentCardID = cis.PaymentCardID
@@ -100,7 +100,7 @@ SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SS
 -- loop step [Set Non-Paypal Combinations] EXEC gas.CTLoad_CombinationsNonPaypal_Set
 ----------------------------------------------------------------------------------------------------
 UPDATE i
-	SET ConsumerCombinationID = c.ConsumerCombinationID
+	SET [i].[ConsumerCombinationID] = c.ConsumerCombinationID
 FROM MIDI.CTLoad_InitialStage i
 INNER JOIN Trans.ConsumerCombination c 
 	ON c.MID = i.MID
@@ -112,7 +112,7 @@ INNER JOIN Trans.ConsumerCombination c
 SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Set Non-Paypal Combinations (low variance - 1) [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
 UPDATE i
-	SET ConsumerCombinationID = c.ConsumerCombinationID
+	SET [i].[ConsumerCombinationID] = c.ConsumerCombinationID
 FROM MIDI.CTLoad_InitialStage i
 INNER JOIN Trans.ConsumerCombination c 
 	ON c.MID = i.MID
@@ -125,7 +125,7 @@ WHERE i.ConsumerCombinationID IS NULL
 SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Set Non-Paypal Combinations (low variance - 2) [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
 UPDATE i
-	SET ConsumerCombinationID = c.ConsumerCombinationID
+	SET [i].[ConsumerCombinationID] = c.ConsumerCombinationID
 FROM MIDI.CTLoad_InitialStage i
 INNER JOIN Trans.ConsumerCombination c 
 	ON i.MID = c.MID
@@ -144,22 +144,22 @@ SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SS
 ----------------------------------------------------------------------------------------------------
 IF OBJECT_ID('tempdb..#PaypalMIDNew') IS NOT NULL DROP TABLE #PaypalMIDNew
 CREATE TABLE #PaypalMIDNew (MID VARCHAR(50) PRIMARY KEY, TranCount INT NOT NULL)
-INSERT INTO #PaypalMIDNew (MID, TranCount)
-SELECT MID, TranCount = COUNT(*)
+INSERT INTO #PaypalMIDNew (#PaypalMIDNew.[MID], #PaypalMIDNew.[TranCount])
+SELECT [MIDI].[CTLoad_InitialStage].[MID], TranCount = COUNT(*)
 FROM MIDI.CTLoad_InitialStage
-WHERE Narrative LIKE 'PAYPAL%'
-	AND ConsumerCombinationID IS NULL
-GROUP BY MID
+WHERE [MIDI].[CTLoad_InitialStage].[Narrative] LIKE 'PAYPAL%'
+	AND [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID] IS NULL
+GROUP BY [MIDI].[CTLoad_InitialStage].[MID]
 HAVING COUNT(*) >= 10
 -- (298 rows affected) / 00:00:01
 		
-INSERT INTO Trans.ConsumerCombination (BrandMIDID, BrandID, MID, Narrative, LocationCountry, MCCID, OriginatorID, IsHighVariance, IsUKSpend, PaymentGatewayStatusID)
-SELECT 142652, 943, '%', 'PAYPAL%', LocationCountry, MCCID, OriginatorID, 1, CASE WHEN LocationCountry = 'GB' THEN 1 ELSE 0 END, 1
+INSERT INTO Trans.ConsumerCombination ([Trans].[ConsumerCombination].[BrandMIDID], [Trans].[ConsumerCombination].[BrandID], [Trans].[ConsumerCombination].[MID], [Trans].[ConsumerCombination].[Narrative], [Trans].[ConsumerCombination].[LocationCountry], [Trans].[ConsumerCombination].[MCCID], [Trans].[ConsumerCombination].[OriginatorID], [Trans].[ConsumerCombination].[IsHighVariance], [Trans].[ConsumerCombination].[IsUKSpend], [Trans].[ConsumerCombination].[PaymentGatewayStatusID])
+SELECT 142652, 943, '%', 'PAYPAL%', [MIDI].[CTLoad_InitialStage].[LocationCountry], [i].[MCCID], [MIDI].[CTLoad_InitialStage].[OriginatorID], 1, CASE WHEN [MIDI].[CTLoad_InitialStage].[LocationCountry] = 'GB' THEN 1 ELSE 0 END, 1
 FROM MIDI.CTLoad_InitialStage i
 WHERE i.ConsumerCombinationID IS NULL
 	AND i.Narrative LIKE 'PAYPAL%'
 	AND i.MCCID IS NOT NULL
-	AND NOT EXISTS (SELECT 1 FROM #PaypalMIDNew pn WHERE i.MID = pn.MID)
+	AND NOT EXISTS (SELECT 1 FROM #PaypalMIDNew pn WHERE #PaypalMIDNew.[i].MID = pn.MID)
 	AND NOT EXISTS (
 		SELECT 1 
 		FROM Trans.ConsumerCombination cc
@@ -172,11 +172,11 @@ WHERE i.ConsumerCombinationID IS NULL
 SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - New Paypal Combinations [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
 -- Update ConsumerCombinationID except for #PaypalMIDNew		
-UPDATE i SET ConsumerCombinationID = x.ConsumerCombinationID, 
-	RequiresSecondaryID = 1
+UPDATE i SET [i].[ConsumerCombinationID] = x.ConsumerCombinationID, 
+	[i].[RequiresSecondaryID] = 1
 FROM MIDI.CTLoad_InitialStage i -- ix_Stuff
 CROSS APPLY (
-	SELECT TOP 1 ConsumerCombinationID
+	SELECT TOP 1 [c].[ConsumerCombinationID]
 	FROM Trans.ConsumerCombination c -- 572,304,491
 	WHERE c.PaymentGatewayStatusID = 1
 	AND i.LocationCountry = c.LocationCountry
@@ -185,7 +185,7 @@ CROSS APPLY (
 ) x
 WHERE i.Narrative LIKE 'PAYPAL%'
 	AND i.ConsumerCombinationID IS NULL
-	AND NOT EXISTS (SELECT 1 FROM #PaypalMIDNew pn WHERE i.MID = pn.MID)
+	AND NOT EXISTS (SELECT 1 FROM #PaypalMIDNew pn WHERE #PaypalMIDNew.[i].MID = pn.MID)
 -- (95,440 rows affected) / 00:00:01
 SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Set Paypal Combinations'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
@@ -195,8 +195,8 @@ SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Set Paypal Combinatio
 -- loop step [Match SecondaryIDs] gas.CTLoad_PaypalSecondaryIDs_Set
 ----------------------------------------------------------------------------------------------------
 -- insert new secondary combinations
-INSERT INTO Warehouse.Relational.PaymentGatewaySecondaryDetail (ConsumerCombinationID, MID, Narrative)
-SELECT ConsumerCombinationID, MID, Narrative
+INSERT INTO Warehouse.Relational.PaymentGatewaySecondaryDetail ([Warehouse].[Relational].[PaymentGatewaySecondaryDetail].[ConsumerCombinationID], [Warehouse].[Relational].[PaymentGatewaySecondaryDetail].[MID], [Warehouse].[Relational].[PaymentGatewaySecondaryDetail].[Narrative])
+SELECT [s].[ConsumerCombinationID], [s].[MID], [MIDI].[CTLoad_InitialStage].[Narrative]
 FROM MIDI.CTLoad_InitialStage s
 WHERE s.RequiresSecondaryID = 1 
 	AND NOT EXISTS (
@@ -210,7 +210,7 @@ WHERE s.RequiresSecondaryID = 1
 SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - match secondary combinations (1)'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
 --update rows with existing secondary combinations and newly inserted IDs
-UPDATE s SET SecondaryCombinationID = p.PaymentGatewayID
+UPDATE s SET [s].[SecondaryCombinationID] = p.PaymentGatewayID
 FROM MIDI.CTLoad_InitialStage s
 INNER JOIN Warehouse.Relational.PaymentGatewaySecondaryDetail p 
 	ON s.ConsumerCombinationID = p.ConsumerCombinationID
@@ -296,25 +296,25 @@ SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - match locations set';
 -- InputModeID is no longer checked because cross database FK constraints aren't supported ###################
 -- Load rated rows into the holding table for pushing into the permanent table
 INSERT INTO MIDI.ConsumerTransactionHolding (
-	FileID, RowNum, ConsumerCombinationID, SecondaryCombinationID, BankID, LocationID, CardholderPresentData, 
-	TranDate, CINID, Amount, IsRefund, IsOnline, InputModeID, PostStatusID, PaymentTypeID	
+	[MIDI].[ConsumerTransactionHolding].[FileID], [MIDI].[ConsumerTransactionHolding].[RowNum], [MIDI].[ConsumerTransactionHolding].[ConsumerCombinationID], [MIDI].[ConsumerTransactionHolding].[SecondaryCombinationID], [MIDI].[ConsumerTransactionHolding].[BankID], [MIDI].[ConsumerTransactionHolding].[LocationID], [MIDI].[ConsumerTransactionHolding].[CardholderPresentData], 
+	[MIDI].[ConsumerTransactionHolding].[TranDate], [MIDI].[ConsumerTransactionHolding].[CINID], [MIDI].[ConsumerTransactionHolding].[Amount], [MIDI].[ConsumerTransactionHolding].[IsRefund], [MIDI].[ConsumerTransactionHolding].[IsOnline], [MIDI].[ConsumerTransactionHolding].[InputModeID], [MIDI].[ConsumerTransactionHolding].[PostStatusID], [MIDI].[ConsumerTransactionHolding].[PaymentTypeID]	
 )
 SELECT 
-	FileID, RowNum, ConsumerCombinationID, SecondaryCombinationID, BankID, LocationID = 0, CardholderPresentData, 
-	TranDate, CINID, Amount, IsRefund, IsOnline, InputModeID, PostStatusID, PaymentTypeID	
+	[MIDI].[CTLoad_InitialStage].[FileID], [MIDI].[CTLoad_InitialStage].[RowNum], [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID], [MIDI].[CTLoad_InitialStage].[SecondaryCombinationID], [MIDI].[CTLoad_InitialStage].[BankID], LocationID = 0, [MIDI].[CTLoad_InitialStage].[CardholderPresentData], 
+	[MIDI].[CTLoad_InitialStage].[TranDate], [MIDI].[CTLoad_InitialStage].[CINID], [MIDI].[CTLoad_InitialStage].[Amount], [MIDI].[CTLoad_InitialStage].[IsRefund], [MIDI].[CTLoad_InitialStage].[IsOnline], [MIDI].[CTLoad_InitialStage].[InputModeID], [MIDI].[CTLoad_InitialStage].[PostStatusID], [MIDI].[CTLoad_InitialStage].[PaymentTypeID]	
 FROM MIDI.CTLoad_InitialStage
-WHERE CINID IS NOT NULL
-	AND ConsumerCombinationID IS not NULL 
+WHERE [MIDI].[CTLoad_InitialStage].[CINID] IS NOT NULL
+	AND [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID] IS not NULL 
 	--AND LocationID IS not NULL
-	AND TranDate > '19000101'
-ORDER BY FileID, RowNum
+	AND [MIDI].[CTLoad_InitialStage].[TranDate] > '19000101'
+ORDER BY [MIDI].[CTLoad_InitialStage].[FileID], [MIDI].[CTLoad_InitialStage].[RowNum]
 -- (7,167,273 rows affected) / 00:02:18 
 SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - capture matched transactions to holding [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
-;WITH RowToUpdate AS (SELECT TOP(1) * FROM MIDI.GenericTrans_FilesProcessed ORDER BY FileID DESC)
+;WITH RowToUpdate AS (SELECT TOP(1) * FROM MIDI.GenericTrans_FilesProcessed ORDER BY [MIDI].[GenericTrans_FilesProcessed].[FileID] DESC)
 UPDATE RowToUpdate SET 
-	RowsProcessed = ISNULL(RowsProcessed,0) + ISNULL(@RowsAffected,0),
-	ProcessedDate = GETDATE() 
+	[MIDI].[GenericTrans_FilesProcessed].[RowsProcessed] = ISNULL([MIDI].[GenericTrans_FilesProcessed].[RowsProcessed],0) + ISNULL(@RowsAffected,0),
+	[MIDI].[GenericTrans_FilesProcessed].[ProcessedDate] = GETDATE() 
 
 ----------------------------------------------------------------------------------------------------
 -- loop step [Clear holding tables] EXEC gas.CTLoad_StagingTables_Clear
@@ -326,19 +326,19 @@ IF OBJECT_ID('tempdb..#CTLoad_InitialStage') IS NOT NULL DROP TABLE #CTLoad_Init
 SELECT *
 INTO #CTLoad_InitialStage
 FROM MIDI.CTLoad_InitialStage
-WHERE CINID IS NOT NULL
+WHERE [MIDI].[CTLoad_InitialStage].[CINID] IS NOT NULL
 	--AND (ConsumerCombinationID IS NULL OR LocationID IS NULL)
-	AND (ConsumerCombinationID IS NULL)
+	AND ([MIDI].[CTLoad_InitialStage].[ConsumerCombinationID] IS NULL)
 
 TRUNCATE TABLE MIDI.CTLoad_InitialStage
 
 INSERT INTO MIDI.CTLoad_InitialStage (
-	FileID, RowNum, BankID, BankIDString, MID, Narrative, LocationAddress, LocationCountry, CardholderPresentData, TranDate
-	, CINID, Amount, IsOnline, IsRefund, OriginatorID, MCC, MCCID, PostStatus, PostStatusID, LocationID, ConsumerCombinationID
-	, SecondaryCombinationID, InputModeID, PaymentTypeID)
-SELECT FileID, RowNum, BankID, BankIDString, MID, Narrative, LocationAddress, LocationCountry, CardholderPresentData, TranDate
-	, CINID, Amount, IsOnline, IsRefund, OriginatorID, MCC, MCCID, PostStatus, PostStatusID, LocationID = 0, ConsumerCombinationID
-	, SecondaryCombinationID, InputModeID, PaymentTypeID
+	[MIDI].[CTLoad_InitialStage].[FileID], [MIDI].[CTLoad_InitialStage].[RowNum], [MIDI].[CTLoad_InitialStage].[BankID], [MIDI].[CTLoad_InitialStage].[BankIDString], [MIDI].[CTLoad_InitialStage].[MID], [MIDI].[CTLoad_InitialStage].[Narrative], [MIDI].[CTLoad_InitialStage].[LocationAddress], [MIDI].[CTLoad_InitialStage].[LocationCountry], [MIDI].[CTLoad_InitialStage].[CardholderPresentData], [MIDI].[CTLoad_InitialStage].[TranDate]
+	, [MIDI].[CTLoad_InitialStage].[CINID], [MIDI].[CTLoad_InitialStage].[Amount], [MIDI].[CTLoad_InitialStage].[IsOnline], [MIDI].[CTLoad_InitialStage].[IsRefund], [MIDI].[CTLoad_InitialStage].[OriginatorID], [MIDI].[CTLoad_InitialStage].[MCC], [MIDI].[CTLoad_InitialStage].[MCCID], [MIDI].[CTLoad_InitialStage].[PostStatus], [MIDI].[CTLoad_InitialStage].[PostStatusID], [MIDI].[CTLoad_InitialStage].[LocationID], [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID]
+	, [MIDI].[CTLoad_InitialStage].[SecondaryCombinationID], [MIDI].[CTLoad_InitialStage].[InputModeID], [MIDI].[CTLoad_InitialStage].[PaymentTypeID])
+SELECT #CTLoad_InitialStage.[FileID], #CTLoad_InitialStage.[RowNum], #CTLoad_InitialStage.[BankID], #CTLoad_InitialStage.[BankIDString], #CTLoad_InitialStage.[MID], #CTLoad_InitialStage.[Narrative], #CTLoad_InitialStage.[LocationAddress], #CTLoad_InitialStage.[LocationCountry], #CTLoad_InitialStage.[CardholderPresentData], #CTLoad_InitialStage.[TranDate]
+	, #CTLoad_InitialStage.[CINID], #CTLoad_InitialStage.[Amount], #CTLoad_InitialStage.[IsOnline], #CTLoad_InitialStage.[IsRefund], #CTLoad_InitialStage.[OriginatorID], #CTLoad_InitialStage.[MCC], #CTLoad_InitialStage.[MCCID], #CTLoad_InitialStage.[PostStatus], #CTLoad_InitialStage.[PostStatusID], LocationID = 0, #CTLoad_InitialStage.[ConsumerCombinationID]
+	, #CTLoad_InitialStage.[SecondaryCombinationID], #CTLoad_InitialStage.[InputModeID], #CTLoad_InitialStage.[PaymentTypeID]
 FROM #CTLoad_InitialStage
 -- (37579 rows affected)
 SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - capture unmatched transactions [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
@@ -368,7 +368,7 @@ SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Start of second part'
 
 --update non-high variance non-paypal combinations
 UPDATE i
-SET ConsumerCombinationID = c.ConsumerCombinationID
+SET [i].[ConsumerCombinationID] = c.ConsumerCombinationID
 FROM MIDI.CTLoad_InitialStage i
 INNER JOIN Trans.ConsumerCombination c ON
 	i.MID = c.MID
@@ -383,7 +383,7 @@ SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SS
 
 --update non-high variance non-paypal combinations
 UPDATE i
-SET ConsumerCombinationID = c.ConsumerCombinationID
+SET [i].[ConsumerCombinationID] = c.ConsumerCombinationID
 FROM MIDI.CTLoad_InitialStage i
 INNER JOIN Trans.ConsumerCombination c ON
 	i.MID = c.MID
@@ -398,7 +398,7 @@ SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SS
 
 --update high variance non-paypal combinations
 UPDATE i
-SET ConsumerCombinationID = c.ConsumerCombinationID
+SET [i].[ConsumerCombinationID] = c.ConsumerCombinationID
 FROM MIDI.CTLoad_InitialStage i
 INNER JOIN Trans.ConsumerCombination c ON
 	i.MID = c.MID
@@ -416,8 +416,8 @@ SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SS
 
 --update paypal combinations
 UPDATE cth
-	SET ConsumerCombinationID = c.ConsumerCombinationID
-	, RequiresSecondaryID = 1
+	SET [cth].[ConsumerCombinationID] = c.ConsumerCombinationID
+	, [cth].[RequiresSecondaryID] = 1
 FROM MIDI.CTLoad_InitialStage cth
 INNER JOIN Trans.ConsumerCombination c
 	ON cth.LocationCountry = c.LocationCountry 
@@ -430,7 +430,7 @@ WHERE cth.ConsumerCombinationID IS NULL
 SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - update paypal combinations [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
 UPDATE cth
-	SET SecondaryCombinationID = p.PaymentGatewayID
+	SET [cth].[SecondaryCombinationID] = p.PaymentGatewayID
 FROM MIDI.CTLoad_InitialStage cth
 INNER JOIN MIDI.PaymentGatewaySecondaryDetail p 
 	ON cth.ConsumerCombinationID = p.ConsumerCombinationID
@@ -441,15 +441,15 @@ WHERE cth.SecondaryCombinationID IS NULL
 -- (2936 rows affected) / 00:00:00
 
 
-INSERT INTO MIDI.PaymentGatewaySecondaryDetail (ConsumerCombinationID, MID, Narrative)
-SELECT ConsumerCombinationID, MID, Narrative
+INSERT INTO MIDI.PaymentGatewaySecondaryDetail ([MIDI].[PaymentGatewaySecondaryDetail].[ConsumerCombinationID], [MIDI].[PaymentGatewaySecondaryDetail].[MID], [MIDI].[PaymentGatewaySecondaryDetail].[Narrative])
+SELECT [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID], [MIDI].[CTLoad_InitialStage].[MID], [MIDI].[CTLoad_InitialStage].[Narrative]
 FROM MIDI.CTLoad_InitialStage
-WHERE RequiresSecondaryID = 1
-	AND SecondaryCombinationID IS NULL
+WHERE [MIDI].[CTLoad_InitialStage].[RequiresSecondaryID] = 1
+	AND [MIDI].[CTLoad_InitialStage].[SecondaryCombinationID] IS NULL
 -- (10977 rows affected) / 00:00:00
 
 UPDATE cth
-	SET SecondaryCombinationID = p.PaymentGatewayID
+	SET [cth].[SecondaryCombinationID] = p.PaymentGatewayID
 FROM MIDI.CTLoad_InitialStage cth
 INNER JOIN MIDI.PaymentGatewaySecondaryDetail p 
 	ON cth.ConsumerCombinationID = p.ConsumerCombinationID
@@ -485,12 +485,12 @@ WHERE l.IsNonLocational = 0
 
 -- EXEC gas.CombinationsMIDIHolding_Fetch -- >> Relational.ConsumerTransactionHolding
 INSERT INTO MIDI.ConsumerTransactionHolding (
-	FileID, RowNum, BankID, CardholderPresentData, TranDate, CINID, Amount, IsOnline, IsRefund, 
-	PostStatusID, LocationID, ConsumerCombinationID, SecondaryCombinationID, InputModeID, PaymentTypeID)
-SELECT FileID, RowNum, BankID, CardholderPresentData, TranDate, CINID, Amount, IsOnline, IsRefund, 
-	PostStatusID, LocationID = 0, ConsumerCombinationID, SecondaryCombinationID, InputModeID, PaymentTypeID
+	[MIDI].[ConsumerTransactionHolding].[FileID], [MIDI].[ConsumerTransactionHolding].[RowNum], [MIDI].[ConsumerTransactionHolding].[BankID], [MIDI].[ConsumerTransactionHolding].[CardholderPresentData], [MIDI].[ConsumerTransactionHolding].[TranDate], [MIDI].[ConsumerTransactionHolding].[CINID], [MIDI].[ConsumerTransactionHolding].[Amount], [MIDI].[ConsumerTransactionHolding].[IsOnline], [MIDI].[ConsumerTransactionHolding].[IsRefund], 
+	[MIDI].[ConsumerTransactionHolding].[PostStatusID], [MIDI].[ConsumerTransactionHolding].[LocationID], [MIDI].[ConsumerTransactionHolding].[ConsumerCombinationID], [MIDI].[ConsumerTransactionHolding].[SecondaryCombinationID], [MIDI].[ConsumerTransactionHolding].[InputModeID], [MIDI].[ConsumerTransactionHolding].[PaymentTypeID])
+SELECT [MIDI].[CTLoad_InitialStage].[FileID], [MIDI].[CTLoad_InitialStage].[RowNum], [MIDI].[CTLoad_InitialStage].[BankID], [MIDI].[CTLoad_InitialStage].[CardholderPresentData], [MIDI].[CTLoad_InitialStage].[TranDate], [MIDI].[CTLoad_InitialStage].[CINID], [MIDI].[CTLoad_InitialStage].[Amount], [MIDI].[CTLoad_InitialStage].[IsOnline], [MIDI].[CTLoad_InitialStage].[IsRefund], 
+	[MIDI].[CTLoad_InitialStage].[PostStatusID], LocationID = 0, [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID], [MIDI].[CTLoad_InitialStage].[SecondaryCombinationID], [MIDI].[CTLoad_InitialStage].[InputModeID], [MIDI].[CTLoad_InitialStage].[PaymentTypeID]
 FROM MIDI.CTLoad_InitialStage
-WHERE ConsumerCombinationID IS NOT NULL
+WHERE [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID] IS NOT NULL
 	--AND LocationID IS NOT NULL
 -- (5098 rows affected) / 00:00:03
 SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - capture matched transactions to holding [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
@@ -498,44 +498,44 @@ SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SS
 
 -- EXEC gas.CTLoad_MIDIHoldingCombinations_Clear
 DELETE FROM MIDI.CTLoad_InitialStage
-WHERE ConsumerCombinationID IS NOT NULL
+WHERE [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID] IS NOT NULL
 	--AND LocationID IS NOT NULL
 -- (5098 rows affected) / 00:00:00
 
 
 -- Load unrated rows into a separate table for further (manual) processing [MIDI].[MIDI_Module]
 INSERT INTO [MIDI].[CTLoad_MIDIHolding] (
-	FileID, RowNum, BankID, MID, Narrative, LocationAddress, LocationCountry, CardholderPresentData, TranDate
-	, CINID, Amount, IsOnline, IsRefund, OriginatorID, MCCID, PostStatusID, LocationID, ConsumerCombinationID
-	, SecondaryCombinationID, InputModeID, PaymentTypeID)
-SELECT FileID, RowNum, BankID, MID, Narrative, LocationAddress, LocationCountry, CardholderPresentData, TranDate
-	, CINID, Amount, IsOnline, IsRefund, OriginatorID, MCCID, PostStatusID, LocationID = 0, ConsumerCombinationID
-	, SecondaryCombinationID, InputModeID, PaymentTypeID
+	[MIDI].[CTLoad_MIDIHolding].[FileID], [MIDI].[CTLoad_MIDIHolding].[RowNum], [MIDI].[CTLoad_MIDIHolding].[BankID], [MIDI].[CTLoad_MIDIHolding].[MID], [MIDI].[CTLoad_MIDIHolding].[Narrative], [MIDI].[CTLoad_MIDIHolding].[LocationAddress], [MIDI].[CTLoad_MIDIHolding].[LocationCountry], [MIDI].[CTLoad_MIDIHolding].[CardholderPresentData], [MIDI].[CTLoad_MIDIHolding].[TranDate]
+	, [MIDI].[CTLoad_MIDIHolding].[CINID], [MIDI].[CTLoad_MIDIHolding].[Amount], [MIDI].[CTLoad_MIDIHolding].[IsOnline], [MIDI].[CTLoad_MIDIHolding].[IsRefund], [MIDI].[CTLoad_MIDIHolding].[OriginatorID], [MIDI].[CTLoad_MIDIHolding].[MCCID], [MIDI].[CTLoad_MIDIHolding].[PostStatusID], [MIDI].[CTLoad_MIDIHolding].[LocationID], [MIDI].[CTLoad_MIDIHolding].[ConsumerCombinationID]
+	, [MIDI].[CTLoad_MIDIHolding].[SecondaryCombinationID], [MIDI].[CTLoad_MIDIHolding].[InputModeID], [MIDI].[CTLoad_MIDIHolding].[PaymentTypeID])
+SELECT [MIDI].[CTLoad_InitialStage].[FileID], [MIDI].[CTLoad_InitialStage].[RowNum], [MIDI].[CTLoad_InitialStage].[BankID], [MIDI].[CTLoad_InitialStage].[MID], [MIDI].[CTLoad_InitialStage].[Narrative], [MIDI].[CTLoad_InitialStage].[LocationAddress], [MIDI].[CTLoad_InitialStage].[LocationCountry], [MIDI].[CTLoad_InitialStage].[CardholderPresentData], [MIDI].[CTLoad_InitialStage].[TranDate]
+	, [MIDI].[CTLoad_InitialStage].[CINID], [MIDI].[CTLoad_InitialStage].[Amount], [MIDI].[CTLoad_InitialStage].[IsOnline], [MIDI].[CTLoad_InitialStage].[IsRefund], [MIDI].[CTLoad_InitialStage].[OriginatorID], [MIDI].[CTLoad_InitialStage].[MCCID], [MIDI].[CTLoad_InitialStage].[PostStatusID], LocationID = 0, [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID]
+	, [MIDI].[CTLoad_InitialStage].[SecondaryCombinationID], [MIDI].[CTLoad_InitialStage].[InputModeID], [MIDI].[CTLoad_InitialStage].[PaymentTypeID]
 FROM MIDI.CTLoad_InitialStage
-WHERE CINID IS NOT NULL
+WHERE [MIDI].[CTLoad_InitialStage].[CINID] IS NOT NULL
 	--AND (ConsumerCombinationID IS NULL OR LocationID IS NULL)
-	AND (ConsumerCombinationID IS NULL)
+	AND ([MIDI].[CTLoad_InitialStage].[ConsumerCombinationID] IS NULL)
 -- (249,905 rows affected) / 00:00:03
 SET @RowsAffected = @@ROWCOUNT; SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - capture remaining matchable transactions for manual processing [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'; EXEC Monitor.ProcessLogger 'MIDI', @Activity, @time OUTPUT, @SSMS OUTPUT
 
 
 UPDATE p SET 
-	RowsProcessed = ISNULL(RowsProcessed,0) + ISNULL(@RowsAffected,0),
-	ProcessedDate = GETDATE()  
+	[p].[RowsProcessed] = ISNULL([p].[RowsProcessed],0) + ISNULL(@RowsAffected,0),
+	[p].[ProcessedDate] = GETDATE()  
 FROM MIDI.GenericTrans_FilesProcessed p
-INNER JOIN (SELECT FileID FROM MIDI.CTLoad_InitialStage GROUP BY FileID) s ON s.FileID = p.FileID
+INNER JOIN (SELECT [MIDI].[CTLoad_InitialStage].[FileID] FROM MIDI.CTLoad_InitialStage GROUP BY [MIDI].[CTLoad_InitialStage].[FileID]) s ON s.FileID = p.FileID
 
 
 -- loop step [QA Logging] EXEC gas.CTLoad_QAStats_Set 
-INSERT INTO MIDI.CardTransaction_QA (FileID, FileCount, MatchedCount, UnmatchedCount, NoCINCount, PositiveCount)
-SELECT FileID
+INSERT INTO MIDI.CardTransaction_QA ([MIDI].[CardTransaction_QA].[FileID], [MIDI].[CardTransaction_QA].[FileCount], [MIDI].[CardTransaction_QA].[MatchedCount], [MIDI].[CardTransaction_QA].[UnmatchedCount], [MIDI].[CardTransaction_QA].[NoCINCount], [MIDI].[CardTransaction_QA].[PositiveCount])
+SELECT [MIDI].[CTLoad_InitialStage].[FileID]
 	, COUNT(1) AS FileCount
-	, SUM(CASE WHEN ConsumerCombinationID IS NULL THEN 0 ELSE 1 END) AS MatchedCount
-	, SUM(CASE WHEN ConsumerCombinationID IS NULL THEN 1 ELSE 0 END) AS UnmatchedCount
-	, SUM(CASE WHEN CINID IS NULL THEN 0 ELSE 1 END) AS NoCINCount
-	, SUM(CASE WHEN IsRefund = 0 THEN 1 ELSE 0 END) AS PositiveCount
+	, SUM(CASE WHEN [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID] IS NULL THEN 0 ELSE 1 END) AS MatchedCount
+	, SUM(CASE WHEN [MIDI].[CTLoad_InitialStage].[ConsumerCombinationID] IS NULL THEN 1 ELSE 0 END) AS UnmatchedCount
+	, SUM(CASE WHEN [MIDI].[CTLoad_InitialStage].[CINID] IS NULL THEN 0 ELSE 1 END) AS NoCINCount
+	, SUM(CASE WHEN [MIDI].[CTLoad_InitialStage].[IsRefund] = 0 THEN 1 ELSE 0 END) AS PositiveCount
 FROM MIDI.CTLoad_InitialStage
-GROUP BY FileID
+GROUP BY [MIDI].[CTLoad_InitialStage].[FileID]
 -- (1 row affected) / 00:00:01
 
 

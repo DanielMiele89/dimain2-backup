@@ -40,7 +40,7 @@ SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Program started'; EXE
 --------------------------------------------------------------------------------------------------------------------------
 -- If the shadow table has data, drop out
 --------------------------------------------------------------------------------------------------------------------------
-IF EXISTS(SELECT 1 FROM SYS.TABLES WHERE [Name] = 'ConsumerTransaction_shadow')
+IF EXISTS(SELECT 1 FROM SYS.TABLES WHERE [SYS].[TABLES].[Name] = 'ConsumerTransaction_shadow')
 BEGIN -- check if the table has any content 
 	DECLARE @RowCount INT; 
 	SELECT @RowCount = COUNT(*) FROM Trans.ConsumerTransaction_shadow; 
@@ -77,16 +77,16 @@ END
 -- Measure the CT holding table
 ---------------------------------------------------------------------------
 IF OBJECT_ID('tempdb..#CTHolding') IS NOT NULL DROP TABLE #CTHolding;
-SELECT PartitionID, [Rows], TranDate = DATEADD(MONTH,DATEDIFF(MONTH,0,TranDate),0),
-	rn = ROW_NUMBER() OVER(ORDER BY PartitionID DESC)
+SELECT [d].[PartitionID], [d].[Rows], TranDate = DATEADD(MONTH,DATEDIFF(MONTH,0,[d].[TranDate]),0),
+	rn = ROW_NUMBER() OVER(ORDER BY [d].[PartitionID] DESC)
 INTO #CTHolding
 FROM (
 	SELECT 
-		PartitionID = $PARTITION.PartitionByMonthFunction(Trandate), 
-		TranDate = MIN(TranDate),
+		PartitionID = $PARTITION.PartitionByMonthFunction([MIDI].[ConsumerTransactionHolding].[TranDate]), 
+		TranDate = MIN([MIDI].[ConsumerTransactionHolding].[TranDate]),
 		[Rows] = COUNT(*)
 	FROM MIDI.[ConsumerTransactionHolding] 
-	GROUP BY $PARTITION.PartitionByMonthFunction(Trandate)
+	GROUP BY $PARTITION.PartitionByMonthFunction([MIDI].[ConsumerTransactionHolding].[TranDate])
 ) d
 
 
@@ -96,8 +96,8 @@ FROM (
 ---------------------------------------------------------------------------
 WHILE 1 = 1 BEGIN 
 		
-	SELECT @CurrentPartitionID = PartitionID, @CurrentPartitionStart = TranDate, @Rows = [Rows] 
-	FROM #CTHolding WHERE rn = @CurrentRow 
+	SELECT @CurrentPartitionID = #CTHolding.[PartitionID], @CurrentPartitionStart = #CTHolding.[TranDate], @Rows = #CTHolding.[Rows] 
+	FROM #CTHolding WHERE #CTHolding.[rn] = @CurrentRow 
 	IF @@ROWCOUNT = 0 BREAK
 
 	SELECT 
@@ -190,10 +190,10 @@ SET @Activity = ISNULL(OBJECT_NAME(@@PROCID),'SSMS') + ' - Program finished'; EX
 -- Update the process log table
 ---------------------------------------------------------------------------
 UPDATE fp SET 
-	RowsLoaded = x.RowsLoaded,
-	LoadedDate = GETDATE() 
+	[fp].[RowsLoaded] = x.RowsLoaded,
+	[fp].[LoadedDate] = GETDATE() 
 FROM MIDI.GenericTrans_FilesProcessed fp
-INNER JOIN (SELECT FileID, RowsLoaded = COUNT(*) FROM MIDI.[ConsumerTransactionHolding] GROUP BY FileID) x ON x.FileID = fp.FileID
+INNER JOIN (SELECT [MIDI].[ConsumerTransactionHolding].[FileID], RowsLoaded = COUNT(*) FROM MIDI.[ConsumerTransactionHolding] GROUP BY [MIDI].[ConsumerTransactionHolding].[FileID]) x ON x.FileID = fp.FileID
 
 
 TRUNCATE TABLE MIDI.[ConsumerTransactionHolding]

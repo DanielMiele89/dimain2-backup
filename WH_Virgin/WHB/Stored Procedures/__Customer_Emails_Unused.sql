@@ -28,7 +28,7 @@ DECLARE @msg VARCHAR(200), @RowsAffected INT
 
 	TRUNCATE TABLE [Staging].[SLC_Report_DailyLoad_NonMasterListCustomers]
 	INSERT INTO [Staging].[SLC_Report_DailyLoad_NonMasterListCustomers]
-	SELECT FanID
+	SELECT [c].[FanID]
 	FROM [Derived].[Customer] c
 	WHERE c.MarketableByEmail = 0
 	AND c.CurrentlyActive = 1
@@ -44,7 +44,7 @@ DECLARE @msg VARCHAR(200), @RowsAffected INT
 -- Note that the column EventDate in table EmailEvent is completely redundant
 -------------------------------------------------------------------------------
 
-	DECLARE @StartRow BIGINT = (SELECT MAX(EventID) FROM [Derived].[EmailEvent])
+	DECLARE @StartRow BIGINT = (SELECT MAX([Derived].[EmailEvent].[EventID]) FROM [Derived].[EmailEvent])
 
 	IF OBJECT_ID('tempdb..#EmailEvent') IS NOT NULL DROP TABLE #EmailEvent
 	SELECT ee.ID AS EventID			--Take the lowest ID. This is arbitrary, but is just needed as a unique key 
@@ -58,18 +58,18 @@ DECLARE @msg VARCHAR(200), @RowsAffected INT
 
 	DROP INDEX [CSX_All] ON [Derived].[EmailEvent]
 
-	INSERT INTO [Derived].[EmailEvent] (EventID, EventDateTime, EventDate, FanID, CompositeID, CampaignKey, EmailEventCodeID)
+	INSERT INTO [Derived].[EmailEvent] ([Derived].[EmailEvent].[EventID], [Derived].[EmailEvent].[EventDateTime], [Derived].[EmailEvent].[EventDate], [Derived].[EmailEvent].[FanID], [Derived].[EmailEvent].[CompositeID], [Derived].[EmailEvent].[CampaignKey], [Derived].[EmailEvent].[EmailEventCodeID])
 	SELECT ee.EventID
 		 , ee.EventDateTime
 		 , ee.EventDateTime AS EventDate
 		 , ee.FanID
-		 , fa.CompositeID
+		 , #EmailEvent.[fa].CompositeID
 		 , ee.CampaignKey
 		 , ee.EmailEventCodeID
 	FROM #EmailEvent ee
 	INNER JOIN [SLC_Report].[dbo].[Fan] fa
-		ON ee.FanID = fa.ID
-		AND fa.ClubID = 166	--	Virgin Loyalty ClubID
+		ON ee.FanID = #EmailEvent.[fa].ID
+		AND #EmailEvent.[fa].ClubID = 166	--	Virgin Loyalty ClubID
 
 	-- log it
 	SET @RowsAffected = @@ROWCOUNT;SET @msg = 'Loaded rows to [Derived].[EmailEvent] [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'
@@ -91,7 +91,7 @@ TRUNCATE TABLE Derived.EmailCampaign
 
 SET IDENTITY_INSERT Derived.EmailCampaign ON
 
-INSERT INTO	Derived.EmailCampaign (ID,CampaignKey,EmailKey,CampaignName,[Subject],SendDateTime,SendDate	)
+INSERT INTO	Derived.EmailCampaign ([Derived].[EmailCampaign].[ID],[Derived].[EmailCampaign].[CampaignKey],[Derived].[EmailCampaign].[EmailKey],[Derived].[EmailCampaign].[CampaignName],[Derived].[EmailCampaign].[Subject],[Derived].[EmailCampaign].[SendDateTime],[Derived].[EmailCampaign].[SendDate]	)
 SELECT	ec.ID,
 		ec.CampaignKey,
 		ec.EmailKey,
@@ -118,8 +118,8 @@ SET IDENTITY_INSERT Derived.EmailCampaign OFF
 --Therefore not pulled through here until understood better.
 TRUNCATE TABLE Derived.EmailEventCode
 
-INSERT INTO	Derived.EmailEventCode (EmailEventCodeID, EmailEventDesc)	
-	SELECT ID, [Name]
+INSERT INTO	Derived.EmailEventCode ([Derived].[EmailEventCode].[EmailEventCodeID], [Derived].[EmailEventCode].[EmailEventDesc])	
+	SELECT [slc_report].[dbo].[EmailEventCode].[ID], [slc_report].[dbo].[EmailEventCode].[Name]
 	FROM slc_report.dbo.EmailEventCode
 
 -- log it
@@ -137,19 +137,19 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Emails_SmartFocusEmailData_V2', @msg
 --Populate Previous Days Table
 TRUNCATE TABLE [Staging].[FanSFDDailyUploadData_PreviousDay]
 INSERT INTO [Staging].[FanSFDDailyUploadData_PreviousDay]
-SELECT [FanID]
-	,[ClubCashAvailable]
-	,[CustomerJourneyStatus]
-	,[ClubCashPending]
-	,[WelcomeEmailCode]
-	,[DateOfLastCard]
-	,[CJS]
-	,[WeekNumber]
-	,[IsDebit]
-	,[IsCredit]
-	,[RowNumber]
-	,[ActivatedDate]
-	,[CompositeID]
+SELECT [Staging].[FanSFDDailyUploadData].[FanID]
+	,[Staging].[FanSFDDailyUploadData].[ClubCashAvailable]
+	,[Staging].[FanSFDDailyUploadData].[CustomerJourneyStatus]
+	,[Staging].[FanSFDDailyUploadData].[ClubCashPending]
+	,[Staging].[FanSFDDailyUploadData].[WelcomeEmailCode]
+	,[Staging].[FanSFDDailyUploadData].[DateOfLastCard]
+	,[Staging].[FanSFDDailyUploadData].[CJS]
+	,[Staging].[FanSFDDailyUploadData].[WeekNumber]
+	,[Staging].[FanSFDDailyUploadData].[IsDebit]
+	,[Staging].[FanSFDDailyUploadData].[IsCredit]
+	,[Staging].[FanSFDDailyUploadData].[RowNumber]
+	,[Staging].[FanSFDDailyUploadData].[ActivatedDate]
+	,[Staging].[FanSFDDailyUploadData].[CompositeID]
 FROM [Staging].[FanSFDDailyUploadData]
 
 -- log it
@@ -161,19 +161,19 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Emails_DailyLoadChecks_Table', @msg
 TRUNCATE TABLE [Staging].[FanSFDDailyUploadData]
 
 INSERT INTO [Staging].[FanSFDDailyUploadData]
-SELECT [FanID]
-		,[ClubCashAvailable]
-		,[CustomerJourneyStatus]
-		,[ClubCashPending]
-		,[WelcomeEmailCode]
-		,[DateOfLastCard]
-		,[CJS]
-		,[WeekNumber]
-		,[IsDebit]
-		,[IsCredit]
-		,[RowNumber]
-		,[ActivatedDate]
-		,[CompositeID]
+SELECT [SLC_Report].[dbo].[FanSFDDailyUploadData].[FanID]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[ClubCashAvailable]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[CustomerJourneyStatus]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[ClubCashPending]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[WelcomeEmailCode]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[DateOfLastCard]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[CJS]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[WeekNumber]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[IsDebit]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[IsCredit]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[RowNumber]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[ActivatedDate]
+		,[SLC_Report].[dbo].[FanSFDDailyUploadData].[CompositeID]
 FROM SLC_Report.dbo.[FanSFDDailyUploadData]
 
 -- log it
@@ -215,14 +215,14 @@ EXEC Monitor.ProcessLog_Insert 'WHB', 'Emails_DailyLoadChecks_Table', @msg
 --Produce List of new Campaigns to be added
 SELECT 
 	e.CampaignKey,
-	LionSendID = Cast(right(Left(QueryName,28),3) as int),
+	LionSendID = Cast(right(Left([SLC_Report].[dbo].[EmailCampaign].[QueryName],28),3) as int),
 	EmailType = 'H',
-	Reference = Cast(Round(Cast(Datediff(day,'2016-07-22',SendDate) as real)/7,0,0)+236 as varchar(4))+'H',
+	Reference = Cast(Round(Cast(Datediff(day,'2016-07-22',[SLC_Report].[dbo].[EmailCampaign].[SendDate]) as real)/7,0,0)+236 as varchar(4))+'H',
 	[HardCoded_OfferFrom] = Cast(NULL as int),
 	[HardCoded_OfferTo] = Cast(NULL as int),
 	[EmailName] = Cast(NULL as varchar(100)),
 	ClubID = Case
-				When CampaignName Like '%NatWest%' then 132
+				When [SLC_Report].[dbo].[EmailCampaign].[CampaignName] Like '%NatWest%' then 132
 				Else 138
 				End,
 	TrueSolus = 0
@@ -232,9 +232,9 @@ WHERE NOT EXISTS (
 	SELECT 1 FROM [Derived].[CampaignLionSendIDs] f 
 	WHERE e.campaignkey = f.campaignkey
 )
-	AND CampaignName Like '%Newsletter_LSID[0-9][0-9][0-9]_%' 
-	and CampaignName not like 'TEST%' 
-	and SendDate > '2016-07-22' 
+	AND [SLC_Report].[dbo].[EmailCampaign].[CampaignName] Like '%Newsletter_LSID[0-9][0-9][0-9]_%' 
+	and [SLC_Report].[dbo].[EmailCampaign].[CampaignName] not like 'TEST%' 
+	and [SLC_Report].[dbo].[EmailCampaign].[SendDate] > '2016-07-22' 
 
 INSERT INTO Derived.CampaignLionSendIDs
 SELECT	*
@@ -302,8 +302,8 @@ EXEC [WHB].[Emails_LionSendTracking_UpdateEmailEvents_V2]
 		(5, sfd.Offer5),
 		(6, sfd.Offer6)
 	) x (OfferSlot, IronOfferID)
-	WHERE NOT (sfd.CJS = 'M3' AND WeekNumber = 2)
-	AND EXISTS (SELECT 1 FROM #LionSendsToBeAdded a WHERE a.LionSendID = sfd.LionSendID)
+	WHERE NOT (sfd.CJS = 'M3' AND [Derived].[SFD_PostUploadAssessmentData].[WeekNumber] = 2)
+	AND EXISTS (SELECT 1 FROM #LionSendsToBeAdded a WHERE a.LionSendID = #LionSendsToBeAdded.[sfd].LionSendID)
 
 	SET @RowsAffected = @@ROWCOUNT;SET @msg = 'Loaded rows to Derived.SFD_PostUploadAssessmentData_Member [' + CAST(@RowsAffected AS VARCHAR(10)) + ']'
 	EXEC Monitor.ProcessLog_Insert 'WHB', 'Emails_Populate_SFDPostUploadAssessmentData_Member', @msg

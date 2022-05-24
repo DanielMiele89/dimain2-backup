@@ -69,16 +69,16 @@ BEGIN
 			 , @Today AS EmailSendDate
 		INTO #DailyData
 		FROM [Email].[Actito_Deltas]
-		WHERE RedeemReminder_Day IS NOT NULL
-		OR EarnConfirmation_Date IS NOT NULL
+		WHERE [Email].[Actito_Deltas].[RedeemReminder_Day] IS NOT NULL
+		OR [Email].[Actito_Deltas].[EarnConfirmation_Date] IS NOT NULL
 
 
 		IF OBJECT_ID('tempdb..#TriggerEmailTracking') IS NOT NULL DROP TABLE #TriggerEmailTracking
-		SELECT FanID
+		SELECT [Email].[Actito_Deltas].[FanID]
 			 , 14 AS TriggerEmailTypeID
 			 , @Today AS EmailSendDate
-			 , Birthday_Code
-			 , Birthday_CodeExpiryDate
+			 , [Email].[Actito_Deltas].[Birthday_Code]
+			 , [Email].[Actito_Deltas].[Birthday_CodeExpiryDate]
 			 , NULL AS FirstEarn_RetailerName
 			 , NULL AS FirstEarn_Date
 			 , NULL AS FirstEarn_Amount
@@ -89,9 +89,9 @@ BEGIN
 			 , NULL AS RedeemReminder_Day
 		INTO #TriggerEmailTracking
 		FROM [Email].[Actito_Deltas]
-		WHERE Birthday_Flag != 0
+		WHERE [Email].[Actito_Deltas].[Birthday_Flag] != 0
 		UNION
-		SELECT FanID
+		SELECT [dd].[FanID]
 			 , 1 AS TriggerEmailTypeID
 			 , @Today AS EmailSendDate
 			 , NULL AS Birthday_Code
@@ -105,9 +105,9 @@ BEGIN
 			 , NULL AS RedeemReminder_Amount
 			 , NULL AS RedeemReminder_Day
 		FROM [Email].[Actito_Deltas] dd
-		WHERE '1900-01-01' < FirstEarn_Date
+		WHERE '1900-01-01' < [dd].[FirstEarn_Date]
 		UNION
-		SELECT FanID
+		SELECT [dd].[FanID]
 			 , 2 AS TriggerEmailTypeID
 			 , @Today AS EmailSendDate
 			 , NULL AS Birthday_Code
@@ -121,9 +121,9 @@ BEGIN
 			 , NULL AS RedeemReminder_Amount
 			 , NULL AS RedeemReminder_Day
 		FROM [Email].[Actito_Deltas] dd
-		WHERE '1900-01-01' < Reached5GBP_Date
+		WHERE '1900-01-01' < [dd].[Reached5GBP_Date]
 		UNION
-		SELECT FanID
+		SELECT [Email].[Actito_Deltas].[FanID]
 			 , 4 AS TriggerEmailTypeID
 			 , @Today AS EmailSendDate
 			 , NULL AS Birthday_Code
@@ -133,11 +133,11 @@ BEGIN
 			 , NULL AS FirstEarn_Amount
 			 , NULL AS FirstEarn_Type
 			 , NULL AS Reached5GBP_Date
-			 , EarnConfirmation_Date
+			 , [Email].[Actito_Deltas].[EarnConfirmation_Date]
 			 , NULL AS RedeemReminder_Amount
 			 , NULL AS RedeemReminder_Day
 		FROM [Email].[Actito_Deltas]
-		WHERE '1900-01-01' < EarnConfirmation_Date
+		WHERE '1900-01-01' < [Email].[Actito_Deltas].[EarnConfirmation_Date]
 		UNION
 		SELECT FanID
 			 , tet.ID AS TriggerEmailTypeID
@@ -206,7 +206,7 @@ BEGIN CATCH
 	IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 	-- Insert the error into the ErrorLog
-	INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+	INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 	VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 	-- Regenerate an error to return to caller

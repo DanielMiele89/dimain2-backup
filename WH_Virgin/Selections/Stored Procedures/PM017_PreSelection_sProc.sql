@@ -25,17 +25,17 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 			 , @Lapsed INT
 			 , @Lapsing INT
 
-		SELECT	@BrandID = BrandID
+		SELECT	@BrandID = [Warehouse].[Relational].[Partner].[BrandID]
 		FROM [Warehouse].[Relational].[Partner]
-		WHERE PartnerID = @PartnerID
+		WHERE [Warehouse].[Relational].[Partner].[PartnerID] = @PartnerID
 
 
-		SELECT @Acquire = Acquire 
-			 , @Lapsed = Lapsed
-			 , @Lapsing = Lapsed - 4
+		SELECT @Acquire = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Acquire] 
+			 , @Lapsed = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Lapsed]
+			 , @Lapsing = [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[Lapsed] - 4
 		FROM [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ]
-		WHERE PartnerID = @PartnerID
-		AND EndDate IS NULL
+		WHERE [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[PartnerID] = @PartnerID
+		AND [Warehouse].[Segmentation].[ROC_Shopper_Segment_Partner_Settings ].[EndDate] IS NULL
 	
 	/*******************************************************************************************************************************************
 		2. Run segmentation for spenders
@@ -69,9 +69,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 			CREATE TABLE #CCIDs (	ConsumerCombinationID BIGINT)
 
 			INSERT INTO #CCIDs
-			SELECT	ConsumerCombinationID
+			SELECT	[cc].[ConsumerCombinationID]
 			FROM Trans.ConsumerCombination cc WITH (NOLOCK)
-			WHERE BrandID = @BrandID
+			WHERE [cc].[BrandID] = @BrandID
 		
 			CREATE CLUSTERED INDEX CIX_CCID_CCID ON #CCIDs (ConsumerCombinationID)
 
@@ -151,10 +151,10 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 	*******************************************************************************************************************************************/
 				
 			IF OBJECT_ID('tempdb..#CustomersEarntOnOffer') IS NOT NULL DROP TABLE #CustomersEarntOnOffer
-			SELECT	FanID
+			SELECT	[Derived].[PartnerTrans].[FanID]
 			INTO #CustomersEarntOnOffer
 			FROM [Derived].[PartnerTrans]
-			WHERE PartnerID = @PartnerID
+			WHERE [Derived].[PartnerTrans].[PartnerID] = @PartnerID
 
 
 	/*******************************************************************************************************************************************
@@ -165,10 +165,10 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 		SELECT *
 		INTO Sandbox.Rory.PoochMuttLapsing_20210617_Virgin
 		FROM #AllCustomers
-		WHERE Segment = 'Lapsing'
+		WHERE #AllCustomers.[Segment] = 'Lapsing'
 		
 		IF OBJECT_ID('[WH_Virgin].[Selections].[PM017_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[PM017_PreSelection]
-		SELECT	FanID
+		SELECT	[Sandbox].[Rory].[PoochMuttLapsing_20210617_Virgin].[FanID]
 		INTO [WH_Virgin].[Selections].[PM017_PreSelection]
 		FROM Sandbox.Rory.PoochMuttLapsing_20210617_Virgin
 

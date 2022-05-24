@@ -43,7 +43,7 @@ IF OBJECT_ID('tempdb..#Partitions') IS NOT NULL DROP TABLE #Partitions;
 )
 SELECT * INTO #Partitions 
 FROM PartitionData 
-WHERE ThisPartitionStartDate < @MinTranDate 
+WHERE [PartitionData].[ThisPartitionStartDate] < @MinTranDate 
 	AND PartitionRowCount > 0
 ORDER BY PartitionID ;
 EXEC master.dbo.oo_TimerMessageV2 'Collected partition data', @time1 OUTPUT, @SSMS OUTPUT
@@ -51,15 +51,15 @@ EXEC master.dbo.oo_TimerMessageV2 'Collected partition data', @time1 OUTPUT, @SS
 --select * from #Partitions
 
 DECLARE @strPartitionID VARCHAR(3), @ThisPartitionStartDate VARCHAR(8), @NextPartitionStartDate VARCHAR(8), @NewFilegroupSuffix VARCHAR(6), @SQL VARCHAR(8000), @PartitionFilegroupName VARCHAR(200);
-SELECT @Counter = MIN(PartitionID) FROM #Partitions
+SELECT @Counter = MIN(#Partitions.[PartitionID]) FROM #Partitions
 WHILE 1 = 1 BEGIN
 	SELECT 
-		@strPartitionID = PartitionID, 
-		@ThisPartitionStartDate = CONVERT(VARCHAR(8),ThisPartitionStartDate,112), 
-		@NextPartitionStartDate = CONVERT(VARCHAR(8),NextPartitionStartDate,112),
-		@NewFilegroupSuffix = RIGHT(PartitionFilegroupName,6),
-		@PartitionFilegroupName = PartitionFilegroupName
-	FROM #Partitions WHERE PartitionID = @Counter;
+		@strPartitionID = #Partitions.[PartitionID], 
+		@ThisPartitionStartDate = CONVERT(VARCHAR(8),#Partitions.[ThisPartitionStartDate],112), 
+		@NextPartitionStartDate = CONVERT(VARCHAR(8),#Partitions.[NextPartitionStartDate],112),
+		@NewFilegroupSuffix = RIGHT(#Partitions.[PartitionFilegroupName],6),
+		@PartitionFilegroupName = #Partitions.[PartitionFilegroupName]
+	FROM #Partitions WHERE #Partitions.[PartitionID] = @Counter;
 	IF @@ROWCOUNT = 0 BREAK;
 
 	SET @msg = 'Processing partition ' + @strPartitionID + ', date ' + @ThisPartitionStartDate;

@@ -47,13 +47,13 @@ BEGIN
 			WHILE 1 = 1
 				BEGIN
 					
-					IF NOT EXISTS (SELECT 1 FROM #InboundTables WHERE @RowID = RowID)
+					IF NOT EXISTS (SELECT 1 FROM #InboundTables WHERE @RowID = #InboundTables.[RowID])
 						BREAK
 
-					SELECT	@TableName = TableName
-						,	@SourceTable = SourceTable
+					SELECT	@TableName = #InboundTables.[TableName]
+						,	@SourceTable = #InboundTables.[SourceTable]
 					FROM #InboundTables
-					WHERE RowID = @RowID
+					WHERE #InboundTables.[RowID] = @RowID
 
 					SET @Query = '	
 									INSERT INTO [WHB].[Inbound_Files]
@@ -80,7 +80,7 @@ BEGIN
 			SELECT	DISTINCT	
 					TableName = 'Transactions'
 				,	LoadDate = CONVERT(DATE, st.LoadDate)
-				,	FileName
+				,	[st].[FileName]
 				,	FileProcessed = 0
 			FROM [Inbound].[Transactions] st
 			WHERE NOT EXISTS (	SELECT 1
@@ -88,7 +88,7 @@ BEGIN
 								WHERE st.FileName = f.FileName
 								AND CONVERT(DATE, st.LoadDate) = CONVERT(DATE, f.LoadDate)
 								AND f.TableName = 'Transactions')
-			ORDER BY	FileName
+			ORDER BY	[st].[FileName]
 					,	LoadDate
 
 			EXEC [Monitor].[ProcessLog_Insert] @StoredProcedureName, 'Finished'
@@ -111,7 +111,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

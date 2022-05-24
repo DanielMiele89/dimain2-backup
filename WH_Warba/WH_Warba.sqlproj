@@ -222,11 +222,6 @@
     <Build Include="Security\Permissions_20.sql" />
   </ItemGroup>
   <ItemGroup>
-    <ArtifactReference Include="..\dacpac_WH_Warba.dacpac">
-      <HintPath>..\dacpac_WH_Warba.dacpac</HintPath>
-      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
-      <DatabaseSqlCmdVariable>dacpac_WH_Warba</DatabaseSqlCmdVariable>
-    </ArtifactReference>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\150\SqlSchemas\master.dacpac">
       <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\150\SqlSchemas\master.dacpac</HintPath>
       <SuppressMissingDependenciesErrors>True</SuppressMissingDependenciesErrors>

@@ -7,21 +7,21 @@ AS
 SELECT	v.FanID
 	,	'' AS Welcome_Code
 
-	,	Birthday_Flag
-	,	Birthday_Code
-	,	Birthday_CodeExpiryDate
-	,	FirstEarn_Date
-	,	FirstEarn_Amount as FirstEarn_TransactionAmount
+	,	[WH_Virgin].[Email].[DailyData].[Birthday_Flag]
+	,	[WH_Virgin].[Email].[DailyData].[Birthday_Code]
+	,	[WH_Virgin].[Email].[DailyData].[Birthday_CodeExpiryDate]
+	,	[WH_Virgin].[Email].[DailyData].[FirstEarn_Date]
+	,	[WH_Virgin].[Email].[DailyData].[FirstEarn_Amount] as FirstEarn_TransactionAmount
 	,	'' FirstEarn_CashbackAmount
-	,	FirstEarn_Type
-	,	FirstEarn_RetailerName
+	,	[WH_Virgin].[Email].[DailyData].[FirstEarn_Type]
+	,	[WH_Virgin].[Email].[DailyData].[FirstEarn_RetailerName]
 
-	,	Reached5GBP_Date
+	,	[WH_Virgin].[Email].[DailyData].[Reached5GBP_Date]
 
-	,	RedeemReminder_Day
-	,	RedeemReminder_Amount
+	,	[WH_Virgin].[Email].[DailyData].[RedeemReminder_Day]
+	,	[WH_Virgin].[Email].[DailyData].[RedeemReminder_Amount]
 
-	,	EarnConfirmation_Date
+	,	[WH_Virgin].[Email].[DailyData].[EarnConfirmation_Date]
 
 	,	Homemover_Flag = ''
 

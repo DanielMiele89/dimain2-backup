@@ -14,7 +14,7 @@ and gender = 'F'
 
 
 	IF OBJECT_ID('[WH_Virgin].[Selections].[BHO014_PreSelection]') IS NOT NULL DROP TABLE [WH_Virgin].[Selections].[BHO014_PreSelection]
-	SELECT FanID
+	SELECT [Sandbox].[bastienc].[boohoo_Virgin].[FanID]
 	INTO [WH_Virgin].[Selections].[BHO014_PreSelection]
 	FROM Sandbox.bastienc.boohoo_Virgin
 

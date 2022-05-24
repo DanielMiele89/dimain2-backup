@@ -147,29 +147,29 @@ BEGIN
 		INTO #SchemeTrans_Temp
 		FROM #PANless_Transaction pt
 		LEFT JOIN OPENQUERY([DIMAIN_TR],'SELECT * FROM [SLC_REPL].[dbo].[RetailOutlet]') ro
-			ON pt.MerchantNumber = ro.MerchantID	
-			AND pt.PartnerID = ro.PartnerID
+			ON pt.MerchantNumber = #PANless_Transaction.[ro].MerchantID	
+			AND pt.PartnerID = #PANless_Transaction.[ro].PartnerID
 		LEFT JOIN [Warehouse].[iron].[PrimaryRetailerIdentification] pri
-			ON pt.PartnerID = pri.PartnerID
+			ON pt.PartnerID = #PANless_Transaction.[pri].PartnerID
 		LEFT JOIN [Warehouse].[Relational].[nFI_Partner_Deals] pd
-			ON COALESCE(pri.PrimaryPartnerID, pri.PartnerID) = pd.PartnerID
-			AND pt.ClubID = pd.ClubID
-			AND pt.TransactionDate BETWEEN pd.StartDate AND pd.EndDate
+			ON COALESCE(#PANless_Transaction.[pri].PrimaryPartnerID, #PANless_Transaction.[pri].PartnerID) = #PANless_Transaction.[pd].PartnerID
+			AND pt.ClubID = #PANless_Transaction.[pd].ClubID
+			AND pt.TransactionDate BETWEEN #PANless_Transaction.[pd].StartDate AND #PANless_Transaction.[pd].EndDate
 		LEFT JOIN [Derived].[IronOffer] iof
 			ON pt.RewardOfferID = iof.IronOfferID
 		LEFT JOIN #IronOffer_SpendStretch ss
 			ON pt.RewardOfferID = ss.IronOfferID
-		CROSS APPLY (	SELECT	CheckDate = DATEADD(DAY, 15, EOMONTH(TransactionDate))
-							,	Investment = COALESCE(pt.NetAmount, ROUND(pt.CashbackAmount * (1 + ISNULL(pd.[Override], 0.35)), 2))
-							,	Commission = COALESCE(pt.NetAmount, ROUND(pt.CashbackAmount * (1 + ISNULL(pd.[Override], 0.35)), 2)) - pt.CashbackAmount
-							,	PublisherCommission = ((COALESCE(pt.NetAmount, ROUND(pt.CashbackAmount * (1 + ISNULL(pd.[Override], 0.35)), 2)) - pt.CashbackAmount) * pd.Publisher / 100) / ((pd.Publisher / 100) + (pd.Reward / 100))
+		CROSS APPLY (	SELECT	CheckDate = DATEADD(DAY, 15, EOMONTH([pt2].[TransactionDate]))
+							,	Investment = COALESCE(#PANless_Transaction.[pt].NetAmount, ROUND(#PANless_Transaction.[pt].CashbackAmount * (1 + ISNULL(#PANless_Transaction.[pd].[Override], 0.35)), 2))
+							,	Commission = COALESCE(#PANless_Transaction.[pt].NetAmount, ROUND(#PANless_Transaction.[pt].CashbackAmount * (1 + ISNULL(#PANless_Transaction.[pd].[Override], 0.35)), 2)) - #PANless_Transaction.[pt].CashbackAmount
+							,	PublisherCommission = ((COALESCE(#PANless_Transaction.[pt].NetAmount, ROUND(#PANless_Transaction.[pt].CashbackAmount * (1 + ISNULL(#PANless_Transaction.[pd].[Override], 0.35)), 2)) - #PANless_Transaction.[pt].CashbackAmount) * #PANless_Transaction.[pd].Publisher / 100) / ((#PANless_Transaction.[pd].Publisher / 100) + (#PANless_Transaction.[pd].Reward / 100))
 						FROM #PANless_Transaction pt2
-						WHERE pt.ID = pt2.ID) pt2
+						WHERE #PANless_Transaction.[pt].ID = pt2.ID) pt2
 
 		
 		INSERT INTO [Staging].[SchemeTrans]
 		SELECT	ID = stt.ID
-			,	SchemeTransID = (ROW_NUMBER() OVER (ORDER BY stt.ID) + (SELECT COALESCE(MAX(SchemeTransID), 0) FROM [Staging].[SchemeTrans] WHERE SchemeTransID > 0))
+			,	SchemeTransID = (ROW_NUMBER() OVER (ORDER BY stt.ID) + (SELECT COALESCE(MAX([Staging].[SchemeTrans].[SchemeTransID]), 0) FROM [Staging].[SchemeTrans] WHERE [Staging].[SchemeTrans].[SchemeTransID] > 0))
 			,	stt.Spend
 			,	stt.RetailerCashback
 			,	stt.TranDate
@@ -201,7 +201,7 @@ BEGIN
 			,	stt.GrossCommission
 			,	CONVERT(TIME, stt.TranDate) AS TranTime
 			,	0 AS Imported
-			,	MaskedCardNumber
+			,	[stt].[MaskedCardNumber]
 		FROM #SchemeTrans_Temp stt
 		WHERE NOT EXISTS (	SELECT 1
 							FROM [Staging].[SchemeTrans] st
@@ -230,7 +230,7 @@ BEGIN
 			IF @@TRANCOUNT > 0 ROLLBACK TRAN;
 			
 		-- Insert the error into the ErrorLog
-			INSERT INTO [Monitor].[ErrorLog] (ErrorDate, ProcedureName, ErrorLine, ErrorMessage, ErrorNumber, ErrorSeverity, ErrorState)
+			INSERT INTO [Monitor].[ErrorLog] ([Monitor].[ErrorLog].[ErrorDate], [Monitor].[ErrorLog].[ProcedureName], [Monitor].[ErrorLog].[ErrorLine], [Monitor].[ErrorLog].[ErrorMessage], [Monitor].[ErrorLog].[ErrorNumber], [Monitor].[ErrorLog].[ErrorSeverity], [Monitor].[ErrorLog].[ErrorState])
 			VALUES (GETDATE(), @ERROR_PROCEDURE, @ERROR_LINE, @ERROR_MESSAGE, @ERROR_NUMBER, @ERROR_SEVERITY, @ERROR_STATE);	
 
 		-- Regenerate an error to return to caller

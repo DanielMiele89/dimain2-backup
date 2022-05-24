@@ -15,10 +15,10 @@ and AccountType IS NOT NULL
 
 
 IF OBJECT_ID('tempdb..#CC') IS NOT NULL DROP TABLE #CC
-SELECT ConsumerCombinationID
+SELECT [WH_Virgin].[trans].[ConsumerCombination].[ConsumerCombinationID]
 INTO #CC
 FROM	WH_Virgin.trans.ConsumerCombination CC
-WHERE	BrandID IN (2434,2592,2777,3165,574,568)			
+WHERE	[WH_Virgin].[trans].[ConsumerCombination].[BrandID] IN (2434,2592,2777,3165,574,568)			
 
 
 IF OBJECT_ID('tempdb..#Trans') IS NOT NULL DROP TABLE #Trans
@@ -31,7 +31,7 @@ SELECT	 F.CINID, Classification, Engagement_Score
 			END AS Classification_Score
 INTO #Trans
 FROM	WH_Virgin.trans.consumertransaction CT
-JOIN	#FB F ON F.CINID = CT.CINID
+JOIN	#FB F ON F.CINID = #FB.[CT].CINID
 JOIN	#CC C 	ON C.ConsumerCombinationID = CT.ConsumerCombinationID
 LEFT JOIN	Derived.Customer_EngagementScore E ON E.FanID = F.FanID
 WHERE	TranDate > DATEADD(MONTH, -24, GETDATE())
@@ -46,14 +46,14 @@ GROUP BY F.CINID, Classification, Engagement_Score
 
 
 IF OBJECT_ID('tempdb..#NtileEngaged') IS NOT NULL DROP TABLE #NtileEngaged	
-SELECT	 CINID
-		, NTILE(2) OVER (ORDER BY Classification_Score ASC, Engagement_Score DESC) AS NTILE_2
+SELECT	 #Trans.[CINID]
+		, NTILE(2) OVER (ORDER BY #Trans.[Classification_Score] ASC, #Trans.[Engagement_Score] DESC) AS NTILE_2
 INTO	#NtileEngaged
 FROM	#Trans
 
 
 IF OBJECT_ID('Sandbox.RukanK.VM_SweatyBetty_CompSteal_15pct_20072021') IS NOT NULL DROP TABLE Sandbox.RukanK.VM_SweatyBetty_CompSteal_15pct_20072021
-SELECT	CINID
+SELECT	#Trans.[CINID]
 INTO Sandbox.RukanK.VM_SweatyBetty_CompSteal_15pct_20072021
 FROM #Trans
-WHERE	CINID IN (SELECT CINID FROM #NtileEngaged WHERE NTILE_2 IN (2))If Object_ID('WH_Virgin.Selections.SWB010_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.SWB010_PreSelectionSelect FanIDInto WH_Virgin.Selections.SWB010_PreSelectionFROM WH_Virgin.derived.Customer cuWHERE EXISTS (	SELECT 1				FROM WH_Virgin.derived.[CINList] cl				INNER JOIN Sandbox.RukanK.VM_SweatyBetty_CompSteal_15pct_20072021 fo					ON cl.CINID = fo.CINID				WHERE cu.SourceUID = cl.CIN)END
+WHERE	#Trans.[CINID] IN (SELECT #NtileEngaged.[CINID] FROM #NtileEngaged WHERE #NtileEngaged.[NTILE_2] IN (2))If Object_ID('WH_Virgin.Selections.SWB010_PreSelection') Is Not Null Drop Table WH_Virgin.Selections.SWB010_PreSelectionSelect [WH_Virgin].[derived].[Customer].[FanID]Into WH_Virgin.Selections.SWB010_PreSelectionFROM WH_Virgin.derived.Customer cuWHERE EXISTS (	SELECT 1				FROM WH_Virgin.derived.[CINList] cl				INNER JOIN Sandbox.RukanK.VM_SweatyBetty_CompSteal_15pct_20072021 fo					ON cl.CINID = fo.CINID				WHERE cu.SourceUID = cl.CIN)END

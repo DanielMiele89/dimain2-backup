@@ -28,15 +28,15 @@ BEGIN
 	
 	DECLARE	@EmailDate DATE
 
-	SELECT @EmailDate = MIN(EmailDate)
+	SELECT @EmailDate = MIN([Selections].[CampaignSetup_POS].[EmailDate])
 	FROM [Selections].[CampaignSetup_POS]
-	WHERE EmailDate > GETDATE()
+	WHERE [Selections].[CampaignSetup_POS].[EmailDate] > GETDATE()
 
 	IF OBJECT_ID('tempdb..#PrioritisedCustomerAccounts') IS NOT NULL DROP TABLE #PrioritisedCustomerAccounts
 	SELECT *
 	INTO #PrioritisedCustomerAccounts
 	FROM [Selections].[PrioritisedCustomerAccounts]
-	WHERE EndDate IS NULL
+	WHERE [Selections].[PrioritisedCustomerAccounts].[EndDate] IS NULL
 
 	IF OBJECT_ID('tempdb..#Offers') IS NOT NULL DROP TABLE #Offers
 	SELECT	iof.PartnerID
@@ -52,7 +52,7 @@ BEGIN
 	FROM [Derived].[IronOffer] iof
 	LEFT JOIN Derived.Partner pa
 		ON iof.PartnerID = pa.PartnerID
-	WHERE EndDate > @EmailDate
+	WHERE [iof].[EndDate] > @EmailDate
 	AND EXISTS (SELECT 1
 				FROM [Selections].[CampaignSetup_POS] cs
 				WHERE cs.OfferID LIKE '%' + CONVERT(VARCHAR(10), iof.IronOfferID) + '%')
@@ -65,14 +65,14 @@ BEGIN
 						AND iom.EndDate > @EmailDate))
 
 	IF OBJECT_ID('tempdb..#TopOffers') IS NOT NULL DROP TABLE #TopOffers
-	SELECT	PartnerID
-		,	PartnerName
-		,	IronOfferID
-		,	IronOfferName
-		,	TopCashBackRate
+	SELECT	#Offers.[PartnerID]
+		,	#Offers.[PartnerName]
+		,	#Offers.[IronOfferID]
+		,	#Offers.[IronOfferName]
+		,	#Offers.[TopCashBackRate]
 	INTO #TopOffers
 	FROM #Offers
-	WHERE OfferRank = 1
+	WHERE #Offers.[OfferRank] = 1
 
 /*******************************************************************************************************************************************
 	2. Remove all offer memberships asigned through the normal process
@@ -105,17 +105,17 @@ BEGIN
 			,	tpo.PartnerID
 
 	INSERT INTO [Segmentation].[OfferMemberAddition]
-	SELECT	CompositeID
-		,	IronOfferID
-		,	StartDate
-		,	EndDate
+	SELECT	[nm].[CompositeID]
+		,	[nm].[IronOfferID]
+		,	[nm].[StartDate]
+		,	[nm].[EndDate]
 		,	GETDATE()
 	FROM #NewMemberships nm
 	WHERE NOT EXISTS (	SELECT 1
 						FROM [Segmentation].[OfferMemberAddition] oma
 						INNER JOIN #Offers iof
 							ON oma.IronOfferID = iof.IronOfferID
-						WHERE nm.CompositeID = oma.CompositeID
-						AND nm.PartnerID = iof.PartnerID)
+						WHERE #Offers.[nm].CompositeID = oma.CompositeID
+						AND #Offers.[nm].PartnerID = iof.PartnerID)
 
 END
