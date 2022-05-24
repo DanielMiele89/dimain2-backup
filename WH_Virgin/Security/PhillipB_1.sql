@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [PhillipB]
+    WITH PASSWORD = N'iWwcyuei5oxI{tDgxruv>kjmmsFT7_&#$!~<ZQpidWqjhxyp', SID = 0x24BF7B341FA64E44A2FBD739068DE142, DEFAULT_DATABASE = [Warehouse], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [virgin_prod]
+    WITH PASSWORD = N'iwcyDu1io{mtgxuvkjpiOdRJmsFT7_&#$!~<jhxyCVp3cz|X', SID = 0x04CF0503B14BDA4993C9ACD6FC8FDEF9, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

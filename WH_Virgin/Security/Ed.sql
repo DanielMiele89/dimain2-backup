@@ -1,0 +1,2 @@
+﻿CREATE USER [Ed] FOR LOGIN [Ed];
+

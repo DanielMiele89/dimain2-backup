@@ -1,0 +1,4 @@
+﻿CREATE PARTITION SCHEME [PartitionByMonthScheme]
+    AS PARTITION [PartitionByMonthFunction]
+    TO ([fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans], [fg_ConsumerTrans]);
+
