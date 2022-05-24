@@ -221,4 +221,17 @@
     <Build Include="Security\Permissions_19.sql" />
     <Build Include="Security\Permissions_20.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <ArtifactReference Include="..\dacpac_WH_Warba.dacpac">
+      <HintPath>..\dacpac_WH_Warba.dacpac</HintPath>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseSqlCmdVariable>dacpac_WH_Warba</DatabaseSqlCmdVariable>
+    </ArtifactReference>
+  </ItemGroup>
+  <ItemGroup>
+    <SqlCmdVariable Include="dacpac_WH_Warba">
+      <DefaultValue>dacpac_WH_Warba</DefaultValue>
+      <Value>$(SqlCmdVar__1)</Value>
+    </SqlCmdVariable>
+  </ItemGroup>
 </Project>
