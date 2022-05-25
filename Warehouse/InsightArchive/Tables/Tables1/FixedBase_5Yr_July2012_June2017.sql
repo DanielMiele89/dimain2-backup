@@ -1,5 +1,0 @@
-﻿CREATE TABLE [InsightArchive].[FixedBase_5Yr_July2012_June2017] (
-    [CINID] INT NOT NULL,
-    PRIMARY KEY CLUSTERED ([CINID] ASC)
-);
-

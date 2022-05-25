@@ -1,2 +1,0 @@
-﻿-- =============================================-- Author:  <Rory Francis>-- Create date: <2019-07-12>-- Description: < sProc to run preselection code per camapign >-- =============================================CREATE Procedure Selections.WA191_PreSelection_sProcASBEGIN
-If Object_ID('Warehouse.Selections.WA191_PreSelection') Is Not Null Drop Table Warehouse.Selections.WA191_PreSelectionSelect FanIDInto Warehouse.Selections.WA191_PreSelectionFrom Sandbox.Conal.Waitrose_Acquire_Lapsed_0_10_ShopperEND

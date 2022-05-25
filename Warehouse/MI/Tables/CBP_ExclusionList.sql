@@ -1,5 +1,0 @@
-﻿CREATE TABLE [MI].[CBP_ExclusionList] (
-    [FanID] INT NOT NULL,
-    CONSTRAINT [PK_MI_CBP_ExclusionList] PRIMARY KEY CLUSTERED ([FanID] ASC)
-);
-

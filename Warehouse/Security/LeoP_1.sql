@@ -1,3 +1,0 @@
-﻿CREATE LOGIN [LeoP]
-    WITH PASSWORD = N'f>p|s{hkrc|wlkt2Qn2c`vpYmsFT7_&#$!~<+|{wzWk^vl=r', SID = 0xFD4252186345594280EB74C13CD7540D, DEFAULT_DATABASE = [Warehouse], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
-

@@ -1,3 +1,0 @@
-﻿-- =============================================-- Author:  <Rory Francis>-- Create date: <2021-05-15>-- Description: < sProc to run preselection code per camapign >-- =============================================CREATE PROCEDURE Selections.BUR002_PreSelection_sProcASBEGINIf Object_ID('tempdb..#Customers') Is Not Null Drop Table #CustomersSELECT *
-INTO #Customers
-FROM [Relational].[Customer]If Object_ID('Warehouse.Selections.BUR002_PreSelection') Is Not Null Drop Table Warehouse.Selections.BUR002_PreSelectionSelect FanIDInto Warehouse.Selections.BUR002_PreSelectionFROM #CustomersEND

@@ -1,3 +1,0 @@
-﻿CREATE LOGIN [PIITestAccount]
-    WITH PASSWORD = N'fHpvtK|ss9{krc|rwalkq_itmsFT7_&#$!~<nc4Ap{|wzkvd', SID = 0x3FBD826B76A12E48AB4869C653B7C806, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
-

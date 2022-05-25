@@ -1,3 +1,0 @@
-﻿CREATE LOGIN [BIDIMAINReportUser]
-    WITH PASSWORD = N'Vl?ssh<znobrwg3gqarv5d{|msFT7_&#$!~<ayulyay2wXC{', SID = 0x3C5C883127FFEC478094883AD0C4B4D0, DEFAULT_LANGUAGE = [us_english];
-

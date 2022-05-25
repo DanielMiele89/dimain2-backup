@@ -1,2 +1,0 @@
-﻿CREATE USER [RyanD] FOR LOGIN [RyanD];
-

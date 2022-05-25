@@ -1,3 +1,0 @@
-﻿CREATE LOGIN [ProcessXtra]
-    WITH PASSWORD = N'!pUhebekwKc{tQ|!fytwhpttmsFT7_&#$!~<ALjqE9yjjqn2', SID = 0xA3480BF0CCD8834D9DC7FF469D1A0172, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
-

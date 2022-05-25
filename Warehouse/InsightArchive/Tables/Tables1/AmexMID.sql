@@ -1,5 +1,0 @@
-﻿CREATE TABLE [InsightArchive].[AmexMID] (
-    [MID] VARCHAR (50) NOT NULL,
-    PRIMARY KEY CLUSTERED ([MID] ASC)
-);
-

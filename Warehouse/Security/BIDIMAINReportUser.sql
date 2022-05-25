@@ -1,2 +1,0 @@
-﻿CREATE USER [BIDIMAINReportUser] FOR LOGIN [BIDIMAINReportUser];
-

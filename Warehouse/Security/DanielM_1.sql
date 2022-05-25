@@ -1,3 +1,0 @@
-﻿CREATE LOGIN [DanielM]
-    WITH PASSWORD = N'sEfp|sr{krc2|wHlktncp|NwmsFT7_&#$!~<z^kviz5lSr%|', SID = 0xDE0F9B290750054EAAE77B61E80930C8, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
-

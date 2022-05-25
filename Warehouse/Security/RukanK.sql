@@ -1,2 +1,0 @@
-﻿CREATE USER [RukanK] FOR LOGIN [RukanK];
-

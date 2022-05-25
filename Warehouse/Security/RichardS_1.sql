@@ -1,3 +1,0 @@
-﻿CREATE LOGIN [RichardS]
-    WITH PASSWORD = N'xJywNgtlmb9g|Wybrytey@lqmsFT7_&#$!~<g1ynfrG3o2cz', SID = 0x68DC7102F6285543BE394B3C2445A7AE, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
-

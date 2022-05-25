@@ -1,6 +1,0 @@
-﻿CREATE TABLE [APW].[MarketShareCINID] (
-    [CINID]          INT NOT NULL,
-    [IsSchemeMember] BIT NOT NULL,
-    CONSTRAINT [PK_APW_MarketShareCINID] PRIMARY KEY CLUSTERED ([CINID] ASC)
-);
-
