@@ -1,0 +1,9 @@
+﻿
+
+CREATE FUNCTION [Staging].[fnGetDaysInMonth] ( @MyDate    DATETIME )
+RETURNS INT
+AS
+BEGIN
+
+    RETURN DAY(DATEADD(DD,-1,DATEADD(MM ,1,DATEADD(DD, 1 - DAY(@MyDate), @MyDate))))
+END

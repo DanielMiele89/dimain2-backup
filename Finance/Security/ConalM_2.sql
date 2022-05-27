@@ -1,2 +1,0 @@
-﻿CREATE USER [ConalM] FOR LOGIN [ConalM];
-
