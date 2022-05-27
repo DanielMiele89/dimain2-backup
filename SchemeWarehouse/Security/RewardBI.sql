@@ -1,0 +1,10 @@
+﻿CREATE SCHEMA [RewardBI]
+    AUTHORIZATION [dbo];
+
+
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[RewardBI] TO [gas];
+

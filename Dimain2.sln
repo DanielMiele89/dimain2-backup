@@ -17,6 +17,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "WH_Virgin", "WH_Virgin\WH_V
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "WH_AllPublishers", "WH_AllPublishers\WH_AllPublishers.sqlproj", "{A3C442C1-3CC9-4E77-90A9-8B9D440F9721}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SchemeWarehouse", "SchemeWarehouse\SchemeWarehouse.sqlproj", "{8F7BD2EF-8801-4F37-B462-13A081747509}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,12 @@ Global
 		{A3C442C1-3CC9-4E77-90A9-8B9D440F9721}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3C442C1-3CC9-4E77-90A9-8B9D440F9721}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A3C442C1-3CC9-4E77-90A9-8B9D440F9721}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8F7BD2EF-8801-4F37-B462-13A081747509}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F7BD2EF-8801-4F37-B462-13A081747509}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F7BD2EF-8801-4F37-B462-13A081747509}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8F7BD2EF-8801-4F37-B462-13A081747509}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F7BD2EF-8801-4F37-B462-13A081747509}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F7BD2EF-8801-4F37-B462-13A081747509}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

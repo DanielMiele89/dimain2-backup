@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [Zoe]
+    WITH PASSWORD = N'u{koHfjyyndm+5bxs2b{ufEpmsFT7_&#$!~<nmzpvtsj{swl', SID = 0x10EBD9BCA0192C4F98783D8B78789B4F, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

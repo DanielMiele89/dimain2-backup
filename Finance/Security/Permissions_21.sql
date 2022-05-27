@@ -1,5 +1,0 @@
-﻿
-GO
-GRANT CREATE SEQUENCE
-    ON SCHEMA::[dbo] TO [DataOps];
-

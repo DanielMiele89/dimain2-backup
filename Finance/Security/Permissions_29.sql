@@ -1,5 +1,0 @@
-﻿
-GO
-GRANT VIEW DEFINITION
-    ON SCHEMA::[dbo] TO [DataOps];
-

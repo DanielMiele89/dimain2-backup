@@ -1,3 +1,0 @@
-﻿CREATE SCHEMA [WHB]
-    AUTHORIZATION [dbo];
-
