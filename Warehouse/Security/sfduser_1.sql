@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [sfduser]
+    WITH PASSWORD = N'ygwou+jtMi4rzavwuuyfqv!pmsFT7_&#$!~<0wujozaccItk', SID = 0x569F9B64D0C5AC469684EE81AE44599C, DEFAULT_DATABASE = [SLC_Report], DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

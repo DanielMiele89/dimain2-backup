@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [TestUser]
+    WITH PASSWORD = N'$oYprcnko8q{d|&jY4uZl0|qmsFT7_&#$!~<b$Zrk2P:ofF`', SID = 0x6B24FA4E7D303F4D9D50222A297566C4, DEFAULT_DATABASE = [Sandbox], DEFAULT_LANGUAGE = [us_english];
+

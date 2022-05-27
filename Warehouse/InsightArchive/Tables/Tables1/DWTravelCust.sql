@@ -1,0 +1,28 @@
+﻿CREATE TABLE [InsightArchive].[DWTravelCust] (
+    [CINID]            INT            NOT NULL,
+    [TimePeriod]       VARCHAR (13)   NOT NULL,
+    [AirlineSpend]     MONEY          NULL,
+    [AirlineVisits]    INT            NULL,
+    [AggSpend]         MONEY          NULL,
+    [AggVisits]        INT            NULL,
+    [CruiseSpend]      MONEY          NULL,
+    [CruiseVisits]     INT            NULL,
+    [HotelSpend]       MONEY          NULL,
+    [HotelVisits]      INT            NULL,
+    [PackageSpend]     MONEY          NULL,
+    [PackageVisits]    INT            NULL,
+    [UKSpend]          MONEY          NULL,
+    [UKVisits]         INT            NULL,
+    [CCSpend]          MONEY          NULL,
+    [NumCancellations] INT            NULL,
+    [TotTrvlSpend]     MONEY          NULL,
+    [TotTrvlTrx]       INT            NULL,
+    [IntSpend]         MONEY          NULL,
+    [IntTrx]           INT            NULL,
+    [NumMthsTrvl]      INT            NULL,
+    [AllSpend]         MONEY          NULL,
+    [AllTrx]           INT            NULL,
+    [Social_Class]     NVARCHAR (255) NULL,
+    [CustAge]          INT            NULL
+);
+

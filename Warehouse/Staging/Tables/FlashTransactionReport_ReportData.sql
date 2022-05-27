@@ -1,0 +1,27 @@
+﻿CREATE TABLE [Staging].[FlashTransactionReport_ReportData] (
+    [ID]                         INT           IDENTITY (1, 1) NOT NULL,
+    [CalculationDate]            DATE          NOT NULL,
+    [RetailerID]                 INT           NOT NULL,
+    [RetailerName]               VARCHAR (100) NOT NULL,
+    [StartDate]                  DATE          NOT NULL,
+    [EndDate]                    DATE          NOT NULL,
+    [PeriodType]                 VARCHAR (25)  NOT NULL,
+    [SuperSegmentID]             INT           NULL,
+    [SuperSegmentName]           VARCHAR (40)  NULL,
+    [OfferTypeID]                INT           NULL,
+    [TypeDescription]            VARCHAR (25)  NULL,
+    [Cardholders]                INT           NULL,
+    [Sales]                      MONEY         NULL,
+    [Spenders]                   INT           NULL,
+    [Transactions]               INT           NULL,
+    [Investment]                 MONEY         NULL,
+    [ATV]                        FLOAT (53)    NULL,
+    [ATF]                        FLOAT (53)    NULL,
+    [RR]                         FLOAT (53)    NULL,
+    [SPS]                        FLOAT (53)    NULL,
+    [SalesToCostRatio]           FLOAT (53)    NULL,
+    [CumulativeSpendersInPeriod] INT           NULL,
+    [OfferTypeForReports]        VARCHAR (100) NULL,
+    CONSTRAINT [PK_FlashTransactionReport_ReportData] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+

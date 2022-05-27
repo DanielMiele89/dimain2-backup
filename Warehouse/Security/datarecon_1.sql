@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [datarecon]
+    WITH PASSWORD = N'9eOx`m^sYhk>jpEB{gfcyxucmsFT7_&#$!~<vqjt{jcso_Bx', SID = 0x39A12A5EE75A054095F71DF38A94618D, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

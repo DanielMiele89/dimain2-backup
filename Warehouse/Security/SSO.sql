@@ -1,0 +1,10 @@
+﻿CREATE SCHEMA [SSO]
+    AUTHORIZATION [dbo];
+
+
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[SSO] TO [gas];
+

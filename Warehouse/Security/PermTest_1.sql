@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [PermTest]
+    WITH PASSWORD = N'exmIs?hkjp{gfxucvoCqjt_ImsFT7_&#$!~<{jc^soc8x{Io', SID = 0xBCA35DE5C1CC8A4DBDCDA8FD65ABB488, DEFAULT_DATABASE = [Sandbox], DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [BIDIMAINETLUser]
+    WITH PASSWORD = N'ex2mshkjrcp{g8fxf,ucv`qjmsFT7_&#$!~<t{Xpjcsox{o}', SID = 0x2C4F31E7509AEE41B1CFF538F03CB00F, DEFAULT_LANGUAGE = [us_english];
+

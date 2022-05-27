@@ -1,0 +1,5 @@
+﻿CREATE TABLE [Relational].[CINOptOutList] (
+    [CINID] INT NOT NULL,
+    CONSTRAINT [PK_CINOptOutList] PRIMARY KEY CLUSTERED ([CINID] ASC)
+);
+
