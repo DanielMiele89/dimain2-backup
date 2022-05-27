@@ -1,0 +1,513 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>WH_AllPublishers</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{a3c442c1-3cc9-4e77-90a9-8b9d440f9721}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>WH_AllPublishers</RootNamespace>
+    <AssemblyName>WH_AllPublishers</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Selections\" />
+    <Folder Include="Selections\Tables\" />
+    <Folder Include="Report\" />
+    <Folder Include="Report\Tables\" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="Derived\" />
+    <Folder Include="Derived\Tables\" />
+    <Folder Include="WHB\" />
+    <Folder Include="WHB\Tables\" />
+    <Folder Include="Staging\" />
+    <Folder Include="Staging\Tables\" />
+    <Folder Include="Monitor\" />
+    <Folder Include="Monitor\Tables\" />
+    <Folder Include="Inbound\" />
+    <Folder Include="Inbound\Tables\" />
+    <Folder Include="Email\" />
+    <Folder Include="Email\Tables\" />
+    <Folder Include="Prototype\" />
+    <Folder Include="Prototype\Tables\" />
+    <Folder Include="Selections\Views\" />
+    <Folder Include="WHB\Views\" />
+    <Folder Include="Email\Views\" />
+    <Folder Include="Derived\Views\" />
+    <Folder Include="Trans\" />
+    <Folder Include="Trans\Views\" />
+    <Folder Include="Storage\" />
+    <Folder Include="Security\" />
+    <Folder Include="Report\Functions\" />
+    <Folder Include="dbo\Functions\" />
+    <Folder Include="Report\Stored Procedures\" />
+    <Folder Include="WHB\Stored Procedures\" />
+    <Folder Include="Selections\Stored Procedures\" />
+    <Folder Include="Monitor\Stored Procedures\" />
+    <Folder Include="Staging\Stored Procedures\" />
+    <Folder Include="Segmentation\" />
+    <Folder Include="Segmentation\Stored Procedures\" />
+    <Folder Include="Prototype\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Selections\Tables\PartnerDedupe_warnerleisure_CustomerMatches_20200218.sql" />
+    <Build Include="Report\Tables\OfferReport_ExposedMembers.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_MonicaVinader_CustomerMatches_20210806.sql" />
+    <Build Include="dbo\Tables\Earnings.sql" />
+    <Build Include="Selections\Tables\CampaignSetup_PartnerDataDedupe.sql" />
+    <Build Include="Report\Tables\OfferReport_Metrics.sql" />
+    <Build Include="Selections\Tables\CampaignSetup_All_20220304.sql" />
+    <Build Include="Derived\Tables\__Publisher.sql" />
+    <Build Include="WHB\Tables\TableLoadStatus.sql" />
+    <Build Include="dbo\Tables\SourceSystem.sql" />
+    <Build Include="Report\Tables\ControlSetup_SegmentationTransDates.sql" />
+    <Build Include="dbo\Tables\SourceType.sql" />
+    <Build Include="Report\Tables\OfferReport_Log.sql" />
+    <Build Include="Derived\Tables\SchemeTransCompare.sql" />
+    <Build Include="Report\Tables\ControlSetup_Counts.sql" />
+    <Build Include="Report\Tables\ControlSetup_Validation_Segments.sql" />
+    <Build Include="Staging\Tables\MIDI_ConsumerCombination_Temp.sql" />
+    <Build Include="Staging\Tables\Visa_Partner.sql" />
+    <Build Include="Report\Tables\OfferCycles.sql" />
+    <Build Include="Staging\Tables\MIDI_ConsumerCombination.sql" />
+    <Build Include="dbo\Tables\PartnersToBrandsImport.sql" />
+    <Build Include="dbo\Tables\Offer.sql" />
+    <Build Include="Monitor\Tables\ProcessLog.sql" />
+    <Build Include="Derived\Tables\__SchemeTrans_Archived.sql" />
+    <Build Include="Inbound\Tables\Virgin_IronOffer.sql" />
+    <Build Include="Derived\Tables\__Offer_Archived.sql" />
+    <Build Include="Inbound\Tables\Virgin_Customer.sql" />
+    <Build Include="Email\Tables\EmailSend.sql" />
+    <Build Include="Inbound\Tables\Publisher.sql" />
+    <Build Include="Derived\Tables\InvalidEmailAddresses.sql" />
+    <Build Include="WHB\Tables\SourceCheckpoint.sql" />
+    <Build Include="Derived\Tables\Publisher.sql" />
+    <Build Include="Derived\Tables\__Customer_Archived.sql" />
+    <Build Include="Staging\Tables\WRBA_Reward_Insight.sql" />
+    <Build Include="Report\Tables\OfferReport_Historical_Archived.sql" />
+    <Build Include="Report\Tables\OfferReport_ConsumerCombinations.sql" />
+    <Build Include="Report\Tables\OfferAttributes.sql" />
+    <Build Include="Report\Tables\OfferReport_MatchTrans.sql" />
+    <Build Include="Report\Tables\OfferReport_PublisherExclude.sql" />
+    <Build Include="Derived\Tables\OfferReport_Results_Monthly_Archive.sql" />
+    <Build Include="Report\Tables\__OfferReport_Results_Archived.sql" />
+    <Build Include="Report\Tables\OfferLinks.sql" />
+    <Build Include="Staging\Tables\Poland_ING_BIN_Agg_2020_updated.sql" />
+    <Build Include="Report\Tables\AmexOfferLinks.sql" />
+    <Build Include="Report\Tables\IronOfferCycles_Temp.sql" />
+    <Build Include="dbo\Tables\Consumer.sql" />
+    <Build Include="Report\Tables\OfferReport_OfferAttributes.sql" />
+    <Build Include="Inbound\Tables\Outlet.sql" />
+    <Build Include="Report\Tables\OfferReport_SchemeTrans.sql" />
+    <Build Include="Staging\Tables\Poland_ING_BIN_Agg_2021_updated.sql" />
+    <Build Include="Derived\Tables\SchemeTransCompare_RewardBI.sql" />
+    <Build Include="Derived\Tables\Outlet.sql" />
+    <Build Include="Derived\Tables\SchemeTransCompare_DIMAIN.sql" />
+    <Build Include="Report\Tables\OfferReport_AllTrans.sql" />
+    <Build Include="WHB\Tables\Missing_Earnings.sql" />
+    <Build Include="Report\Tables\OfferReport_AllOffers.sql" />
+    <Build Include="Report\Tables\ExecLog.sql" />
+    <Build Include="Report\Tables\GAS_ActiveMIDS.sql" />
+    <Build Include="Report\Tables\OfferReport_OfferLinks.sql" />
+    <Build Include="Derived\Tables\Publishers.sql" />
+    <Build Include="Report\Tables\OfferReport_Cardholders_Cycle.sql" />
+    <Build Include="Inbound\Tables\Virgin_PartnerTrans.sql" />
+    <Build Include="Report\Tables\NegativeFanIDs_VectorIDs.sql" />
+    <Build Include="Report\Tables\ControlSetup_UniversalOffer.sql" />
+    <Build Include="dbo\Tables\WarehouseLoadAudit.sql" />
+    <Build Include="Inbound\Tables\Partner.sql" />
+    <Build Include="Derived\Tables\SchemeTrans_Agg_RF.sql" />
+    <Build Include="Report\Tables\IronOfferCycles.sql" />
+    <Build Include="Report\Tables\CampaignHistory.sql" />
+    <Build Include="Report\Tables\CampaignHistory_Archive.sql" />
+    <Build Include="Report\Tables\CustomerIDTypes.sql" />
+    <Build Include="Derived\Tables\Partner.sql" />
+    <Build Include="Derived\Tables\CustomerIDs.sql" />
+    <Build Include="Report\Tables\Publishers.sql" />
+    <Build Include="Report\Tables\IronOffer_References_Combined.sql" />
+    <Build Include="Staging\Tables\WRBA_Reward_Insight_DUMP_V2.sql" />
+    <Build Include="Report\Tables\IronOffer_References.sql" />
+    <Build Include="Report\Tables\VectorIDToPublisherID.sql" />
+    <Build Include="Staging\Tables\ControlSetup_OffersSegment.sql" />
+    <Build Include="Report\Tables\OfferReport_Results_RewardBI.sql" />
+    <Build Include="Report\Tables\OfferReport_Log_Errors.sql" />
+    <Build Include="Report\Tables\OfferReport_OutlierExclusion.sql" />
+    <Build Include="Derived\Tables\SchemeTrans_Source.sql" />
+    <Build Include="Inbound\Tables\Offer.sql" />
+    <Build Include="Derived\Tables\SchemeTrans.sql" />
+    <Build Include="Report\Tables\OfferIDTypes.sql" />
+    <Build Include="Report\Tables\OfferReport_MatchCustomers.sql" />
+    <Build Include="Staging\Tables\PublisherOfferTracker_Import.sql" />
+    <Build Include="Derived\Tables\Offer.sql" />
+    <Build Include="Inbound\Tables\RBS_IronOffer.sql" />
+    <Build Include="Report\Tables\OfferReport_Metrics_CustGroup.sql" />
+    <Build Include="Report\Tables\OfferReport_AllOffers_Errors.sql" />
+    <Build Include="Staging\Tables\PublisherOfferTracker_Transformed.sql" />
+    <Build Include="Inbound\Tables\Customer.sql" />
+    <Build Include="Derived\Tables\Customer.sql" />
+    <Build Include="Report\Tables\IronOfferSegment.sql" />
+    <Build Include="Report\Tables\OfferReport_Metrics_Adj.sql" />
+    <Build Include="Staging\Tables\ControlSetup_Validation_Segments.sql" />
+    <Build Include="Report\Tables\ControlSetup_CycleDates.sql" />
+    <Build Include="Report\Tables\OfferReport_CTCustomers.sql" />
+    <Build Include="Report\Tables\OfferReport_Results.sql" />
+    <Build Include="Inbound\Tables\RBS_Customer.sql" />
+    <Build Include="Derived\Tables\OfferIDs.sql" />
+    <Build Include="Selections\Tables\__ControlGroupMembers_InProgram_Archived.sql" />
+    <Build Include="Staging\Tables\PublisherOfferTracker_OfferNameToPublisher.sql" />
+    <Build Include="Report\Tables\OfferReport_ControlGroupMembers_Staging.sql" />
+    <Build Include="Report\Tables\OfferReport_PublisherAdjustmentv2.sql" />
+    <Build Include="Report\Tables\OfferReport_Historical.sql" />
+    <Build Include="Selections\Tables\ControlGroupMembers_InProgram.sql" />
+    <Build Include="Report\Tables\ControlSetup_ExposedIntersection.sql" />
+    <Build Include="Derived\Tables\ForecastToOffer.sql" />
+    <Build Include="Report\Tables\AmexExposedClickCounts.sql" />
+    <Build Include="Staging\Tables\BrandExistingCombinations_POS.sql" />
+    <Build Include="Report\Tables\OfferReport_ConsumerTransaction.sql" />
+    <Build Include="Staging\Tables\MV_MIDType.sql" />
+    <Build Include="Report\Tables\OfferReport_Cardholders.sql" />
+    <Build Include="Staging\Tables\BrandExistingCombinations_DD.sql" />
+    <Build Include="Report\Tables\OfferReport_Results_RewardBI_20211129.sql" />
+    <Build Include="dbo\Tables\MissingEarnings.sql" />
+    <Build Include="Staging\Tables\BrandNewCandidate_POS.sql" />
+    <Build Include="Derived\Tables\__Offer_Archived2.sql" />
+    <Build Include="Report\Tables\OfferReport_Historical_20211129.sql" />
+    <Build Include="Staging\Tables\BrandNewCandidate_DD.sql" />
+    <Build Include="Derived\Tables\OfferReport_Results_Monthly_20211129.sql" />
+    <Build Include="Staging\Tables\MV_ConsumerCombination.sql" />
+    <Build Include="Report\Tables\OfferReport_OfferNameHierarchy.sql" />
+    <Build Include="Inbound\Tables\Visa_Customer.sql" />
+    <Build Include="Inbound\Tables\nFI_IronOffer.sql" />
+    <Build Include="Inbound\Tables\nFI_PartnerTrans.sql" />
+    <Build Include="Email\Tables\NewsletterTestSchedule.sql" />
+    <Build Include="Prototype\Tables\ForecastingBudgetTracking_Import.sql" />
+    <Build Include="Report\Tables\ControlSetup_ControlGroupIDs.sql" />
+    <Build Include="Report\Tables\OfferReport_ConsumerCombinations_InProgramme.sql" />
+    <Build Include="Prototype\Tables\ForecastingBudgetTracking.sql" />
+    <Build Include="Report\Tables\OfferReport_Results_RewardBI_20211214.sql" />
+    <Build Include="Report\Tables\PublisherExclude.sql" />
+    <Build Include="Report\Tables\OfferReport_ControlGroupMembers.sql" />
+    <Build Include="Report\Tables\OfferReport_Historical_20211214.sql" />
+    <Build Include="Derived\Tables\OfferReport_Results_Monthly_20211214.sql" />
+    <Build Include="Selections\Tables\CampaignSetup_BriefsRequiringCode_ForEmail.sql" />
+    <Build Include="Report\Tables\ControlSetup_FlashReportRetailers.sql" />
+    <Build Include="Report\Tables\OfferReport_Aggregate.sql" />
+    <Build Include="Derived\Tables\OfferReport_Results_Monthly_20211215.sql" />
+    <Build Include="Derived\Tables\RetailerCommercialTerms.sql" />
+    <Build Include="Derived\Tables\OfferReport_Results_Monthly.sql" />
+    <Build Include="Selections\Tables\BriefRequestTool_CampaignSetup_Import.sql" />
+    <Build Include="Report\Tables\OfferReport_ReportData_Monthly.sql" />
+    <Build Include="Selections\Tables\CampaignSetup.sql" />
+    <Build Include="Selections\Tables\BriefRequestTool_CampaignSetup.sql" />
+    <Build Include="Selections\Tables\CampaignSetup_InProgrammeControlGroup.sql" />
+    <Build Include="Report\Tables\OfferReport_ThresholdMetrics.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_AskItalian_CustomerMatches_20170622.sql" />
+    <Build Include="Report\Tables\OfferReport_ControlGroupMembers_Counts.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_Bills_DeDupe_20171110.sql" />
+    <Build Include="Inbound\Tables\nFI_Customer.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_CharlesTyrwhitt_CustomerMatches_20170428.sql" />
+    <Build Include="Staging\Tables\Poland_ING_BIN_Agg_2021.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_CharlesTyrwhitt_CustomerMatches_20170511.sql" />
+    <Build Include="Report\Tables\Calendar.sql" />
+    <Build Include="Staging\Tables\Poland_ING_BIN_Agg_2020.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_CharlesTyrwhitt_CustomerMatches_20181214.sql" />
+    <Build Include="Inbound\Tables\Visa_PartnerTrans.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_EvansCycles_CustomerMatches_20170419.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_EvansCycles_CustomerMatches_Spenders_20180607.sql" />
+    <Build Include="Inbound\Tables\Visa_IronOffer.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_Groupon_CustomerMatches_20180108.sql" />
+    <Build Include="Selections\Tables\ControlGroupMembers_InProgram_Costa_20220302.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_Groupon_CustomerMatches_20180117.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_Haven_CustomerMatches_20200122.sql" />
+    <Build Include="Report\Tables\ControlSetup_OffersSegment.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_HavenHolidays_CustomerMatches_20190508.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_MonicaVinader_CustomerMatches_20200513.sql" />
+    <Build Include="Report\Tables\OfferReport_OfferReportingPeriods.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_MorrisonsLaunch_MorrisonsRewardMatchedCustomers_20180530.sql" />
+    <Build Include="Inbound\Tables\RBS_PartnerTrans.sql" />
+    <Build Include="Selections\Tables\PartnerDedupe_MorrisonsReward_MatchedCustomers_20190304.sql" />
+    <Build Include="Selections\Views\CampaignExecution_SelectionCounts.sql" />
+    <Build Include="Selections\Views\CampaignExecution_TableNames.sql" />
+    <Build Include="Selections\Views\CampaignExecution_OutputTables.sql" />
+    <Build Include="Selections\Views\CampaignExecution_Offers.sql" />
+    <Build Include="Selections\Views\CampaignExecution_CampaignSetup.sql" />
+    <Build Include="Selections\Views\CampaignSetup_POS.sql" />
+    <Build Include="Selections\Views\CampaignSetup_All.sql" />
+    <Build Include="WHB\Views\LatestSourceCheckpoint.sql" />
+    <Build Include="Email\Views\DailyTriggerEmailCounts.sql" />
+    <Build Include="Derived\Views\IronOffer_Campaign_HTM.sql" />
+    <Build Include="Trans\Views\ConsumerTransaction.sql" />
+    <Build Include="Trans\Views\ConsumerCombination.sql" />
+    <Build Include="Email\Views\OfferSlotData.sql" />
+    <Build Include="Trans\Views\ConsumerCombination_DD.sql" />
+    <Build Include="Derived\Views\Retailer.sql" />
+    <Build Include="Storage\WH_AllPublishers_Indexes.sql" />
+    <Build Include="Security\New_DataOps.sql" />
+    <Build Include="Security\New_Insight.sql" />
+    <Build Include="Security\ChrisN.sql" />
+    <Build Include="Security\ChrisN_1.sql" />
+    <Build Include="Security\danielm.sql" />
+    <Build Include="Security\DanielM_1.sql" />
+    <Build Include="Security\DarrenW.sql" />
+    <Build Include="Security\DarrenW_1.sql" />
+    <Build Include="Security\datarecon.sql" />
+    <Build Include="Security\datarecon_1.sql" />
+    <Build Include="Security\Rory.sql" />
+    <Build Include="Security\Rory_1.sql" />
+    <Build Include="Security\conord.sql" />
+    <Build Include="Security\conord_1.sql" />
+    <Build Include="Security\kevinc.sql" />
+    <Build Include="Security\kevinc_1.sql" />
+    <Build Include="Security\ExcelQuery_DataOps.sql" />
+    <Build Include="Security\ExcelQuery_DataOps_1.sql" />
+    <Build Include="Security\DIMAIN2_conordimain2.sql" />
+    <Build Include="Security\DIMAIN2_conordimain2_1.sql" />
+    <Build Include="Security\Ed.sql" />
+    <Build Include="Security\Ed_1.sql" />
+    <Build Include="Security\glynd.sql" />
+    <Build Include="Security\glynd_1.sql" />
+    <Build Include="Security\GunayS.sql" />
+    <Build Include="Security\GunayS_1.sql" />
+    <Build Include="Security\hayden.sql" />
+    <Build Include="Security\hayden_1.sql" />
+    <Build Include="Security\LeoP.sql" />
+    <Build Include="Security\LeoP_1.sql" />
+    <Build Include="Security\Michael.sql" />
+    <Build Include="Security\Michael_1.sql" />
+    <Build Include="Security\PhillipB.sql" />
+    <Build Include="Security\PhillipB_1.sql" />
+    <Build Include="Security\Process_InsightUser.sql" />
+    <Build Include="Security\Process_InsightUser_1.sql" />
+    <Build Include="Security\MarkD.sql" />
+    <Build Include="Security\MarkD_1.sql" />
+    <Build Include="Security\patrickm.sql" />
+    <Build Include="Security\patrickm_1.sql" />
+    <Build Include="Security\peter.sql" />
+    <Build Include="Security\peter_1.sql" />
+    <Build Include="Security\SamH.sql" />
+    <Build Include="Security\SamH_1.sql" />
+    <Build Include="Security\SamW.sql" />
+    <Build Include="Security\SamW_1.sql" />
+    <Build Include="Security\Process_AWS_SpendEarn.sql" />
+    <Build Include="Security\Process_AWS_SpendEarn_1.sql" />
+    <Build Include="Security\JosephS.sql" />
+    <Build Include="Security\JosephS_1.sql" />
+    <Build Include="Security\ProcessOp.sql" />
+    <Build Include="Security\ProcessOp_1.sql" />
+    <Build Include="Security\RukanK.sql" />
+    <Build Include="Security\RukanK_1.sql" />
+    <Build Include="Security\tasfia.sql" />
+    <Build Include="Security\tasfia_1.sql" />
+    <Build Include="Security\SLCReplication.sql" />
+    <Build Include="Security\SLCReplication_1.sql" />
+    <Build Include="Security\Vernon.sql" />
+    <Build Include="Security\Vernon_1.sql" />
+    <Build Include="Security\VitaliiV.sql" />
+    <Build Include="Security\VitaliiV_1.sql" />
+    <Build Include="Security\virgin_etl_user.sql" />
+    <Build Include="Security\virgin_etl_user_1.sql" />
+    <Build Include="Security\visa_etl_user.sql" />
+    <Build Include="Security\visa_etl_user_1.sql" />
+    <Build Include="Security\WilliamA.sql" />
+    <Build Include="Security\WilliamA_1.sql" />
+    <Build Include="Security\Zoe.sql" />
+    <Build Include="Security\Zoe_1.sql" />
+    <Build Include="Security\ConalM.sql" />
+    <Build Include="Security\ConalM_1.sql" />
+    <Build Include="Security\JoanneK.sql" />
+    <Build Include="Security\JoanneK_1.sql" />
+    <Build Include="Security\RichardS.sql" />
+    <Build Include="Security\RichardS_1.sql" />
+    <Build Include="Security\MatthewL.sql" />
+    <Build Include="Security\MatthewL_1.sql" />
+    <Build Include="Security\ShannonM.sql" />
+    <Build Include="Security\ShannonM_1.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="Report\Functions\OfferReport_GetCycleDate.sql" />
+    <Build Include="dbo\Functions\InitCap.sql" />
+    <Build Include="dbo\Functions\IsEmailStructureValid.sql" />
+    <Build Include="dbo\Functions\iTVF_NarrativeCleaner.sql" />
+    <Build Include="dbo\Functions\il_SplitDelimitedStringArray.sql" />
+    <Build Include="dbo\Functions\iTVF_SegmentID_From_OfferName.sql" />
+    <Build Include="dbo\Functions\iTVF_OfferTypeID_From_OfferName.sql" />
+    <Build Include="dbo\Functions\iTVF_SegmentCode_From_OfferName.sql" />
+    <Build Include="dbo\Functions\FuzzyMatch_iTVF2k5.sql" />
+    <Build Include="dbo\Functions\iTVF_IsEmailStructureValid.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_OfferReportingPeriods.sql" />
+    <Build Include="WHB\Stored Procedures\Warehouse_Earnings_EnableIndexes.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Load_ExposedMembers.sql" />
+    <Build Include="Report\Stored Procedures\CampaignExecution_OfferCountsReconciliation.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_ExposedIntersection.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Load_MatchTrans.sql" />
+    <Build Include="Selections\Stored Procedures\CampaignExecution_ResetSelections_IndividualPartner.sql" />
+    <Build Include="WHB\Stored Procedures\TableLoadStatus_Get.sql" />
+    <Build Include="WHB\Stored Procedures\TableLoadStatus_Set.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_SegmentationTransDates.sql" />
+    <Build Include="WHB\Stored Procedures\TableLoadStatus_Reset.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_Counts.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_CycleDates.sql" />
+    <Build Include="WHB\Stored Procedures\__Visa_LandingTable_Truncation.sql" />
+    <Build Include="WHB\Stored Procedures\Inbound_Load_Offer_20220408.sql" />
+    <Build Include="Selections\Stored Procedures\BriefRequestTool_OffersToSetUp.sql" />
+    <Build Include="Monitor\Stored Procedures\ProcessLogger.sql" />
+    <Build Include="WHB\Stored Procedures\SchemeTrans_MatchedTransactions_VirginPCA.sql" />
+    <Build Include="WHB\Stored Procedures\__Virgin_LandingIronOffer_Load.sql" />
+    <Build Include="Staging\Stored Procedures\MIDI_ConsumerCombination_Update.sql" />
+    <Build Include="Staging\Stored Procedures\ControlSetup_Load_Segments.sql" />
+    <Build Include="WHB\Stored Procedures\PartnersOffers_Load_Offer.sql" />
+    <Build Include="WHB\Stored Procedures\__Virgin_LandingPartnerTrans_Load.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Update_OfferMetrics.sql" />
+    <Build Include="WHB\Stored Procedures\__Virgin_WarehouseConsumer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\SchemeTrans_Match_20220419.sql" />
+    <Build Include="WHB\Stored Procedures\__Virgin_WarehouseOffer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Inbound_Load_Customer.sql" />
+    <Build Include="WHB\Stored Procedures\__Virgin_WarehousePartnerTrans_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Inbound_Load_Publisher.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Calculate_Uplift.sql" />
+    <Build Include="WHB\Stored Procedures\Customers_Load_Customer.sql" />
+    <Build Include="Report\Stored Procedures\WeeklySummaryV2_FetchTransactionList_StarcomMeteor.sql" />
+    <Build Include="WHB\Stored Procedures\PartnersOffers_Load_Publisher.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Clear_Staging.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Migration_LoadCampaignResults.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Refresh_PublisherExclude.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Migration_LoadMonthlyResults.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Load_SchemeTrans.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Insert_OfferLinks.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Insert_OfferLinks_WithAmex.sql" />
+    <Build Include="WHB\Stored Procedures\Inbound_Load_Outlet.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Insert_OfferNameHierarchy.sql" />
+    <Build Include="Report\Stored Procedures\MonthStartDate_Fetch.sql" />
+    <Build Include="WHB\Stored Procedures\PartnersOffers_Load_Outlet.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Load_AllTrans.sql" />
+    <Build Include="WHB\Stored Procedures\__Virgin_LandingCustomer_Load.sql" />
+    <Build Include="Report\Stored Procedures\MIDs_To_GAS.sql" />
+    <Build Include="Report\Stored Procedures\Execute_Uploader.sql" />
+    <Build Include="WHB\Stored Procedures\__Virgin_LandingTable_Truncation.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Insert_ReadyOffers_Staging.sql" />
+    <Build Include="WHB\Stored Procedures\Customers_PANLessTransLoad_FanIDLoad_20211117.sql" />
+    <Build Include="Report\Stored Procedures\GenerateTransactionList.sql" />
+    <Build Include="Report\Stored Procedures\Bespoke_Monitoring.sql" />
+    <Build Include="WHB\Stored Procedures\__Visa_LandingCustomer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Inbound_Load_Partner.sql" />
+    <Build Include="WHB\Stored Procedures\__Visa_LandingIronOffer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\__Visa_LandingPartnerTrans_Load.sql" />
+    <Build Include="WHB\Stored Procedures\__Visa_WarehouseConsumer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\PartnersOffers_Load_Partner.sql" />
+    <Build Include="WHB\Stored Procedures\__Visa_WarehouseOffer_Load.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Load_LegacyTables.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Fetch_IronOfferRef.sql" />
+    <Build Include="Report\Stored Procedures\PANLessTransLoad_FanIDLoad.sql" />
+    <Build Include="Report\Stored Procedures\SSRS_R0180_OfferCountsReconciliation.sql" />
+    <Build Include="WHB\Stored Procedures\__Visa_WarehousePartnerTrans_Load.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Insert_OutlierExclusions.sql" />
+    <Build Include="Report\Stored Procedures\MIDS_Not_In_GAS.sql" />
+    <Build Include="WHB\Stored Procedures\Customers_PANLessTransLoad_FanIDLoad.sql" />
+    <Build Include="WHB\Stored Procedures\__RBS_LandingIronOffer_Load.sql" />
+    <Build Include="Staging\Stored Procedures\PublisherOfferTracker_Clear.sql" />
+    <Build Include="WHB\Stored Procedures\SchemeTrans_PANless_Transaction.sql" />
+    <Build Include="WHB\Stored Procedures\Inbound_Load_Offer.sql" />
+    <Build Include="WHB\Stored Procedures\__RBS_LandingPartnerTrans_Load.sql" />
+    <Build Include="Staging\Stored Procedures\OfferReport_Insert_CustomerErrors.sql" />
+    <Build Include="WHB\Stored Procedures\__RBS_LandingCustomer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\__RBS_LandingTable_Truncation.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_Segments.sql" />
+    <Build Include="WHB\Stored Procedures\__nFI_LandingCustomer_Load_Archived.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Fetch_ExposedControlCustomers.sql" />
+    <Build Include="Segmentation\Stored Procedures\ControlSetup_Segmentation_DD.sql" />
+    <Build Include="WHB\Stored Procedures\__RBS_WarehouseConsumer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\__RBS_WarehouseOffer_Load.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_ControlMembers_InProgram.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Fetch_ConsumerCombinations.sql" />
+    <Build Include="WHB\Stored Procedures\__RBS_WarehousePartnerTrans_Load.sql" />
+    <Build Include="Staging\Stored Procedures\PublisherOfferTracker_ExportToRewardBI.sql" />
+    <Build Include="WHB\Stored Procedures\__nFI_LandingIronOffer_Load.sql" />
+    <Build Include="Staging\Stored Procedures\PublisherOfferTracker_AddToOfferIDs.sql" />
+    <Build Include="WHB\Stored Procedures\__nFI_LandingPartnerTrans_Load.sql" />
+    <Build Include="Selections\Stored Procedures\BriefRequestTool_UpdateRetailerDetails.sql" />
+    <Build Include="Selections\Stored Procedures\BriefRequestTool_PreviousCampaigns.sql" />
+    <Build Include="WHB\Stored Procedures\__nFI_WarehouseConsumer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\__nFI_WarehouseOffer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\__nFI_WarehousePartnerTrans_Load.sql" />
+    <Build Include="WHB\Stored Procedures\SchemeTrans_MatchedTransactions_VisaBarclaycard.sql" />
+    <Build Include="Staging\Stored Procedures\BrandNewCandidate_FetchSpend.sql" />
+    <Build Include="Selections\Stored Procedures\BriefRequestTool_ImportCampaignDetails.sql" />
+    <Build Include="WHB\Stored Procedures\SchemeTrans_Match.sql" />
+    <Build Include="Prototype\Stored Procedures\ForecastTool_ForecastDetails_Merge_V3.sql" />
+    <Build Include="Selections\Stored Procedures\BriefRequestTool_ImportCampaignDetails_Import.sql" />
+    <Build Include="Prototype\Stored Procedures\ForecastTool_ForecastDetails_Import_V3.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Load_ConsumerTransaction.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Fetch_ThresholdMetrics_V3.sql" />
+    <Build Include="Report\Stored Procedures\SSRS_APR001_RetailerTransactionList.sql" />
+    <Build Include="Segmentation\Stored Procedures\ControlSetup_Segmentation_POS.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_Offers.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Fetch_CTMetrics_Threshold_V2.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_ControlGroups.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Fetch_CardholderCounts.sql" />
+    <Build Include="Report\Stored Procedures\ControlSetup_Load_ControlMembers.sql" />
+    <Build Include="Report\Stored Procedures\AffintyPackageLog.sql" />
+    <Build Include="Selections\Stored Procedures\CampaignSetup_BriefsRequiringCode.sql" />
+    <Build Include="Report\Stored Procedures\OfferReport_Insert_ReadyOffers_Log.sql" />
+    <Build Include="WHB\Stored Procedures\Warehouse_Earnings_DisableIndexes.sql" />
+    <Build Include="Security\Derived.sql" />
+    <Build Include="Security\Email.sql" />
+    <Build Include="Security\Inbound.sql" />
+    <Build Include="Security\Mappings.sql" />
+    <Build Include="Security\Monitor.sql" />
+    <Build Include="Security\Prototype.sql" />
+    <Build Include="Security\Report.sql" />
+    <Build Include="Security\Rory_2.sql" />
+    <Build Include="Security\Segmentation.sql" />
+    <Build Include="Security\Selections.sql" />
+    <Build Include="Security\Staging.sql" />
+    <Build Include="Security\Trans.sql" />
+    <Build Include="Security\WHB.sql" />
+  </ItemGroup>
+</Project>

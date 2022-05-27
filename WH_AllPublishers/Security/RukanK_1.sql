@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [RukanK]
+    WITH PASSWORD = N'rob{v}emdmtexproMiHvh`sWmsFT7_&#$!~<sHzm.a>o1p8g', SID = 0xB993D714D3694942B714C90785EA04EE, DEFAULT_DATABASE = [Sandbox], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

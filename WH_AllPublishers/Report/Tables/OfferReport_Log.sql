@@ -1,0 +1,25 @@
+﻿CREATE TABLE [Report].[OfferReport_Log] (
+    [ID]                      INT           IDENTITY (1, 1) NOT NULL,
+    [OfferID]                 INT           NOT NULL,
+    [IronOfferID]             INT           NOT NULL,
+    [OfferReportingPeriodsID] INT           NULL,
+    [StartDate]               DATETIME2 (7) NOT NULL,
+    [EndDate]                 DATETIME2 (7) NOT NULL,
+    [ControlGroupTypeID]      INT           NOT NULL,
+    [IsPartial]               BIT           NOT NULL,
+    [IsCalculated]            BIT           DEFAULT ((0)) NOT NULL,
+    [IsReported]              BIT           DEFAULT ((0)) NOT NULL,
+    [ReportDate]              DATETIME      NULL,
+    [MonthlyReportingDate]    DATE          NULL,
+    [Notes]                   VARCHAR (500) DEFAULT ('Automated') NOT NULL,
+    [IsError]                 BIT           DEFAULT ((0)) NOT NULL,
+    [ErrorDetails]            VARCHAR (500) NULL,
+    [OfferStartDate]          DATETIME2 (7) NULL,
+    [OfferEndDate]            DATETIME2 (7) NULL,
+    [IsChecked]               BIT           DEFAULT ((0)) NOT NULL,
+    [CalcDate]                DATETIME2 (7) NULL,
+    [AddedDate]               DATETIME2 (7) DEFAULT (getdate()) NOT NULL,
+    [ModifiedDate]            DATETIME2 (7) DEFAULT (getdate()) NOT NULL,
+    CONSTRAINT [PK_LogID] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+

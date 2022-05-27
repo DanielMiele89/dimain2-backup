@@ -1,0 +1,2 @@
+﻿CREATE USER [MarkD] FOR LOGIN [MarkD];
+

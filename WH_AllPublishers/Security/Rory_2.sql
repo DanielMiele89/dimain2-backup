@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [Rory]
+    AUTHORIZATION [Rory];
+

@@ -1,0 +1,2 @@
+﻿CREATE USER [Zoe] FOR LOGIN [Zoe];
+
