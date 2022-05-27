@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [ChrisN]
+    WITH PASSWORD = N'mzl|;zqx{pt7ydQ%h{igr@|{msFT7_&#$!~<ihg8y 1$zrww', SID = 0x6AD1D630ABB9644DB9DE848454D93EFE, DEFAULT_DATABASE = [Warehouse], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

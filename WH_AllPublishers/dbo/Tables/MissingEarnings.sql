@@ -1,0 +1,26 @@
+﻿CREATE TABLE [dbo].[MissingEarnings] (
+    [EarningID]                 INT           IDENTITY (1, 1) NOT NULL,
+    [ConsumerID]                INT           NULL,
+    [PartnerID]                 INT           NULL,
+    [RetailerID]                INT           NULL,
+    [OutletID]                  INT           NULL,
+    [IsOnline]                  BIT           NULL,
+    [CardHolderPresentData]     CHAR (1)      NULL,
+    [TransactionAmount]         SMALLMONEY    NOT NULL,
+    [ExtremeValueFlag]          BIT           NULL,
+    [TransactionDate]           DATE          NULL,
+    [AffiliateCommissionAmount] SMALLMONEY    NULL,
+    [CommissionChargable]       MONEY         NULL,
+    [CashbackEarned]            MONEY         NULL,
+    [OfferID]                   INT           NULL,
+    [ActivationDays]            INT           NULL,
+    [AboveBase]                 INT           NULL,
+    [PaymentMethodID]           TINYINT       NULL,
+    [SourceID]                  VARCHAR (36)  NOT NULL,
+    [SourceTypeID]              INT           NOT NULL,
+    [SourceAddedDate]           DATE          NULL,
+    [CreatedDateTime]           DATETIME2 (7) NOT NULL,
+    CONSTRAINT [PK_MissingEarnings] PRIMARY KEY CLUSTERED ([EarningID] ASC),
+    CONSTRAINT [FK_MissingEarnings_SourceTypeID] FOREIGN KEY ([SourceTypeID]) REFERENCES [dbo].[SourceType] ([SourceTypeID])
+);
+
