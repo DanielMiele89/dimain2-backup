@@ -1,0 +1,25 @@
+﻿CREATE TABLE [MI].[MRR_InSchemeSales_Working] (
+    [ID]                      INT           IDENTITY (1, 1) NOT NULL,
+    [PartnerID]               INT           NULL,
+    [ClientServiceRef]        NVARCHAR (30) NOT NULL,
+    [PaymentTypeID]           INT           NULL,
+    [ChannelID]               TINYINT       NULL,
+    [CustomerAttributeID_0]   INT           NULL,
+    [CustomerAttributeID_0BP] INT           NULL,
+    [CustomerAttributeID_1]   INT           NULL,
+    [CustomerAttributeID_1BP] INT           NULL,
+    [CustomerAttributeID_2]   INT           NULL,
+    [CustomerAttributeID_2BP] INT           NULL,
+    [CustomerAttributeID_3]   INT           NULL,
+    [Mid_SplitID]             INT           NULL,
+    [CumulativeTypeID]        INT           NOT NULL,
+    [PeriodTypeID]            INT           NOT NULL,
+    [DateID]                  INT           NOT NULL,
+    [INSchemeSales]           SMALLMONEY    NOT NULL,
+    [INSchemeTransactions]    INT           NULL,
+    [FanID]                   INT           NOT NULL,
+    [Commission]              MONEY         NULL,
+    [Cardholders]             INT           NOT NULL,
+    CONSTRAINT [MI_MRR_InSchemeSales_Working] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+

@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [GunayS]
+    WITH PASSWORD = N'ex6m?sh$Qkjp_N{gf&gAxucvmsFT7_&#$!~<qZjt7{jcsox7', SID = 0xFBD8AF9F827A3442904F93B583C0DD72, DEFAULT_DATABASE = [Warehouse], DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

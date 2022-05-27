@@ -1,0 +1,7 @@
+﻿CREATE LOGIN [Michael]
+    WITH PASSWORD = N'ex7Zmshkjp{wBgfxu~czvq?=msFT7_&#$!~<jt{j?pcshokG', SID = 0x17748D934F90E841B3CDD760656F8BB0, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+
+
+GO
+ALTER LOGIN [Michael] DISABLE;
+

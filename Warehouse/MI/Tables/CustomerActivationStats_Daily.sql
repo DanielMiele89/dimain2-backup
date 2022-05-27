@@ -1,0 +1,26 @@
+﻿CREATE TABLE [MI].[CustomerActivationStats_Daily] (
+    [ID]                                INT  IDENTITY (1, 1) NOT NULL,
+    [RunDate]                           DATE NOT NULL,
+    [ActivatedOnlinePrevDayNatWest]     INT  NOT NULL,
+    [ActivatedOnlinePrevDayRBS]         INT  NOT NULL,
+    [ActivatedOfflinePrevDayNatWest]    INT  NOT NULL,
+    [ActivatedOfflinePrevDayRBS]        INT  NOT NULL,
+    [OptedOutOnlinePrevDayNatWest]      INT  NULL,
+    [OptedOutOnlinePrevDayRBS]          INT  NULL,
+    [OptedOutOfflinePrevDayNatWest]     INT  NULL,
+    [OptedOutOfflinePrevDayRBS]         INT  NULL,
+    [ActivatedOnlineCumulativeNatWest]  INT  NOT NULL,
+    [ActivatedOnlineCumulativeRBS]      INT  NOT NULL,
+    [ActivatedOfflineCumulativeNatWest] INT  NOT NULL,
+    [ActivatedOfflineCumulativeRBS]     INT  NOT NULL,
+    [OptedOutOnlineCumulativeNatWest]   INT  NULL,
+    [OptedOutOnlineCumulativeRBS]       INT  NULL,
+    [OptedOutOfflineCumulativeNatWest]  INT  NULL,
+    [OptedOutOfflineCumulativeRBS]      INT  NULL,
+    [CustomersEarnedNatWest]            INT  CONSTRAINT [DF_MI_CustomerActivationStatus_Daily_CustomersEarnedNatWest] DEFAULT ((0)) NOT NULL,
+    [CustomersEarnedRBS]                INT  CONSTRAINT [DF_MI_CustomerActivationStatus_Daily_CustomersEarnedRBS] DEFAULT ((0)) NOT NULL,
+    [CustomersEarnedThisMonthNatWest]   INT  CONSTRAINT [DF_MI_CustomerActivationStatus_Daily_CustomersEarnedThisMonthNatWest] DEFAULT ((0)) NOT NULL,
+    [CustomersEarnedThisMonthRBS]       INT  CONSTRAINT [DF_MI_CustomerActivationStatus_Daily_CustomersEarnedThisMonthRBS] DEFAULT ((0)) NOT NULL,
+    CONSTRAINT [PK_MI_CustomerActivationStats] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+

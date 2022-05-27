@@ -1,0 +1,27 @@
+﻿CREATE TABLE [InsightArchive].[Uplift_RetailerReport_template] (
+    [ID]                         INT          IDENTITY (1, 1) NOT NULL,
+    [MetricID]                   INT          NOT NULL,
+    [UpliftProgramid]            INT          NOT NULL,
+    [UpliftPartnerGroupID]       INT          NULL,
+    [UpliftPartnerID]            INT          NULL,
+    [UpliftClientServiceRef]     VARCHAR (40) NULL,
+    [UpliftPaymentTypeID]        INT          NOT NULL,
+    [UpliftChannelID]            INT          NOT NULL,
+    [UpliftCustomerAttributeID]  INT          NOT NULL,
+    [UpliftMid_SplitID]          INT          NOT NULL,
+    [UpliftCumulativeTypeID]     INT          NOT NULL,
+    [UpliftPeriodTypeID]         INT          NOT NULL,
+    [ResultsProgramid]           INT          NOT NULL,
+    [ResultsPartnerGroupID]      INT          NULL,
+    [ResultsPartnerID]           INT          NULL,
+    [ResultsClientServiceRef]    VARCHAR (40) NULL,
+    [ResultsPaymentTypeID]       INT          NOT NULL,
+    [ResultsChannelID]           INT          NOT NULL,
+    [ResultsCustomerAttributeID] INT          NOT NULL,
+    [ResultsMid_SplitID]         INT          NOT NULL,
+    [ResultsCumulativeTypeID]    INT          NOT NULL,
+    [ResultsPeriodTypeID]        INT          NOT NULL,
+    [DateIDFrom]                 INT          NOT NULL,
+    [DateIDTo]                   INT          NULL
+);
+

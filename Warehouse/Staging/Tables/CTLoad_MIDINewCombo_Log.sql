@@ -1,0 +1,27 @@
+﻿CREATE TABLE [Staging].[CTLoad_MIDINewCombo_Log] (
+    [ID]                                  INT           NOT NULL,
+    [MID]                                 VARCHAR (50)  NOT NULL,
+    [LocationCountry]                     VARCHAR (3)   NOT NULL,
+    [MCCID]                               SMALLINT      NOT NULL,
+    [IsUKSpend]                           BIT           NULL,
+    [MatchType]                           TINYINT       NULL,
+    [MatchCount]                          INT           NULL,
+    [BrandProbability]                    FLOAT (53)    NULL,
+    [OriginalBrand_FirstMostCommonMCCID]  SMALLINT      NOT NULL,
+    [OriginalBrand_SecondMostCommonMCCID] SMALLINT      NOT NULL,
+    [OriginalBrand_ThirdMostCommonMCCID]  SMALLINT      NOT NULL,
+    [DoMCCsMatch]                         SMALLINT      NULL,
+    [OriginalBrandID]                     SMALLINT      NULL,
+    [UpdatedBrandID]                      SMALLINT      NULL,
+    [Narrative_Cleaned]                   VARCHAR (250) NULL,
+    [OriginalNarrative]                   VARCHAR (50)  NOT NULL,
+    [UpdatedNarrative]                    NVARCHAR (50) NULL,
+    [IsHighVariance]                      BIT           NOT NULL,
+    [NarrativeCount]                      INT           NULL,
+    [NarrativeCount_PartialLeft]          INT           NULL,
+    [NarrativeCount_PartialRight]         INT           NULL,
+    [BrandCount]                          INT           NULL,
+    [EntryReview]                         INT           NOT NULL,
+    [RunDate]                             DATE          NULL
+);
+

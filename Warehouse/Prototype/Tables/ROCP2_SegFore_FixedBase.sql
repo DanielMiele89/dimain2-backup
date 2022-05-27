@@ -1,0 +1,5 @@
+﻿CREATE TABLE [Prototype].[ROCP2_SegFore_FixedBase] (
+    [CINID] INT NOT NULL,
+    PRIMARY KEY CLUSTERED ([CINID] ASC)
+);
+
