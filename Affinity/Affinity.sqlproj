@@ -13,7 +13,7 @@
     </RootPath>
     <RootNamespace>Affinity</RootNamespace>
     <AssemblyName>Affinity</AssemblyName>
-    <ModelCollation>1033, CI</ModelCollation>
+    <ModelCollation>1033,CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -22,6 +22,8 @@
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -56,5 +58,219 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="Hayden\" />
+    <Folder Include="Hayden\Tables\" />
+    <Folder Include="Processing\" />
+    <Folder Include="Processing\Tables\" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="DDLMonitor\" />
+    <Folder Include="DDLMonitor\Tables\" />
+    <Folder Include="Processing\Views\" />
+    <Folder Include="Storage\" />
+    <Folder Include="Security\" />
+    <Folder Include="Processing\Functions\" />
+    <Folder Include="dbo\Functions\" />
+    <Folder Include="Processing\Stored Procedures\" />
+    <Folder Include="dbo\Stored Procedures\" />
+    <Folder Include="AWS\" />
+    <Folder Include="AWS\Stored Procedures\" />
+    <Folder Include="Database Triggers\" />
+    <Folder Include="Processing\User Defined Types\" />
+    <Folder Include="Processing\Sequences\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Hayden\Tables\MissingMIDTuple_1.sql" />
+    <Build Include="Processing\Tables\midtupleconversion_1.sql" />
+    <Build Include="dbo\Tables\MIDTupleID_1.sql" />
+    <Build Include="dbo\Tables\OldMIDTupleID_1.sql" />
+    <Build Include="dbo\Tables\Transactions_OutsidePartitions_1.sql" />
+    <Build Include="dbo\Tables\TransShadow_1.sql" />
+    <Build Include="dbo\Tables\Transactions_1.sql" />
+    <Build Include="Processing\Tables\ConsumerCombination_1.sql" />
+    <Build Include="Processing\Tables\ConsumerTransactionHolding_Credit_1.sql" />
+    <Build Include="Processing\Tables\Temp_RowNumFileID_1.sql" />
+    <Build Include="Processing\Tables\ConsumerTransactionHolding_Debit_1.sql" />
+    <Build Include="Processing\Tables\ConsumerTransactionHolding_MIDI_Credit_1.sql" />
+    <Build Include="Processing\Tables\ConsumerTransactionHolding_MIDI_Debit_1.sql" />
+    <Build Include="Processing\Tables\Customers_New_1.sql" />
+    <Build Include="Processing\Tables\Test_Customers_1.sql" />
+    <Build Include="Processing\Tables\ConsumerTransactionHolding_nFI_1.sql" />
+    <Build Include="Processing\Tables\TransactionPerturbation_1.sql" />
+    <Build Include="Processing\Tables\Customers_1.sql" />
+    <Build Include="Processing\Tables\FileExtraction_Merchant_Staging_1.sql" />
+    <Build Include="Processing\Tables\FileExtraction_Transaction_Staging_1.sql" />
+    <Build Include="Processing\Tables\Historical_Log_1.sql" />
+    <Build Include="Processing\Tables\Masking_CombinationsHeavyMask_1.sql" />
+    <Build Include="dbo\Tables\TransactionPerturbation_DIDEVTEST_1.sql" />
+    <Build Include="Processing\Tables\Masking_CombinationsLightHeavyMask_1.sql" />
+    <Build Include="Processing\Tables\Masking_CombinationsToMask_1.sql" />
+    <Build Include="Processing\Tables\Masking_CombinationsToMask_GB_1.sql" />
+    <Build Include="Processing\Tables\Masking_ConsumerCombinations_1.sql" />
+    <Build Include="Processing\Tables\Masking_MIDTransactionCount_1.sql" />
+    <Build Include="Processing\Tables\Masking_NameDictionary_1.sql" />
+    <Build Include="Processing\Tables\Masking_Staging_CornCobWords_1.sql" />
+    <Build Include="Processing\Tables\Masking_ThresholdDates_1.sql" />
+    <Build Include="Processing\Tables\MerchantLocation_1.sql" />
+    <Build Include="DDLMonitor\Tables\DDLEvents_1.sql" />
+    <Build Include="Processing\Tables\MerchantPostcodes_1.sql" />
+    <Build Include="Processing\Tables\MIDTupleMatching_1.sql" />
+    <Build Include="Processing\Tables\Package_Errors_1.sql" />
+    <Build Include="Processing\Tables\Package_Log_1.sql" />
+    <Build Include="Processing\Tables\Archive_FileIDs_1.sql" />
+    <Build Include="dbo\Tables\Transactions_CorrectedCardType_1.sql" />
+    <Build Include="Processing\Tables\Package_SourceType_1.sql" />
+    <Build Include="dbo\Tables\Transactions_CorrectedCardType2_1.sql" />
+    <Build Include="Processing\Tables\QA_Masking_SpotCheck_1.sql" />
+    <Build Include="Processing\Tables\ExecLog_1.sql" />
+    <Build Include="Processing\Tables\QA_Masking_SpotCheck_Subset_1.sql" />
+    <Build Include="Processing\Tables\RowNum_Log_1.sql" />
+    <Build Include="Processing\Tables\Staging_ShoppingCentres_1.sql" />
+    <Build Include="Processing\Tables\TransactionPerturbation_MIDI_1.sql" />
+    <Build Include="dbo\Tables\ConsumerCombination_Masked_1.sql" />
+    <Build Include="dbo\Tables\Masking_CornCobExempt_1.sql" />
+    <Build Include="dbo\Tables\Masking_GBCountries_1.sql" />
+    <Build Include="Processing\Tables\PackageLog_ProgressReport_1.sql" />
+    <Build Include="dbo\Tables\Masking_MCCRules_1.sql" />
+    <Build Include="dbo\Tables\Masking_NarrativeRules_1.sql" />
+    <Build Include="dbo\Tables\Masking_Results_1.sql" />
+    <Build Include="dbo\Tables\CardholderPresentData_1.sql" />
+    <Build Include="Processing\Tables\Masking_CombinationsToLightHeavyMask_1.sql" />
+    <Build Include="dbo\Tables\TransactionVarianceMapping_1.sql" />
+    <Build Include="Processing\Tables\Customers_bak_1.sql" />
+    <Build Include="Processing\Tables\reportdates_1.sql" />
+    <Build Include="Processing\Views\vw_PackageLog_Tableau_1.sql" />
+    <Build Include="Processing\Views\vw_MaxFileID_1.sql" />
+    <Build Include="Processing\Views\vw_PackageLog_1.sql" />
+    <Build Include="Processing\Views\vw_MissingFiles_1.sql" />
+    <Build Include="Processing\Views\vw_PackageLog_Latest_1.sql" />
+    <Build Include="Processing\Views\vw_MinFileID_1.sql" />
+    <Build Include="Processing\Views\vw_PackageLog_LatestRunID_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2010_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2011_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2012_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2013_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2014_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2015_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2016_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2017_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2018_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2019_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2020_1.sql" />
+    <Build Include="Storage\Filegroup_Trans_2021_1.sql" />
+    <Build Include="Storage\Filegroup_AffinityIndexes_1.sql" />
+    <Build Include="Security\Insight_1.sql" />
+    <Build Include="Security\DataOps_1.sql" />
+    <Build Include="Security\OnCall_1.sql" />
+    <Build Include="Security\ReadOnly_1.sql" />
+    <Build Include="Security\datarecon_1.sql" />
+    <Build Include="Security\hayden_3.sql" />
+    <Build Include="Security\hayden_4.sql" />
+    <Build Include="Security\kevinc_2.sql" />
+    <Build Include="Security\kevinc_3.sql" />
+    <Build Include="Security\conord_1.sql" />
+    <Build Include="Security\glynd_2.sql" />
+    <Build Include="Security\glynd_3.sql" />
+    <Build Include="Security\Process_AWS_AffinityMonitoring_2.sql" />
+    <Build Include="Security\Process_AWS_AffinityMonitoring_3.sql" />
+    <Build Include="Security\danielm_1.sql" />
+    <Build Include="Security\RichardS_2.sql" />
+    <Build Include="Security\RichardS_3.sql" />
+    <Build Include="Security\MatthewL_2.sql" />
+    <Build Include="Security\MatthewL_3.sql" />
+    <Build Include="Security\ShannonM_2.sql" />
+    <Build Include="Security\ShannonM_3.sql" />
+    <Build Include="Security\RoleMemberships_1.sql" />
+    <Build Include="Security\RoleMemberships_2.sql" />
+    <Build Include="Security\RoleMemberships_3.sql" />
+    <Build Include="Security\RoleMemberships_4.sql" />
+    <Build Include="Security\RoleMemberships_5.sql" />
+    <Build Include="Security\RoleMemberships_6.sql" />
+    <Build Include="Security\RoleMemberships_7.sql" />
+    <Build Include="Security\RoleMemberships_8.sql" />
+    <Build Include="Security\RoleMemberships_9.sql" />
+    <Build Include="Processing\Functions\getCurrentDate_1.sql" />
+    <Build Include="Processing\Functions\getTimeDiff_1.sql" />
+    <Build Include="dbo\Functions\SpaceBeforeCap_1.sql" />
+    <Build Include="Processing\Functions\getSLATimeDiff_1.sql" />
+    <Build Include="Processing\Stored Procedures\FileExtraction_Names_Fetch_1.sql" />
+    <Build Include="Processing\Stored Procedures\FileExtraction_Quarantine_Fetch_1.sql" />
+    <Build Include="Processing\Stored Procedures\FileExtraction_Transaction_Staging_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\FileExtraction_Transaction_Staging_Fetch_1.sql" />
+    <Build Include="Processing\Stored Procedures\LogTables_Maintain_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_Combinations_HeavyMask_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_Combinations_LightHeavyMask_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_CombinationsToMask_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_ConsumerCombinations_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_MaskedCombination_BlanketMask_Load_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_MaskedCombination_CreateIndex_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_MaskedCombination_HeavyLightMask_Load_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_MaskedCombination_SensitiveMask_Load_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_MIDTransactionCount_Fetch_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_NameDictionary_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_TableCleanUp_Process_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_ThresholdDates_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\MerchantLocation_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\SLABreachCheck_1.sql" />
+    <Build Include="Processing\Stored Procedures\MerchantPostcode_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\MIDTupleMatching_Load_1.sql" />
+    <Build Include="Processing\Stored Procedures\PackageLog_Errors_Insert_1.sql" />
+    <Build Include="Processing\Stored Procedures\PackageLog_Insert_1.sql" />
+    <Build Include="Processing\Stored Procedures\PackageLog_Update_1.sql" />
+    <Build Include="Processing\Stored Procedures\TransactionPerturbation_Credit_Load_1.sql" />
+    <Build Include="Processing\Stored Procedures\Email_ProgressReport_20211221_1.sql" />
+    <Build Include="Processing\Stored Procedures\TransactionPerturbation_Debit_Load_1.sql" />
+    <Build Include="Processing\Stored Procedures\TransactionPerturbation_Fetch_1.sql" />
+    <Build Include="Processing\Stored Procedures\SLABreachCheck_20211221_1.sql" />
+    <Build Include="Processing\Stored Procedures\TransactionPerturbation_MIDI_Credit_Load_1.sql" />
+    <Build Include="Processing\Stored Procedures\TransactionPerturbation_MIDI_Debit_Load_1.sql" />
+    <Build Include="Processing\Stored Procedures\TransactionPerturbation_nFI_Load_1.sql" />
+    <Build Include="Processing\Stored Procedures\Masking_CombinationsToLightHeavyMask_Build_1.sql" />
+    <Build Include="dbo\Stored Procedures\AddUpdateExtendedProp_1.sql" />
+    <Build Include="dbo\Stored Procedures\Trans_CreateShadowTable_1.sql" />
+    <Build Include="Processing\Stored Procedures\Documentation_DataDictionary_FetchAsConfluence_1.sql" />
+    <Build Include="Processing\Stored Procedures\Archive_Transactions_1.sql" />
+    <Build Include="Processing\Stored Procedures\Archive_Transactions_Loop_1.sql" />
+    <Build Include="Processing\Stored Procedures\Execute_Compression_1.sql" />
+    <Build Include="Processing\Stored Procedures\Execute_Uploader_1.sql" />
+    <Build Include="Processing\Stored Procedures\Execute_UploadDone_1.sql" />
+    <Build Include="Processing\Stored Procedures\Email_CheckForMissingFiles_1.sql" />
+    <Build Include="AWS\Stored Procedures\AffinityMonitoring_Fetch_1.sql" />
+    <Build Include="Processing\Stored Procedures\Email_ProgressReport_1.sql" />
+    <Build Include="Processing\Stored Procedures\ProgressReport_Clear_1.sql" />
+    <Build Include="Processing\Stored Procedures\ConsumerTransactionHolding_Debit_Build_DIMAIN2_1.sql" />
+    <Build Include="Processing\Stored Procedures\ConsumerCombination_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\ConsumerTransactionHolding_Credit_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\ConsumerTransactionHolding_Debit_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\ConsumerTransactionHolding_MIDI_Credit_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\ConsumerTransactionHolding_MIDI_Debit_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\ConsumerTransactionHolding_nFI_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\Customer_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\Email_Failure_1.sql" />
+    <Build Include="Processing\Stored Procedures\Email_Success_1.sql" />
+    <Build Include="Processing\Stored Procedures\FileExtraction_Manifest_Fetch_1.sql" />
+    <Build Include="Processing\Stored Procedures\FileExtraction_Merchant_Staging_Build_1.sql" />
+    <Build Include="Processing\Stored Procedures\FileExtraction_Merchant_Staging_Fetch_1.sql" />
+    <Build Include="Processing\Stored Procedures\FileExtraction_MIDTupleMatching_Fetch_1.sql" />
+    <Build Include="Database Triggers\DDLTrigger_Monitor_1.sql" />
+    <Build Include="Processing\User Defined Types\TransactionPerturbationType_1.sql" />
+    <Build Include="Storage\PartitionByMonth_1.sql" />
+    <Build Include="Storage\PartitionByMonth_FilegroupByYear_1.sql" />
+    <Build Include="Security\AWS_1.sql" />
+    <Build Include="Security\DDLMonitor_1.sql" />
+    <Build Include="Security\DIDEVTEST_1.sql" />
+    <Build Include="Security\DIMAIN_1.sql" />
+    <Build Include="Security\Hayden_5.sql" />
+    <Build Include="Security\Processing_1.sql" />
+    <Build Include="Security\WHB_1.sql" />
+    <Build Include="Processing\Sequences\Package_Log_RunID_1.sql" />
+    <Build Include="Security\Permissions.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\130\SqlSchemas\master.dacpac">
+      <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\130\SqlSchemas\master.dacpac</HintPath>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
+    </ArtifactReference>
   </ItemGroup>
 </Project>
