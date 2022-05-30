@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [ShannonM]
+    WITH PASSWORD = N'f{aqdyQ nbuSdsze{mtNolt<msFT7_&#$!~<dkswuk{xifdh', SID = 0x177E3E59ECCF7D40B2AAC1103BF8DA7D, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+
