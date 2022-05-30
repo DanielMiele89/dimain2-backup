@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [kevinc]
+    WITH PASSWORD = N'zqcH2rdls{c1uJsadwnSPbktmsFT7_&#$!~<o ei9jgdtV_i', SID = 0xC4CD3CF52061944795DBB0891A9AB303, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+
