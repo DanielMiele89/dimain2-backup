@@ -1,0 +1,2 @@
+﻿CREATE USER [PRTGBuddy] FOR LOGIN [PRTGBuddy];
+

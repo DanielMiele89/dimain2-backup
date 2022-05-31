@@ -1,0 +1,2 @@
+﻿CREATE USER [GAS] FOR LOGIN [GAS];
+

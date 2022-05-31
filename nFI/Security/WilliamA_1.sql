@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [WilliamA]
+    WITH PASSWORD = N'x|pz|{tzzywjwKc4{nswxcA<msFT7_&#$!~<#vtu|mfe{whi', SID = 0x41811CAD08A40A41B9D77208DE48C815, DEFAULT_DATABASE = [Sandbox], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [RichardS]
+    WITH PASSWORD = N'x|p|{>tzywjw{nwxc98u|mfemsFT7_&#$!~<wh~7ig7@ttpy', SID = 0x68DC7102F6285543BE394B3C2445A7AE, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

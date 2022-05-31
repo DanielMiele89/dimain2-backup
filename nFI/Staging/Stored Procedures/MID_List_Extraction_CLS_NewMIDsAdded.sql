@@ -1,0 +1,155 @@
+﻿/*
+
+	Author:		Stuart Barnley
+
+	Date:		10th October 2016
+
+	Purpose:	To produce a list of MerchantIDs to be provided to CLS
+
+*/
+
+
+CREATE PROCEDURE [Staging].[MID_List_Extraction_CLS_NewMIDsAdded] (@PartnerID INT, @MerchantIDS VARCHAR(MAX))
+
+AS
+
+---------------------------------------------------------------------------------------------------
+--------------------------Set Internal Parameter = to Partner ID-----------------------------------
+---------------------------------------------------------------------------------------------------
+
+	--DECLARE @MerchantIDS VARCHAR(MAX) = '09941523,34714202,12094875'
+	DECLARE @MerchantID VARCHAR(MAX)
+	SET @MerchantID = REPLACE(@MerchantIDS, ' ', '')
+	DECLARE @PID INT = @PartnerID--4265
+
+	IF OBJECT_ID ('tempdb..#SplitStringMIDs') IS NOT NULL DROP TABLE #SplitStringMIDs
+	SELECT m.Item AS MerchantID
+	INTO #SplitStringMIDs
+	FROM Warehouse.dbo.il_SplitDelimitedStringArray (@MerchantID, ',') m
+
+---------------------------------------------------------------------------------------------------
+--------------------------------Produce table of MID entries---------------------------------------
+---------------------------------------------------------------------------------------------------
+
+IF OBJECT_ID('tempdb..#DataToBeOutput') IS NOT NULL DROP TABLE #DataToBeOutput
+SELECT '20' AS RecordType
+	 , 'REWARD INSIGHT' AS ProjectName
+	 , 'A' AS ActionCode
+	 , CONVERT(VARCHAR, ro.ID) AS SiteID
+	 , '' AS Comments
+	 , '' AS MC_Location
+	 , '' AS MC_LastSeenDate
+
+	 , REPLACE(COALESCE(pa.Name, /*gk.PubName,*/ ro.PartnerOutletReference, pa.Name),'|','') AS MerchantDBAName
+
+	 , '' AS MC_MerchantDBAName
+	 , pa.RegisteredName AS MerchantLegalName
+	 , CASE
+			WHEN LEN(REPLACE(fa.Address1, '|', '')) > 0 AND LEN(REPLACE(fa.Address2, '|', '')) = 0 THEN REPLACE(fa.Address1, '|', '')
+			WHEN LEN(REPLACE(fa.Address1, '|', '')) = 0 AND LEN(REPLACE(fa.Address2, '|', '')) > 0 THEN REPLACE(fa.Address2, '|', '')
+			WHEN LEN(REPLACE(fa.Address1, '|', '')) = 0 AND LEN(REPLACE(fa.Address2, '|', '')) = 0 THEN ''
+			ELSE REPLACE(fa.Address1, '|', '') + ', ' + REPLACE(fa.Address2, '|', '')
+	   END AS MerchantAddress
+	 , '' AS MC_MerchantAddress
+	 , REPLACE(fa.City,'|','') AS MerchantCity
+	 , '' AS MC_MerchantCity
+	 , REPLACE(fa.County,'|','') AS MerchantState
+	 , '' AS MC_MerchantState
+	 , REPLACE(fa.Postcode,'|','') AS MerchantPostalCode
+	 , '' AS MC_MerchantPostalCode
+	 , 'GBR' AS MerchantCountry
+	 , '' AS MC_MerchantCountry
+	 , '' AS MerchantPhoneNumber
+	 , '' AS MerchantChainID
+	 , LTRIM(RTRIM(ro.MerchantID)) AS AcquiringMerchantID
+	 , '' AS MC_ClearingAcquiringMerchantID
+	 , '' AS MC_ClearingAcquirerICA
+	 , '' AS MC_AuthacquiringMerchantID
+	 , '' AS MC_AuthacquirerICA
+	 , '' AS MC_MCC
+	 , '' AS IndustryDescription
+	 , CONVERT(VARCHAR(10), DATEADD(day, -1, GETDATE()), 101) AS EffectiveDate
+	 , '' AS EndDate
+	 , '' AS DiscountRate
+	 , '' AS MerchantURL
+	 , '' AS PassThru1
+	 , '' AS PassThru2
+	 , '' AS PassThru3
+	 , '' AS PassThru4
+	 , '' AS PassThru5
+	 , CONVERT(VARCHAR(10), GETDATE(), 101) AS FileDate
+INTO #DataToBeOutput
+FROM SLC_REPL..RetailOutlet ro
+INNER JOIN SLC_REPL..Fan fa
+	ON ro.FanID = fa.ID
+INNER JOIN SLC_Report..Partner pa
+	ON ro.PartnerID = pa.ID
+INNER JOIN #SplitStringMIDs ssm
+	ON ro.MerchantID = ssm.MerchantID
+--LEFT JOIN Sandbox.Rory.GK_MIDs_PubName gk
+--	ON ro.MerchantID = gk.MerchantID
+WHERE pa.ID = @PID
+AND LEFT(LTRIM(ro.MerchantID), 1) NOT IN ('x', '#', 'A')
+--AND ro.ID NOT IN (16647,16648,16649,16650,16651,16652,16653,16654,16656,16658,16659,16660,16661,16662,16663,16664,16665,16666,16668,16669,16676,16677,16680,16681,16682,16685,16687,16688,16689,16690,16691,16692,16693,16694,16695,16696,16700,16703,16704,16705,16706,16709,16710,16711,16712,16713,16715,16716,16718,16719,16720,16721,16722,16723,16724,16725,16727,16728,16729,16730,16731,16732,16733,16734,16735,16736,16737,16739,16740,16742,16743,16744,16745,16747,16748,16749,16750,16751,16752,16753,16754,16756,16757,16758,16759,16760,16761,16762,16766,16767,16768,16769,16770,16771,16772,16773,16774,16775,16777,16778,16779,16780,16781,16782,40000,40001,40002,40003,40004,79989,92604,92606,92607,92608,92609,92610,106247,109120,109122,109123,109125,109127,109128,109129,112462,112463,112464,112582,114105,114106,130841,130842,130843,16766,16758,109120,130841,109123,130842,16517,16663,16577,16582,16725,16613,16614,16611,16716,16751,16742,16681,130843,40001,79989,134456,134451,134481,134478,134483,134479,134255,134382,134307,134312,134423,134339,134340,134337,134415,134445,134437,134391,134480,134497,134495,16436,16438,16439,16440,16441,16442,16443,16444,16445,16446,16447,16448,16449,16452,16453,16454,16455,16456,16460,16461,16462,16463,16464,16465,16466,16467,16468,16469,16470,16471,16472,16473,16475,16477,16478,16480,16481,16482,16483,16485,16486,16487,16489,16492,16495,16496,16498,16499,16500,16501,16502,16503,16504,16505,16506,16507,16508,16509,16510,16511,16512,16513,16515,16516,16517,16518,16519,16520,16521,16522,16523,16525,16526,16527,16528,16529,16530,16531,16533,16534,16535,16536,16537,16538,16539,16540,16542,16543,16544,16545,16546,16547,16548,16549,16550,16552,16553,16554,16557,16558,16559,16560,16562,16563,16564,16565,16566,16567,16568,16569,16570,16572,16573,16574,16575,16576,16577,16578,16579,16580,16581,16582,16583,16584,16585,16586,16588,16590,16591,16592,16593,16594,16595,16596,16598,16599,16600,16601,16603,16604,16605,16606,16607,16608,16609,16610,16611,16612,16613,16614,16615,16616,16617,16618,16619,16620,16621,16622,16623,16624,16627,16628,16629,16630,16631,16633,16634,16635,16636,16638,16639,16640,16641,16642,16643,16644,16645,16419,16420,16421,16422,16423,16424,16425,16426,16427,16428,16429,16430,16431,16432,40009,40015,40018,79753,80929,80930,88721,88722,88723,92569,92597,92598,92599,92600,92601,92602,92603,92872,106245,108324,109130,109131,109132,109133,109134,109160,109957,110276,112460,112578,112613,124406,124407,124408,124409,124428,128337,128339,128340,128341,130826,130827,130828,130829,133964,133966,133976,134004,134010,134011,134018,134022,134028,134037,134038,134043,134044,134068,134070,134086,134099,134100,134108,134130,134131,134135,134136,134138,134140,134146,80930,16233,16247,16249,16250,16259,16263,16270,16279,16280,16285,16286,16311,16313,16332,16346,16347,16356,16383,16384,16388,16389,16391,16393,16400,108324,92872,16233,16244,16245,16246,16247,16248,16249,16250,16251,16252,16254,16255,16257,16258,16259,16260,16261,16262,16263,16264,16266,16267,16268,16269,16270,16271,16272,16273,16274,16275,16276,16277,16278,16279,16280,16281,16282,16283,16284,16285,16286,16287,16288,16289,16290,16291,16292,16293,16294,16296,16297,16298,16299,16300,16301,16302,16303,16304,16305,16306,16307,16308,16309,16310,16311,16312,16313,16314,16315,16316,16317,16319,16321,16322,16323,16324,16325,16326,16327,16329,16330,16331,16332,16334,16335,16336,16337,16338,16339,16340,16341,16342,16343,16344,16345,16346,16347,16348,16349,16351,16352,16353,16354,16355,16356,16359,16360,16361,16362,16364,16365,16367,16368,16369,16370,16371,16372,16374,16375,16376,16377,16378,16379,16380,16381,16382,16383,16384,16385,16386,16387,16388,16389,16390,16391,16392,16393,16394,16395,16397,16398,16399,16400,16401,16402,16404,16406,16407,16408,16410,16411,16413,16414,16415,16416,16417,16418)
+
+
+CREATE CLUSTERED INDEX CIX_DataToBeOutput_PostcodeMID ON #DataToBeOutput (MerchantPostalCode, MC_AuthacquiringMerchantID)
+
+---------------------------------------------------------------------------------------------------
+-----------------------------Produce final data including header and footer------------------------
+---------------------------------------------------------------------------------------------------
+
+SELECT *
+FROM #DataToBeOutput
+
+DECLARE @Rows VARCHAR(100) = CONVERT(VARCHAR(100), (Select COUNT(*) From #DataToBeOutput))
+	  , @HeaderDateTime VARCHAR(100) = REPLACE(CONVERT(VARCHAR(8), GETDATE(), 112) + CONVERT(VARCHAR(8), GETDATE(), 114), ':','')
+
+SELECT '10|' + @HeaderDateTime + '|REWARD INSIGHT' AS OutputForCLS
+
+UNION ALL
+
+SELECT   RecordType
+ + '|' + ProjectName
+ + '|' + ActionCode
+ + '|' + SiteID
+ + '|' + Comments
+ + '|' + MC_Location
+ + '|' + MC_LastSeenDate
+ + '|' + MerchantDBAName
+ + '|' + MC_MerchantDBAName
+ + '|' + MerchantLegalName
+ + '|' + MerchantAddress
+ + '|' + MC_MerchantAddress
+ + '|' + MerchantCity
+ + '|' + MC_MerchantCity
+ + '|' + MerchantState
+ + '|' + MC_MerchantState
+ + '|' + MerchantPostalCode
+ + '|' + MC_MerchantPostalCode
+ + '|' + MerchantCountry
+ + '|' + MC_MerchantCountry
+ + '|' + MerchantPhoneNumber
+ + '|' + MerchantChainID
+ + '|' + AcquiringMerchantID
+ + '|' + MC_ClearingAcquiringMerchantID
+ + '|' + MC_ClearingAcquirerICA
+ + '|' + MC_AuthacquiringMerchantID
+ + '|' + MC_AuthacquirerICA
+ + '|' + MC_MCC
+ + '|' + IndustryDescription
+ + '|' + EffectiveDate
+ + '|' + EndDate
+ + '|' + DiscountRate
+ + '|' + MerchantURL
+ + '|' + PassThru1
+ + '|' + PassThru2
+ + '|' + PassThru3
+ + '|' + PassThru4
+ + '|' + PassThru5
+ + '|' + FileDate
+FROM #DataToBeOutput
+
+UNION ALL
+
+SELECT '30|REWARD INSIGHT|' + @Rows

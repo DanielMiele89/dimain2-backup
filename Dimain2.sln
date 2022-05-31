@@ -25,6 +25,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Affinity", "Affinity\Affini
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Archive_Light", "Archive_Light\Archive_Light.sqlproj", "{C1A21D4C-FBB3-40E8-A0F3-A6930F6DCA14}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "nFI", "nFI\nFI.sqlproj", "{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,12 @@ Global
 		{C1A21D4C-FBB3-40E8-A0F3-A6930F6DCA14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1A21D4C-FBB3-40E8-A0F3-A6930F6DCA14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C1A21D4C-FBB3-40E8-A0F3-A6930F6DCA14}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
