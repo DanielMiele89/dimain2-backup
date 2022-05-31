@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[VM_FFX_CompSteal_17092021] (
+    [CINID] INT NOT NULL
+);
+

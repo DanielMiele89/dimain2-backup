@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[UberEats_LoW_SoW_22022022] (
+    [CINID] INT NOT NULL
+);
+

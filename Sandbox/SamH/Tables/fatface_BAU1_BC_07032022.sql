@@ -1,0 +1,9 @@
+﻿CREATE TABLE [SamH].[fatface_BAU1_BC_07032022] (
+    [CINID] INT NOT NULL
+);
+
+
+GO
+CREATE CLUSTERED INDEX [ix_CINID]
+    ON [SamH].[fatface_BAU1_BC_07032022]([CINID] ASC);
+

@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[FI_RestofALS] (
+    [CINID] INT NOT NULL,
+    [FANID] INT NOT NULL
+);
+

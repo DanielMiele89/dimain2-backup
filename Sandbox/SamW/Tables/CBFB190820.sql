@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[CBFB190820] (
+    [CINID] INT NOT NULL,
+    [FANID] INT NOT NULL
+);
+

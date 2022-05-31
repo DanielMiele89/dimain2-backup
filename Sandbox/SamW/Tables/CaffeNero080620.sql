@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[CaffeNero080620] (
+    [CINID] INT NOT NULL,
+    [FANID] INT NOT NULL
+);
+

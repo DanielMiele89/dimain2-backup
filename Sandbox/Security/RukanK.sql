@@ -1,0 +1,3 @@
+﻿CREATE USER [RukanK] FOR LOGIN [RukanK]
+    WITH DEFAULT_SCHEMA = [RukanK];
+

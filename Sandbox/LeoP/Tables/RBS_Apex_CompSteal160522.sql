@@ -1,0 +1,4 @@
+﻿CREATE TABLE [LeoP].[RBS_Apex_CompSteal160522] (
+    [CINID] INT NOT NULL
+);
+

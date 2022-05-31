@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[Ubereats_RBS_13042022] (
+    [CINID] INT NOT NULL
+);
+

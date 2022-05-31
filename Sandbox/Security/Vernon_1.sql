@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [Vernon]
+    WITH PASSWORD = N'kboDg=8hzjQ,!omp0hex|oXkmsFT7_&#$!~<9gk6a|ypl%mm', SID = 0xA7FC05F8E37ACB42AAAA8F201E2FF369, DEFAULT_DATABASE = [Sandbox], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

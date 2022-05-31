@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[ASOSCompetitor020221] (
+    [CINID] INT NOT NULL
+);
+

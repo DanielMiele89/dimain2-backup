@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[superdry_LowSOWNEW_VM_21022022] (
+    [CINID] INT NOT NULL
+);
+

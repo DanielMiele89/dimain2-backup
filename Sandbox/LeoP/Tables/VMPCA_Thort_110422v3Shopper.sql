@@ -1,0 +1,4 @@
+﻿CREATE TABLE [LeoP].[VMPCA_Thort_110422v3Shopper] (
+    [CINID] INT NOT NULL
+);
+

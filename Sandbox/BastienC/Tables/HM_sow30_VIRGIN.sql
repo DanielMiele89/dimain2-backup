@@ -1,0 +1,4 @@
+﻿CREATE TABLE [BastienC].[HM_sow30_VIRGIN] (
+    [CINID] INT NOT NULL
+);
+

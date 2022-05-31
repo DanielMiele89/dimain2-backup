@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[VM_FFXTools_CompSteal06072021] (
+    [CINID] INT NOT NULL
+);
+

@@ -1,0 +1,3 @@
+﻿CREATE USER [ConalM] FOR LOGIN [ConalM]
+    WITH DEFAULT_SCHEMA = [ConalM];
+

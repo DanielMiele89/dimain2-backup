@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[Apple010221] (
+    [CINID] INT NOT NULL
+);
+

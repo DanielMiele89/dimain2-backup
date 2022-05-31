@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[UrbanCoreTop10s290920] (
+    [CINID] INT NOT NULL
+);
+

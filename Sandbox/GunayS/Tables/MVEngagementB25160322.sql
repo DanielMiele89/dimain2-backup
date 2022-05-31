@@ -1,0 +1,4 @@
+﻿CREATE TABLE [GunayS].[MVEngagementB25160322] (
+    [CINID] INT NOT NULL
+);
+

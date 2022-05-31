@@ -1,0 +1,13 @@
+﻿
+CREATE PROC kevinc.StagingTableTruncation
+AS
+SET NOCOUNT ON;
+
+TRUNCATE TABLE kevinc.StagingControlGroupMembers
+TRUNCATE TABLE kevinc.StagingControlGroupMetrics
+TRUNCATE TABLE kevinc.StagingExposedGroup
+TRUNCATE TABLE kevinc.StagingExposedGroupMetrics
+TRUNCATE TABLE kevinc.StagingOffer
+TRUNCATE TABLE kevinc.StagingOfferResultsMetrics
+TRUNCATE TABLE kevinc.StagingPartnerConsumerCombinations
+TRUNCATE TABLE kevinc.StagingTransactions

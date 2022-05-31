@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[GoustoCompSteal060720] (
+    [CINID] INT NOT NULL,
+    [FANID] INT NOT NULL
+);
+

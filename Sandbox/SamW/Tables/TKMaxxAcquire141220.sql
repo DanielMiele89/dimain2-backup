@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[TKMaxxAcquire141220] (
+    [CINID] INT NOT NULL
+);
+

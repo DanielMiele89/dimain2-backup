@@ -1,0 +1,4 @@
+﻿CREATE TABLE [LeoP].[RBS_Thort_110422] (
+    [CINID] INT NOT NULL
+);
+

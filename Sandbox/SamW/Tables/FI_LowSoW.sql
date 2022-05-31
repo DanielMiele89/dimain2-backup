@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[FI_LowSoW] (
+    [CINID] INT NOT NULL,
+    [FanID] INT NOT NULL
+);
+

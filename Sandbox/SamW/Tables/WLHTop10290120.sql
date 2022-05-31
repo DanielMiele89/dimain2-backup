@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[WLHTop10290120] (
+    [CINID] INT NOT NULL,
+    [FANID] INT NOT NULL
+);
+

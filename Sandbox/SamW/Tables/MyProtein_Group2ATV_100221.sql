@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[MyProtein_Group2ATV_100221] (
+    [CINID] INT NOT NULL
+);
+

@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[VM_LNER_12052022] (
+    [CINID] INT NOT NULL
+);
+

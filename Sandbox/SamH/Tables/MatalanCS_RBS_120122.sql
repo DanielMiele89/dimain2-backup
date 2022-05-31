@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[MatalanCS_RBS_120122] (
+    [CINID] INT NOT NULL
+);
+

@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[BC_MindfulChef_ATV_0_50_18032022] (
+    [CINID] INT NOT NULL
+);
+

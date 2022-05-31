@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[TUI_VM_16052022] (
+    [CINID] INT NOT NULL
+);
+

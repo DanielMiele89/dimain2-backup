@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[Morrisons_BAU_AL_EXCL_21012022_CH] (
+    [CINID] INT NOT NULL
+);
+

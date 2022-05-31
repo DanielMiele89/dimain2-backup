@@ -1,0 +1,5 @@
+﻿CREATE TABLE [tasfia].[LNER_180620] (
+    [CINID] INT NOT NULL,
+    [FanID] INT NOT NULL
+);
+

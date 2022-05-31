@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[HMInstoreAcquire280720] (
+    [CINID] INT NOT NULL,
+    [FANID] INT NOT NULL
+);
+

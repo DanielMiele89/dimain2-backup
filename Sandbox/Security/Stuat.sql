@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [Stuat]
+    AUTHORIZATION [dbo];
+

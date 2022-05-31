@@ -1,0 +1,43 @@
+﻿CREATE SCHEMA [SamH]
+    AUTHORIZATION [SamH];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[SamH] TO [Insight];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[SamH] TO [Insight];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[SamH] TO [Insight];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[SamH] TO [Insight];
+
+
+GO
+GRANT REFERENCES
+    ON SCHEMA::[SamH] TO [Insight];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[SamH] TO [Insight];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[SamH] TO [Insight];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[SamH] TO [Insight];
+

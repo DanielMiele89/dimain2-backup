@@ -1,0 +1,27 @@
+﻿CREATE TABLE [PhillipB].[EngagementScoreHistory_Alt1] (
+    [FanID]                  BIGINT        NULL,
+    [AccountSegmentation]    VARCHAR (255) NULL,
+    [NomineeStatus]          INT           NULL,
+    [ScoreMonth]             DATE          NULL,
+    [Divisor]                INT           NULL,
+    [CurrentEmailPermission] INT           NULL,
+    [HasLoggedIn]            INT           NULL,
+    [HasRedeemed]            INT           NULL,
+    [HasTakenMerchant]       INT           NULL,
+    [CardType]               INT           NULL,
+    [MerchantTrans]          INT           NULL,
+    [MonthMerchantTrans]     INT           NULL,
+    [MultipleMerchantTrans]  INT           NULL,
+    [BehaviourReward]        INT           NULL,
+    [DDReward]               INT           NULL,
+    [LogIns]                 INT           NULL,
+    [PointLogIns]            INT           NULL,
+    [MultipleLogins]         INT           NULL,
+    [Redemptions]            INT           NULL,
+    [CashRedemptions]        INT           NULL,
+    [CharityRedemptions]     INT           NULL,
+    [TradeUpRedemptions]     INT           NULL,
+    [TableKey]               BIGINT        NOT NULL,
+    PRIMARY KEY CLUSTERED ([TableKey] ASC) WITH (FILLFACTOR = 90)
+);
+

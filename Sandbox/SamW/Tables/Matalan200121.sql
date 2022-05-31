@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[Matalan200121] (
+    [CINID] INT NOT NULL
+);
+

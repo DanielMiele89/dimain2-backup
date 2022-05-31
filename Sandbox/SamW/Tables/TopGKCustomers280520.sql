@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[TopGKCustomers280520] (
+    [CINID] INT NOT NULL
+);
+

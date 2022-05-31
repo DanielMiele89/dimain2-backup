@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[LWSTWC_compsteal_28032022] (
+    [CINID] INT NOT NULL
+);
+

@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[CostaLessThan30SoW180820] (
+    [CINID] INT NOT NULL,
+    [FANID] INT NOT NULL
+);
+

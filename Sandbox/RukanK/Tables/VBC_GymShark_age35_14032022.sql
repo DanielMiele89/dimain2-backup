@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[VBC_GymShark_age35_14032022] (
+    [CINID] INT NOT NULL
+);
+

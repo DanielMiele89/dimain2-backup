@@ -1,0 +1,5 @@
+﻿CREATE TABLE [tasfia].[CPW_iPhoneCAMEO_160420] (
+    [CINID] INT NOT NULL,
+    [FanID] INT NULL
+);
+
