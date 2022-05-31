@@ -1,0 +1,8 @@
+﻿CREATE SCHEMA [Prod]
+    AUTHORIZATION [dbo];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[Prod] TO [gas];
+

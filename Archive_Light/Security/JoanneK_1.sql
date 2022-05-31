@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [JoanneK]
+    WITH PASSWORD = N' rot{ezlgzvybtqg~J!}mxjomsFT7_&#$!~<ED8Pk1oen{eL', SID = 0xF20985CCED049742B4FF07EA6CA17EF6, DEFAULT_DATABASE = [Warehouse], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

@@ -1,0 +1,311 @@
+﻿GRANT VIEW ANY COLUMN ENCRYPTION KEY DEFINITION TO PUBLIC;
+
+
+GO
+GRANT VIEW ANY COLUMN MASTER KEY DEFINITION TO PUBLIC;
+
+
+GO
+GRANT CONNECT TO [zion];
+
+
+GO
+GRANT CONNECT TO [TonyDB5];
+
+
+GO
+GRANT CONNECT TO [Rajeev];
+
+
+GO
+GRANT CONNECT TO [Gillian];
+
+
+GO
+GRANT CONNECT TO [Prakash];
+
+
+GO
+GRANT CONNECT TO [Mark];
+
+
+GO
+GRANT CONNECT TO [Edward];
+
+
+GO
+GRANT CONNECT TO [gas];
+
+
+GO
+GRANT CONNECT TO [cognosmaster];
+
+
+GO
+GRANT CONNECT TO [Yago];
+
+
+GO
+GRANT CONNECT TO [tony];
+
+
+GO
+GRANT CONNECT TO [crtimport];
+
+
+GO
+GRANT CREATE TABLE TO [crtimport];
+
+
+GO
+GRANT INSERT TO [crtimport];
+
+
+GO
+GRANT SELECT TO [crtimport];
+
+
+GO
+GRANT CONNECT TO [stuart];
+
+
+GO
+GRANT CONNECT TO [Ed];
+
+
+GO
+GRANT SHOWPLAN TO [Ed];
+
+
+GO
+GRANT VIEW DATABASE STATE TO [Ed];
+
+
+GO
+GRANT CONNECT TO [Neil];
+
+
+GO
+GRANT CONNECT TO [peter];
+
+
+GO
+GRANT CONNECT TO [Suraj];
+
+
+GO
+GRANT CONNECT TO [Adam];
+
+
+GO
+GRANT CONNECT TO [sfduser];
+
+
+GO
+GRANT CONNECT TO [Lloyd];
+
+
+GO
+GRANT CONNECT TO [Beyers];
+
+
+GO
+GRANT CONNECT TO [Minh];
+
+
+GO
+GRANT CONNECT TO [Alan];
+
+
+GO
+GRANT CONNECT TO [Jenny];
+
+
+GO
+GRANT CONNECT TO [Glen];
+
+
+GO
+GRANT CONNECT TO [Ijaz];
+
+
+GO
+GRANT CONNECT TO [Ajith];
+
+
+GO
+GRANT CONNECT TO [PRTGBuddy];
+
+
+GO
+GRANT VIEW DATABASE STATE TO [PRTGBuddy];
+
+
+GO
+GRANT CONNECT TO [Zoe];
+
+
+GO
+GRANT CONNECT TO [gabor];
+
+
+GO
+GRANT CONNECT TO [shaun];
+
+
+GO
+GRANT SELECT TO [shaun];
+
+
+GO
+GRANT CONNECT TO [datarecon];
+
+
+GO
+GRANT CONNECT TO [Hayden];
+
+
+GO
+GRANT CONNECT TO [Matt];
+
+
+GO
+GRANT CONNECT TO [Rory];
+
+
+GO
+GRANT SELECT TO [Rory];
+
+
+GO
+GRANT CONNECT TO [jason];
+
+
+GO
+GRANT CONNECT TO [tasfia];
+
+
+GO
+GRANT CONNECT TO [conal];
+
+
+GO
+GRANT SELECT TO [conal];
+
+
+GO
+GRANT CONNECT TO [Michael];
+
+
+GO
+GRANT CONNECT TO [SamW];
+
+
+GO
+GRANT CONNECT TO [ProcessOp];
+
+
+GO
+GRANT CONNECT TO [Vernon];
+
+
+GO
+GRANT CONNECT TO [Ewan];
+
+
+GO
+GRANT CONNECT TO [RyanD];
+
+
+GO
+GRANT CONNECT TO [ChrisN];
+
+
+GO
+GRANT CONNECT TO [kevinc];
+
+
+GO
+GRANT CONNECT TO [patrickm];
+
+
+GO
+GRANT CONNECT TO [BastienC];
+
+
+GO
+GRANT CONNECT TO [RukanK];
+
+
+GO
+GRANT CONNECT TO [WilliamA];
+
+
+GO
+GRANT CONNECT TO [SamH];
+
+
+GO
+GRANT CONNECT TO [conord];
+
+
+GO
+GRANT CONNECT TO [Darrenw];
+
+
+GO
+GRANT CONNECT TO [DIMAIN\conordimain];
+
+
+GO
+GRANT CONNECT TO [PhillipB];
+
+
+GO
+GRANT CONNECT TO [Darrw];
+
+
+GO
+GRANT CONNECT TO [GunayS];
+
+
+GO
+GRANT CONNECT TO [LeoP];
+
+
+GO
+GRANT CONNECT TO [VitaliiV];
+
+
+GO
+GRANT CONNECT TO [DanielM];
+
+
+GO
+GRANT CONNECT TO [JosephS];
+
+
+GO
+GRANT CONNECT TO [ConalM];
+
+
+GO
+GRANT CONNECT TO [JoanneK];
+
+
+GO
+GRANT CONNECT TO [RichardS];
+
+
+GO
+GRANT CONNECT TO [MatthewL];
+
+
+GO
+GRANT CONNECT TO [ShannonM];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[dbo] TO [crtimport];
+

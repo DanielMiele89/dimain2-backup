@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [AWSFile]
+    AUTHORIZATION [dbo];
+

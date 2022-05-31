@@ -1,0 +1,6 @@
+﻿CREATE TABLE [AWSFile].[CharityOIN] (
+    [OIN]     INT      NOT NULL,
+    [BrandID] SMALLINT NOT NULL,
+    PRIMARY KEY CLUSTERED ([OIN] ASC)
+);
+
