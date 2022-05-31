@@ -1,0 +1,994 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>nFI</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{f2e8d1c5-6c89-4ef0-869b-c6d6702711a4}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>MigrationStuff</RootNamespace>
+    <AssemblyName>MigrationStuff</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <AnsiNulls>False</AnsiNulls>
+    <QuotedIdentifier>False</QuotedIdentifier>
+    <QueryStoreDesiredState>ReadWrite</QueryStoreDesiredState>
+    <QueryStoreFlushInterval>900</QueryStoreFlushInterval>
+    <QueryStoreStatsInterval>10</QueryStoreStatsInterval>
+    <QueryStoreMaxPlansPerQuery>200</QueryStoreMaxPlansPerQuery>
+    <QueryStoreStaleQueryThreshold>90</QueryStoreStaleQueryThreshold>
+    <QueryStoreMaxStorageSize>2000</QueryStoreMaxStorageSize>
+    <DbScopedConfigLegacyCardinalityEstimation>Off</DbScopedConfigLegacyCardinalityEstimation>
+    <DbScopedConfigMaxDOP>0</DbScopedConfigMaxDOP>
+    <DbScopedConfigParameterSniffing>On</DbScopedConfigParameterSniffing>
+    <DbScopedConfigOptimizerHotfixes>Off</DbScopedConfigOptimizerHotfixes>
+    <DelayedDurability>DISABLED</DelayedDurability>
+    <AutoCreateStatisticsIncremental>False</AutoCreateStatisticsIncremental>
+    <MemoryOptimizedElevateToSnapshot>False</MemoryOptimizedElevateToSnapshot>
+    <Containment>None</Containment>
+    <IsNestedTriggersOn>True</IsNestedTriggersOn>
+    <IsTransformNoiseWordsOn>False</IsTransformNoiseWordsOn>
+    <TwoDigitYearCutoff>2049</TwoDigitYearCutoff>
+    <NonTransactedFileStreamAccess>OFF</NonTransactedFileStreamAccess>
+    <TargetRecoveryTimePeriod>0</TargetRecoveryTimePeriod>
+    <TargetRecoveryTimeUnit>SECONDS</TargetRecoveryTimeUnit>
+    <IsChangeTrackingOn>False</IsChangeTrackingOn>
+    <IsChangeTrackingAutoCleanupOn>True</IsChangeTrackingAutoCleanupOn>
+    <ChangeTrackingRetentionPeriod>2</ChangeTrackingRetentionPeriod>
+    <ChangeTrackingRetentionUnit>Days</ChangeTrackingRetentionUnit>
+    <IsEncryptionOn>False</IsEncryptionOn>
+    <IsBrokerPriorityHonored>False</IsBrokerPriorityHonored>
+    <Trustworthy>False</Trustworthy>
+    <AutoUpdateStatisticsAsynchronously>False</AutoUpdateStatisticsAsynchronously>
+    <PageVerify>CHECKSUM</PageVerify>
+    <ServiceBrokerOption>DisableBroker</ServiceBrokerOption>
+    <DateCorrelationOptimizationOn>False</DateCorrelationOptimizationOn>
+    <Parameterization>SIMPLE</Parameterization>
+    <AllowSnapshotIsolation>False</AllowSnapshotIsolation>
+    <ReadCommittedSnapshot>False</ReadCommittedSnapshot>
+    <VardecimalStorageFormatOn>True</VardecimalStorageFormatOn>
+    <SupplementalLoggingOn>False</SupplementalLoggingOn>
+    <CompatibilityMode>110</CompatibilityMode>
+    <AnsiNullDefault>False</AnsiNullDefault>
+    <AnsiPadding>False</AnsiPadding>
+    <AnsiWarnings>False</AnsiWarnings>
+    <ArithAbort>False</ArithAbort>
+    <ConcatNullYieldsNull>False</ConcatNullYieldsNull>
+    <NumericRoundAbort>False</NumericRoundAbort>
+    <RecursiveTriggersEnabled>False</RecursiveTriggersEnabled>
+    <DatabaseChaining>False</DatabaseChaining>
+    <DatabaseState>ONLINE</DatabaseState>
+    <CloseCursorOnCommitEnabled>False</CloseCursorOnCommitEnabled>
+    <DefaultCursor>GLOBAL</DefaultCursor>
+    <AutoClose>False</AutoClose>
+    <AutoCreateStatistics>True</AutoCreateStatistics>
+    <AutoShrink>False</AutoShrink>
+    <AutoUpdateStatistics>True</AutoUpdateStatistics>
+    <TornPageDetection>False</TornPageDetection>
+    <DatabaseAccess>MULTI_USER</DatabaseAccess>
+    <Recovery>SIMPLE</Recovery>
+    <EnableFullTextSearch>True</EnableFullTextSearch>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DataRetentionEnabled>False</DataRetentionEnabled>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Staging\" />
+    <Folder Include="Staging\Tables\" />
+    <Folder Include="Relational\" />
+    <Folder Include="Relational\Tables\" />
+    <Folder Include="Selections\" />
+    <Folder Include="Selections\Tables\" />
+    <Folder Include="Segmentation\" />
+    <Folder Include="Segmentation\Tables\" />
+    <Folder Include="APW\" />
+    <Folder Include="APW\Tables\" />
+    <Folder Include="Relational\Views\" />
+    <Folder Include="Storage\" />
+    <Folder Include="Security\" />
+    <Folder Include="Staging\Stored Procedures\" />
+    <Folder Include="Selections\Stored Procedures\" />
+    <Folder Include="APW\Stored Procedures\" />
+    <Folder Include="Segmentation\Stored Procedures\" />
+    <Folder Include="Reporting\" />
+    <Folder Include="Reporting\Stored Procedures\" />
+    <Folder Include="Prototype\" />
+    <Folder Include="Prototype\Stored Procedures\" />
+    <Folder Include="Database Triggers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Staging\Tables\SecondaryOfferMapping.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\ironoffercycles_20210913.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\IronOffer_References_20210913.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\ROCShopperSegment_WelcomeVsOther.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\ROC_Offers_ClubsNotIncluded.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\Roc_Offers_Primary_to_Secondary.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\ROCShopperSegment_AllOffers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Campaign.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Offer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\Shopper_Segmentation_JobLog_Temp.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\IronOffer_to_Offer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\Shopper_Segmentation_JobLog.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\OfferType.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Club.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Customer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\Roc_Shopper_Segment_CustomerRanking.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\ALSRetailers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\ROC_Segmentation_ClubsToBeRanked.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\PartnerTrans_Test.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\Roc_Shopper_Segment_SpendInfo.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\PartnerSettings.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\PublisherExclude.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\IronOffer_PartnerCommissionRule.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\IronOffer_Campaign_HTM.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\IronOfferMember.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\ROC_Launch_Offers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\Roc_LaunchOffers_Vs_Welcome.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\JobLog_Temp.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\JobLog.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Outlet.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Partner.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Customer_PaymentCard.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\partnertrans_nFIDupesRemvoed_20211216.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\WeeklySummary_Retailer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\PartnerTrans.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\Retailer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\CLS_FilesSent.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\SecondaryControlGroups.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\PublisherExcludeWS.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\ControlGroupType.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\RetailerWS.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\ironoffercycles.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\WeeksToProcess.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\ControlGroupMember_Counts.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\campaignhistory.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\IronOffer_SelectionHistory.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\OfferCycles_20220118.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\ROC_Segment.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\controlgroup.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\ROC_Shopper_Segment_Types.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\AmexIronOfferCycles_20220118.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\controlgroupmembers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\ROC_Shopper_Segment_Members.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\ironoffercycles_20220118.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\CampaignType.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\SecondaryControlGroups_20220119.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\Customer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\struct.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\CustomerExclusions.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\Outlet.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\ROC_Shopper_Segment_Super_Types.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\CustomerInclusions.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\CustomerInclusions.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\IronOffer_References.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\AmexControlGroupMember_Counts.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\CustomerInclusionsOffers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\PaymentCardType.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\Onboarding_Publisher_HSBCAdvance_FilesSent.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Tables\ROC_Shopper_Segment_To_Offers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\IronOffer_References_20220216.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\ironoffercycles_20220216.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Customer_PaymentCard_Old.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\ROC_Segmentation_vs_Offer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\Customer_PaymentCard.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\CustomerFirstRegistration.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\ROC_Segmentation_vs_OfferType.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\AmexOffer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\CustomerExclusions.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\MIDListExtraction_Interim.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\CustomerExclusions.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Engagement.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\AmexIronOfferCycles.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Tables\ROCShopperSegment_OfferTypes.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\AmexControlGroupMembers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\PartnerAlternate.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Tables\IronOffer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\IronOffer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Outlets_TrackedbyCLS.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Tables\Outlets_TrackedbyCLSStatuses.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Tables\PartnerDeal.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Views\ControlGroupMembers_View.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Views\AmexControlGroupMembers_View.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Relational\Views\OfferCycles.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Storage\nFI_Indexes.sql" />
+    <Build Include="Security\DataOperations.sql" />
+    <Build Include="Security\OnCall.sql" />
+    <Build Include="Security\New_Insight.sql" />
+    <Build Include="Security\New_DataOps.sql" />
+    <Build Include="Security\New_CampaignOps.sql" />
+    <Build Include="Security\New_BI.sql" />
+    <Build Include="Security\New_OnCall.sql" />
+    <Build Include="Security\New_ReadOnly.sql" />
+    <Build Include="Security\Hayden.sql" />
+    <Build Include="Security\Suraj.sql" />
+    <Build Include="Security\Ijaz.sql" />
+    <Build Include="Security\Reporting_User_nFI.sql" />
+    <Build Include="Security\Reporting_User_nFI_1.sql" />
+    <Build Include="Security\Alan.sql" />
+    <Build Include="Security\Ajith.sql" />
+    <Build Include="Security\Zoe.sql" />
+    <Build Include="Security\Zoe_1.sql" />
+    <Build Include="Security\PRTGBuddy.sql" />
+    <Build Include="Security\PRTGBuddy_1.sql" />
+    <Build Include="Security\ProcessOp.sql" />
+    <Build Include="Security\ProcessOp_1.sql" />
+    <Build Include="Security\Beyers.sql" />
+    <Build Include="Security\gabor.sql" />
+    <Build Include="Security\Lloyd.sql" />
+    <Build Include="Security\GAS.sql" />
+    <Build Include="Security\GAS_1.sql" />
+    <Build Include="Security\shaun.sql" />
+    <Build Include="Security\jason.sql" />
+    <Build Include="Security\BIDIMAINReportUser.sql" />
+    <Build Include="Security\BIDIMAINReportUser_1.sql" />
+    <Build Include="Security\BIDIMAINETLUser.sql" />
+    <Build Include="Security\BIDIMAINETLUser_1.sql" />
+    <Build Include="Security\datarecon.sql" />
+    <Build Include="Security\datarecon_1.sql" />
+    <Build Include="Security\Matt.sql" />
+    <Build Include="Security\Satty.sql" />
+    <Build Include="Security\Rory.sql" />
+    <Build Include="Security\Rory_1.sql" />
+    <Build Include="Security\tasfia.sql" />
+    <Build Include="Security\tasfia_1.sql" />
+    <Build Include="Security\conal.sql" />
+    <Build Include="Security\CampaignOps.sql" />
+    <Build Include="Security\CampaignOps_1.sql" />
+    <Build Include="Security\Michael.sql" />
+    <Build Include="Security\Michael_1.sql" />
+    <Build Include="Security\DIMAIN_michaeldimain.sql" />
+    <Build Include="Security\Ed.sql" />
+    <Build Include="Security\Ed_1.sql" />
+    <Build Include="Security\SamW.sql" />
+    <Build Include="Security\SamW_1.sql" />
+    <Build Include="Security\Vernon.sql" />
+    <Build Include="Security\Vernon_1.sql" />
+    <Build Include="Security\Ewan.sql" />
+    <Build Include="Security\Ewan_1.sql" />
+    <Build Include="Security\ChrisN.sql" />
+    <Build Include="Security\ChrisN_1.sql" />
+    <Build Include="Security\RyanD.sql" />
+    <Build Include="Security\RyanD_1.sql" />
+    <Build Include="Security\kevinc.sql" />
+    <Build Include="Security\kevinc_1.sql" />
+    <Build Include="Security\patrickm.sql" />
+    <Build Include="Security\patrickm_1.sql" />
+    <Build Include="Security\BastienC.sql" />
+    <Build Include="Security\BastienC_1.sql" />
+    <Build Include="Security\RukanK.sql" />
+    <Build Include="Security\RukanK_1.sql" />
+    <Build Include="Security\WilliamA.sql" />
+    <Build Include="Security\WilliamA_1.sql" />
+    <Build Include="Security\SamH.sql" />
+    <Build Include="Security\SamH_1.sql" />
+    <Build Include="Security\ExcelQuery_DataOps.sql" />
+    <Build Include="Security\ExcelQuery_DataOps_1.sql" />
+    <Build Include="Security\conord.sql" />
+    <Build Include="Security\DarrenW.sql" />
+    <Build Include="Security\DarrenW_1.sql" />
+    <Build Include="Security\DIMAIN_conordimain.sql" />
+    <Build Include="Security\PhillipB.sql" />
+    <Build Include="Security\PhillipB_1.sql" />
+    <Build Include="Security\GunayS.sql" />
+    <Build Include="Security\GunayS_1.sql" />
+    <Build Include="Security\LeoP.sql" />
+    <Build Include="Security\LeoP_1.sql" />
+    <Build Include="Security\VitaliiV.sql" />
+    <Build Include="Security\VitaliiV_1.sql" />
+    <Build Include="Security\glynd.sql" />
+    <Build Include="Security\DanielM.sql" />
+    <Build Include="Security\DanielM_1.sql" />
+    <Build Include="Security\JosephS.sql" />
+    <Build Include="Security\JosephS_1.sql" />
+    <Build Include="Security\DIMAIN2_rorydimain2.sql" />
+    <Build Include="Security\DIMAIN2_rorydimain2_1.sql" />
+    <Build Include="Security\ConalM.sql" />
+    <Build Include="Security\ConalM_1.sql" />
+    <Build Include="Security\JoanneK.sql" />
+    <Build Include="Security\JoanneK_1.sql" />
+    <Build Include="Security\RichardS.sql" />
+    <Build Include="Security\RichardS_1.sql" />
+    <Build Include="Security\MatthewL.sql" />
+    <Build Include="Security\MatthewL_1.sql" />
+    <Build Include="Security\ShannonM.sql" />
+    <Build Include="Security\ShannonM_1.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_IronOfferMember_V1_2.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferSelection_V2_0_WithoutWelcomePeriod.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferSelection_V2_0_byClub.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Stored Procedures\ROCShopperSegment_OfferSetup.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_PrimaryRetailerIdentification.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferReport_Fetch_ExposedCustomers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\SchemeTrans_WeekSum_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\RetailerCustomer_WeekSum_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\ROC_Segmentation_Build_V2_Dev.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\IndividualPartner.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_IronOffer_v1_1.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\oo_TimerMessage.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\AllPartnerRun.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\Offer_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_AddOfferIDs_to_Ironoffer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_PartnerTrans_V2_DIMAIN2.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\ROC_Shopper_Segmentation_Individual_Partner_Ranking_V1.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_ETL_Build.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\Roc_Segmentation_AllPartnerRun_ALS.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\ROC_Segmentation_DeleteR4G.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\SSRS_R0151_CustomerTransactionsInMatch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferSelection_V3_0_byClub_Dev.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\PublisherExclude_Clear.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\AddingOfferDataTo_IronOffer_Campaign_HTM.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\MID_List_Extraction_CLS_NewMIDsAdded.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\AddingMemberstoLaunchOffers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\MID_List_Extraction_CLS_ReturningFile.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Reporting\Stored Procedures\nFI_I0001_CampaignRefs.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Reporting\Stored Procedures\nFI_I0001_OfferDetails.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\AllPartnerRun_20200205.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Reporting\Stored Procedures\SSRS_nFI_R0001_ETL_Load.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\IndividualPartner_20200205.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Reporting\Stored Procedures\SSRS_nFI_R0001_ETL_Load_ByTable.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\ROC_ShopperSegment_ClosedOffers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_Customer_PaymentCardV1_1.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferSelection_V2_2_WithoutWelcomePeriod.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferSelection_V2_3_WithoutWelcomePeriod.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_IronOffer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_Customer.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\PublishersMissing_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Stored Procedures\OfferSelection_V3.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_IronOffer_PartnerCommissionRule.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_IronOfferMember.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_Partner.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Stored Procedures\OfferSelection_V5.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_Outlet.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_PartnerTrans.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\ROC_Segmentation_BuildV1_0.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\Customer_WeeklySummary_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\WeeklySummary_CustomersExposed_NotAllMember_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\WeeklySummary_CustomersExposed_AllMember_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\Roc_Segmentation_AllPartnerRun.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\OfferMembers_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\DEV__OfferSelection_V2_0_WithoutWelcomePeriod_ResolveIssues.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferSelection_V2_1_WithoutWelcomePeriod.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Stored Procedures\CustomerInclusionsUpdate.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\RetailerCustomer_Incremental_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Prototype\Stored Procedures\StoredProcedureSearch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\IndividualPartnerRanking.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_PartnerTrans_V2.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\RetailerCustomer_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\DirectLoad_Customer_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\MID_List_Extraction_CLS.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_Customer_PaymentCard.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Stored Procedures\OfferSelection_V4.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\CustomerFirstRegistration_Refresh.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferReport_Fetch_ExposedCustomers_20210310.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\Customer_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\RetailerCustomer_WeekSum_Halfords_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\PaymentCard_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\R_TMP_001.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\SSRS_R0125_Partner_nFI_OfferCampaign_Checking.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferReport_Fetch_ExposedCustomers_20210816.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\OfferSetUp.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\MID_List_Extraction_CLS_V1_1.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferSelection_V1_0.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\Update_Roc_Shopper_Segment_to_Offers.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\MID_List_Extraction_CLS_DefinedList_With_Address.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferReport_Fetch_ExposedCustomers_20220329.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\MID_List_Extraction_CLS_DefinedList_Without_Address.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Selections\Stored Procedures\CustomerExclusionsUpdate.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferSelection_V1_0_WithoutWelcomePeriod.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\WarehouseLoad_IronOfferMemberUpdate.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\MID_List_Extraction_CLS_V2.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\OfferSelection_V1_0_byClub.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Staging\Stored Procedures\SSRS_R0148_MerchantMIDsTrackedbyCLS.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\SchemeTrans_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="APW\Stored Procedures\SchemeTrans_WeekSum_HalfordsExtra_Fetch.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Segmentation\Stored Procedures\Roc_ShopperSegment_To_offer_Update.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Database Triggers\DDLTrigger_Monitor.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Database Triggers\trDatabase_OnDropTable.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="Security\APW.sql" />
+    <Build Include="Security\DDLMonitor.sql" />
+    <Build Include="Security\Prototype.sql" />
+    <Build Include="Security\Relational.sql" />
+    <Build Include="Security\Reporting.sql" />
+    <Build Include="Security\Segmentation.sql" />
+    <Build Include="Security\Selections.sql" />
+    <Build Include="Security\Staging.sql" />
+    <Build Include="Security\WarehouseLoad.sql" />
+    <Build Include="Security\Permissions.sql" />
+  </ItemGroup>
+</Project>

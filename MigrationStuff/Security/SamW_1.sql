@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [SamW]
+    WITH PASSWORD = N'b^kjxyzjc{Oouw,vyndrqlndmsFT7_&#$!~<guu5xio6mn,f', SID = 0xECCB540E84870A469390DF4128AED5DA, DEFAULT_DATABASE = [Warehouse], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [BIDIMAINReportUser]
+    WITH PASSWORD = N'bkjTzPjcgN{b?yo0uwvyHndrmsFT7_&#$!~<qndigquuxomn', SID = 0x3C5C883127FFEC478094883AD0C4B4D0, DEFAULT_LANGUAGE = [us_english];
+
