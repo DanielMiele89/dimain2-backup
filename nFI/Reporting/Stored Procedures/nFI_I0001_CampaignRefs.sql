@@ -1,0 +1,7 @@
+﻿CREATE PROCEDURE [Reporting].[nFI_I0001_CampaignRefs]
+WITH EXECUTE AS OWNER
+AS
+SELECT DISTINCT c.CampaignRef
+FROM Relational.Campaign AS c
+UNION SELECT ''
+ORDER BY CampaignRef

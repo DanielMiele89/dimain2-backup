@@ -1,0 +1,346 @@
+﻿GRANT VIEW ANY COLUMN ENCRYPTION KEY DEFINITION TO PUBLIC;
+
+
+GO
+GRANT VIEW ANY COLUMN MASTER KEY DEFINITION TO PUBLIC;
+
+
+GO
+GRANT CONNECT TO [Hayden];
+
+
+GO
+GRANT CONNECT TO [Suraj];
+
+
+GO
+GRANT CONNECT TO [Ijaz];
+
+
+GO
+GRANT CONNECT TO [Reporting_User_nFI];
+
+
+GO
+GRANT EXECUTE TO [Reporting_User_nFI];
+
+
+GO
+GRANT SELECT TO [Reporting_User_nFI];
+
+
+GO
+GRANT CONNECT TO [Alan];
+
+
+GO
+GRANT SHOWPLAN TO [DataOperations];
+
+
+GO
+GRANT CONNECT TO [Ajith];
+
+
+GO
+GRANT CONNECT TO [Zoe];
+
+
+GO
+GRANT CREATE PROCEDURE TO [Zoe];
+
+
+GO
+GRANT CREATE TABLE TO [Zoe];
+
+
+GO
+GRANT CONNECT TO [PRTGBuddy];
+
+
+GO
+GRANT VIEW DATABASE STATE TO [PRTGBuddy];
+
+
+GO
+GRANT CONNECT TO [ProcessOp];
+
+
+GO
+GRANT CONNECT TO [Beyers];
+
+
+GO
+GRANT CONNECT TO [gabor];
+
+
+GO
+GRANT CONNECT TO [Lloyd];
+
+
+GO
+GRANT SELECT TO [Lloyd];
+
+
+GO
+GRANT CONNECT TO [GAS];
+
+
+GO
+GRANT CONNECT TO [shaun];
+
+
+GO
+GRANT CONNECT TO [jason];
+
+
+GO
+GRANT CONNECT TO [BIDIMAINReportUser];
+
+
+GO
+GRANT CONNECT TO [BIDIMAINETLUser];
+
+
+GO
+GRANT CONNECT TO [datarecon];
+
+
+GO
+GRANT CONTROL TO [OnCall];
+
+
+GO
+GRANT CONNECT TO [Matt];
+
+
+GO
+GRANT SHOWPLAN TO [Matt];
+
+
+GO
+GRANT CONNECT TO [Satty];
+
+
+GO
+GRANT CONNECT TO [Rory];
+
+
+GO
+GRANT CREATE PROCEDURE TO [Rory];
+
+
+GO
+GRANT CREATE TABLE TO [Rory];
+
+
+GO
+GRANT INSERT TO [Rory];
+
+
+GO
+GRANT SELECT TO [Rory];
+
+
+GO
+GRANT UPDATE TO [Rory];
+
+
+GO
+GRANT CONNECT TO [tasfia];
+
+
+GO
+GRANT CONNECT TO [conal];
+
+
+GO
+GRANT CREATE PROCEDURE TO [New_Insight];
+
+
+GO
+GRANT CREATE TABLE TO [New_Insight];
+
+
+GO
+GRANT SHOWPLAN TO [New_Insight];
+
+
+GO
+GRANT CREATE PROCEDURE TO [New_DataOps];
+
+
+GO
+GRANT CREATE TABLE TO [New_DataOps];
+
+
+GO
+GRANT SHOWPLAN TO [New_DataOps];
+
+
+GO
+GRANT CREATE PROCEDURE TO [New_CampaignOps];
+
+
+GO
+GRANT CREATE TABLE TO [New_CampaignOps];
+
+
+GO
+GRANT SHOWPLAN TO [New_CampaignOps];
+
+
+GO
+GRANT CREATE PROCEDURE TO [New_BI];
+
+
+GO
+GRANT CREATE TABLE TO [New_BI];
+
+
+GO
+GRANT SHOWPLAN TO [New_BI];
+
+
+GO
+GRANT CREATE PROCEDURE TO [New_OnCall];
+
+
+GO
+GRANT CREATE TABLE TO [New_OnCall];
+
+
+GO
+GRANT SHOWPLAN TO [New_OnCall];
+
+
+GO
+GRANT SHOWPLAN TO [New_ReadOnly];
+
+
+GO
+GRANT CONNECT TO [CampaignOps];
+
+
+GO
+GRANT CONNECT TO [Michael];
+
+
+GO
+GRANT CONNECT TO [DIMAIN\michaeldimain];
+
+
+GO
+GRANT CONNECT TO [Ed];
+
+
+GO
+GRANT CONNECT TO [SamW];
+
+
+GO
+GRANT CONNECT TO [Vernon];
+
+
+GO
+GRANT CONNECT TO [Ewan];
+
+
+GO
+GRANT CONNECT TO [ChrisN];
+
+
+GO
+GRANT CONNECT TO [RyanD];
+
+
+GO
+GRANT CONNECT TO [kevinc];
+
+
+GO
+GRANT CONNECT TO [patrickm];
+
+
+GO
+GRANT CONNECT TO [BastienC];
+
+
+GO
+GRANT CONNECT TO [RukanK];
+
+
+GO
+GRANT CONNECT TO [WilliamA];
+
+
+GO
+GRANT CONNECT TO [SamH];
+
+
+GO
+GRANT CONNECT TO [ExcelQuery_DataOps];
+
+
+GO
+GRANT CONNECT TO [conord];
+
+
+GO
+GRANT CONNECT TO [DarrenW];
+
+
+GO
+GRANT CONNECT TO [DIMAIN\conordimain];
+
+
+GO
+GRANT CONNECT TO [PhillipB];
+
+
+GO
+GRANT CONNECT TO [GunayS];
+
+
+GO
+GRANT CONNECT TO [LeoP];
+
+
+GO
+GRANT CONNECT TO [VitaliiV];
+
+
+GO
+GRANT CONNECT TO [glynd];
+
+
+GO
+GRANT CONNECT TO [DanielM];
+
+
+GO
+GRANT CONNECT TO [JosephS];
+
+
+GO
+GRANT CONNECT TO [DIMAIN2\rorydimain2];
+
+
+GO
+GRANT CONNECT TO [ConalM];
+
+
+GO
+GRANT CONNECT TO [JoanneK];
+
+
+GO
+GRANT CONNECT TO [RichardS];
+
+
+GO
+GRANT CONNECT TO [MatthewL];
+
+
+GO
+GRANT CONNECT TO [ShannonM];
+

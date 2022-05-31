@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [RyanD]
+    WITH PASSWORD = N'EaGqbweqfHk{wcvgwe|mDjulmsFT7_&#$!~<tbkqetfd6uEb', SID = 0x99C0379C9B6C924F9A602171449EA909, DEFAULT_LANGUAGE = [us_english];
+
