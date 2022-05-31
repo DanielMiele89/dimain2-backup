@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[GKCBNewDelivery080920] (
+    [CINID] INT NOT NULL
+);
+

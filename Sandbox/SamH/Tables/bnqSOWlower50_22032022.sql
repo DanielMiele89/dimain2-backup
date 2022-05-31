@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[bnqSOWlower50_22032022] (
+    [CINID] INT NOT NULL
+);
+

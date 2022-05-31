@@ -1,0 +1,8 @@
+﻿CREATE SCHEMA [Zoe]
+    AUTHORIZATION [Zoe];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[Zoe] TO [tasfia];
+

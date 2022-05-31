@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[costa_sow30_EXCL_FC1_28012022] (
+    [CINID] INT NOT NULL
+);
+

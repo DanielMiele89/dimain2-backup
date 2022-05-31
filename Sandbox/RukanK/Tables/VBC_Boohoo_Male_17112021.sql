@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[VBC_Boohoo_Male_17112021] (
+    [CINID] INT NOT NULL
+);
+

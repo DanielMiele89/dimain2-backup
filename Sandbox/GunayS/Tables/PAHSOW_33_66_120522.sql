@@ -1,0 +1,4 @@
+﻿CREATE TABLE [GunayS].[PAHSOW_33_66_120522] (
+    [CINID] INT NOT NULL
+);
+

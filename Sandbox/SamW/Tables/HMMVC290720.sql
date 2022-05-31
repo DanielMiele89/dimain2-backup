@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[HMMVC290720] (
+    [CINID] INT NOT NULL,
+    [FanID] INT NOT NULL
+);
+

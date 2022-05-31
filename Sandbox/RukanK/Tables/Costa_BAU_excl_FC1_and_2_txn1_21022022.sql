@@ -1,0 +1,9 @@
+﻿CREATE TABLE [RukanK].[Costa_BAU_excl_FC1_and_2_txn1_21022022] (
+    [CINID] INT NULL
+);
+
+
+GO
+CREATE CLUSTERED INDEX [CIX_CINID]
+    ON [RukanK].[Costa_BAU_excl_FC1_and_2_txn1_21022022]([CINID] ASC) WITH (FILLFACTOR = 90);
+

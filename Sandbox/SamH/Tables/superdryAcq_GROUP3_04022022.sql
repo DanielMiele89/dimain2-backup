@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[superdryAcq_GROUP3_04022022] (
+    [CINID] INT NOT NULL
+);
+

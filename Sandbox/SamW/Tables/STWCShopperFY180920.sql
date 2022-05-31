@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[STWCShopperFY180920] (
+    [CINID] INT NOT NULL
+);
+

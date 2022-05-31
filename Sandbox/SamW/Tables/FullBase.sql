@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[FullBase] (
+    [CINID] INT NOT NULL,
+    [FANID] INT NOT NULL
+);
+

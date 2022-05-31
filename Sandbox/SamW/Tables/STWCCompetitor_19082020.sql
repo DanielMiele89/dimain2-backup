@@ -1,0 +1,5 @@
+﻿CREATE TABLE [SamW].[STWCCompetitor_19082020] (
+    [CINID] INT NOT NULL,
+    [FanID] INT NOT NULL
+);
+

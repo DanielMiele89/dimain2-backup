@@ -1,0 +1,3 @@
+﻿CREATE USER [Ian]
+    WITH DEFAULT_SCHEMA = [Ian];
+

@@ -1,0 +1,9 @@
+﻿CREATE TABLE [GunayS].[HFRemainingCust090322BC] (
+    [CINID] INT NOT NULL
+);
+
+
+GO
+CREATE CLUSTERED INDEX [ix_CINID]
+    ON [GunayS].[HFRemainingCust090322BC]([CINID] ASC);
+

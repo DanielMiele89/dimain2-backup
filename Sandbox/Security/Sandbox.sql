@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [Sandbox]
+    AUTHORIZATION [dbo];
+

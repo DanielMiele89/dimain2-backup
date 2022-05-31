@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[RBS_ffx_CompSteal02022022] (
+    [CINID] INT NOT NULL
+);
+

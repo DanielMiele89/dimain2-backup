@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[clinique_LSOW11032022_VM] (
+    [CINID] INT NOT NULL
+);
+

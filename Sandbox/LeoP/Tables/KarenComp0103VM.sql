@@ -1,0 +1,4 @@
+﻿CREATE TABLE [LeoP].[KarenComp0103VM] (
+    [CINID] INT NOT NULL
+);
+

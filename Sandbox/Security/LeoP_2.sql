@@ -1,0 +1,48 @@
+﻿CREATE SCHEMA [LeoP]
+    AUTHORIZATION [dbo];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[LeoP] TO [Insight];
+
+
+GO
+GRANT CREATE SEQUENCE
+    ON SCHEMA::[LeoP] TO [Insight];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[LeoP] TO [Insight];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[LeoP] TO [Insight];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[LeoP] TO [Insight];
+
+
+GO
+GRANT REFERENCES
+    ON SCHEMA::[LeoP] TO [Insight];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[LeoP] TO [Insight];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[LeoP] TO [Insight];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[LeoP] TO [Insight];
+

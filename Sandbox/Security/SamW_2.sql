@@ -1,0 +1,108 @@
+﻿CREATE SCHEMA [SamW]
+    AUTHORIZATION [SamW];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[SamW] TO [shaun];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[SamW] TO [Insight];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[SamW] TO [Insight];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[SamW] TO [Insight];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[SamW] TO [Insight];
+
+
+GO
+GRANT REFERENCES
+    ON SCHEMA::[SamW] TO [Insight];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[SamW] TO [Insight];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[SamW] TO [Insight];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[SamW] TO [Insight];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT CONTROL
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT CREATE SEQUENCE
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT REFERENCES
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT TAKE OWNERSHIP
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[SamW] TO [conord];
+
+
+GO
+GRANT VIEW CHANGE TRACKING
+    ON SCHEMA::[SamW] TO [conord];
+

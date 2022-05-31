@@ -1,0 +1,4 @@
+﻿CREATE TABLE [BastienC].[HM_sow30_BARCLAYS] (
+    [CINID] INT NOT NULL
+);
+

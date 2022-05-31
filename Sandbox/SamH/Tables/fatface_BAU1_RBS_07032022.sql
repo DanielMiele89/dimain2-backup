@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[fatface_BAU1_RBS_07032022] (
+    [CINID] INT NOT NULL
+);
+

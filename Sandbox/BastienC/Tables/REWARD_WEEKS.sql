@@ -1,0 +1,5 @@
+﻿CREATE TABLE [BastienC].[REWARD_WEEKS] (
+    [START_DATE] DATE NOT NULL,
+    [END_DATE]   DATE NOT NULL
+);
+

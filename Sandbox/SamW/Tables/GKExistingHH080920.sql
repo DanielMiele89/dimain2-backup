@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[GKExistingHH080920] (
+    [CINID] INT NOT NULL
+);
+

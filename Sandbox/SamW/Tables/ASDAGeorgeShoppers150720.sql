@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[ASDAGeorgeShoppers150720] (
+    [CINID] INT NOT NULL
+);
+

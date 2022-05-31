@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [PRTGBuddy]
+    WITH PASSWORD = N'kmoghzjo^mhex|o$ok?gk|y3msFT7_&#$!~<tplmm.qdr$eb', SID = 0x38F59F091CF9C64AB01F2392342A25C9, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

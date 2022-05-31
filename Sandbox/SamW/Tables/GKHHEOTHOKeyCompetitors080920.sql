@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamW].[GKHHEOTHOKeyCompetitors080920] (
+    [CINID] INT NOT NULL
+);
+

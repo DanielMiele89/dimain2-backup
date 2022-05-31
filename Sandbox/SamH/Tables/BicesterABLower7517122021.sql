@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[BicesterABLower7517122021] (
+    [CINID] INT NOT NULL
+);
+

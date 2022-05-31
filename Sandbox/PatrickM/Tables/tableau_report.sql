@@ -1,0 +1,26 @@
+﻿CREATE TABLE [PatrickM].[tableau_report] (
+    [Brand]                   VARCHAR (3)  NOT NULL,
+    [Date]                    DATE         NULL,
+    [CurrentAccount]          VARCHAR (18) NULL,
+    [NomineeStatus]           VARCHAR (22) NULL,
+    [MarketableOptIn]         VARCHAR (3)  NOT NULL,
+    [Registered]              VARCHAR (3)  NOT NULL,
+    [marketable]              INT          NULL,
+    [nonmarketable]           INT          NULL,
+    [clubcashavailable]       MONEY        NULL,
+    [ClubcashPending]         MONEY        NULL,
+    [cashredemptions]         INT          NULL,
+    [CashRedemptionsValue]    MONEY        NULL,
+    [charityredemptions]      INT          NULL,
+    [charityredemptionsvalue] MONEY        NULL,
+    [TradeUpRedemptions]      INT          NULL,
+    [TradeUpRedemptionsValue] MONEY        NULL,
+    [Redemptions]             INT          NULL,
+    [RedemptionsValue]        MONEY        NULL,
+    [WebLogins]               INT          NULL,
+    [MobileAppLogins]         INT          NULL,
+    [TotalLogins]             INT          NULL,
+    [Opened]                  INT          NULL,
+    [volume]                  INT          NULL
+);
+

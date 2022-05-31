@@ -27,6 +27,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Archive_Light", "Archive_Li
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "nFI", "nFI\nFI.sqlproj", "{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Sandbox", "Sandbox\Sandbox.sqlproj", "{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,12 @@ Global
 		{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{433BAA77-AD0B-4F0C-BD3B-BE72352145D4}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

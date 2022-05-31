@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[RBS_FFXCampaign1_04022022] (
+    [CINID] INT NOT NULL
+);
+

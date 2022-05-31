@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[VM_AmbassadorTG_17032022] (
+    [CINID] INT NOT NULL
+);
+

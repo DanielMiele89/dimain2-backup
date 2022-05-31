@@ -1,0 +1,4 @@
+﻿CREATE TABLE [LeoP].[INVRBS_Aspinal_CompSteal010422] (
+    [CINID] INT NOT NULL
+);
+

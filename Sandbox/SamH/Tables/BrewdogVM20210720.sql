@@ -1,0 +1,4 @@
+﻿CREATE TABLE [SamH].[BrewdogVM20210720] (
+    [CINID] INT NOT NULL
+);
+

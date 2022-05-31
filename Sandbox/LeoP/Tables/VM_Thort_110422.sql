@@ -1,0 +1,4 @@
+﻿CREATE TABLE [LeoP].[VM_Thort_110422] (
+    [CINID] INT NOT NULL
+);
+

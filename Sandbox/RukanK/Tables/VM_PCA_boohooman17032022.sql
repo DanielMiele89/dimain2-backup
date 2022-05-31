@@ -1,0 +1,4 @@
+﻿CREATE TABLE [RukanK].[VM_PCA_boohooman17032022] (
+    [CINID] INT NOT NULL
+);
+
