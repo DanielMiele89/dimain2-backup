@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [Vernon]
+    WITH PASSWORD = N'zdjiTV.mh?puzzz#agmfdWUwmsFT7_&#$!~<o2ts`o9cvcpm', SID = 0xA7FC05F8E37ACB42AAAA8F201E2FF369, DEFAULT_DATABASE = [Sandbox], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+
