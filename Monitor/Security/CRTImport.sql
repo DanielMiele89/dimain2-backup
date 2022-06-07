@@ -1,0 +1,2 @@
+﻿CREATE USER [CRTImport] FOR LOGIN [CRTImport];
+
