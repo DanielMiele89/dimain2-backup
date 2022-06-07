@@ -31,6 +31,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Sandbox", "Sandbox\Sandbox.
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Finance", "Finance\Finance.sqlproj", "{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Monitor", "Monitor\Monitor.sqlproj", "{829B8A76-339E-457A-A583-A52F49EC358B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,12 @@ Global
 		{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{829B8A76-339E-457A-A583-A52F49EC358B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{829B8A76-339E-457A-A583-A52F49EC358B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{829B8A76-339E-457A-A583-A52F49EC358B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{829B8A76-339E-457A-A583-A52F49EC358B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{829B8A76-339E-457A-A583-A52F49EC358B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{829B8A76-339E-457A-A583-A52F49EC358B}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
