@@ -33,6 +33,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Finance", "Finance\Finance.
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Monitor", "Monitor\Monitor.sqlproj", "{829B8A76-339E-457A-A583-A52F49EC358B}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Outbound", "Outgoing\Outbound.sqlproj", "{A45A968D-B658-4749-A3DE-CF545944D7C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,12 @@ Global
 		{829B8A76-339E-457A-A583-A52F49EC358B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{829B8A76-339E-457A-A583-A52F49EC358B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{829B8A76-339E-457A-A583-A52F49EC358B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A45A968D-B658-4749-A3DE-CF545944D7C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A45A968D-B658-4749-A3DE-CF545944D7C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A45A968D-B658-4749-A3DE-CF545944D7C4}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{A45A968D-B658-4749-A3DE-CF545944D7C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A45A968D-B658-4749-A3DE-CF545944D7C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A45A968D-B658-4749-A3DE-CF545944D7C4}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
