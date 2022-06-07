@@ -6,14 +6,14 @@
     <Name>MigrationStuff</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{7dcf2045-7ef2-42c4-bd99-93b8b3c77581}</ProjectGuid>
+    <ProjectGuid>{a842f2ed-7dcf-4fb0-b286-355910bf37ec}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
     <RootNamespace>MigrationStuff</RootNamespace>
     <AssemblyName>MigrationStuff</AssemblyName>
-    <ModelCollation>1033, CI</ModelCollation>
+    <ModelCollation>1033,CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -22,6 +22,8 @@
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -56,5 +58,27 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\CRT_FileLocation.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_MIDI_Location.sql" />
+    <Build Include="dbo\Stored Procedures\__MigrationCheck_ConsumerTransaction_CreditCard.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_WHB_PartnerTrans.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_MIDI_ConsumerTransaction_CreditCardHolding.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_WHB_CBP_DailyMIReport.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_MIDI_ConsumerCombination.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_MIDI_ConsumerTransactionHolding.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_MIDI_CTLoad_MIDIHolding.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_MIDI_CINList.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_WHB_Customer.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_WHB_CBP_CustomerSpend.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_Check_CardTransaction_QA.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_MIDI_CreditCardLoad_MIDIHolding.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_Affinity_RowNum_Log.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_Check_AdditionalCashbackAward.sql" />
+    <Build Include="dbo\Stored Procedures\MigrationCheck_Check_SchemeTransUniqueID.sql" />
   </ItemGroup>
 </Project>
