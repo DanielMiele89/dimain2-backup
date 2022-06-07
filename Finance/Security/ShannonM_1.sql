@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [ShannonM]
+    WITH PASSWORD = N'hbu|Bix?FqsypAirsv|1rlv msFT7_&#$!~<vgc11vs&jdin', SID = 0x177E3E59ECCF7D40B2AAC1103BF8DA7D, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+
