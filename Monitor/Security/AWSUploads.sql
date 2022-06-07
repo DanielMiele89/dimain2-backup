@@ -1,0 +1,2 @@
+﻿CREATE USER [AWSUploads] FOR LOGIN [AWSUploads];
+

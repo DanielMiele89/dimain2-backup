@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [AWSUploads]
+    WITH PASSWORD = N'amja{pe|mjmO3VI,sQkjypm>msFT7_&#$!~<L3wnyLpytyef', SID = 0x4F5F583BEEF7A442AF8C3BCA60DD7F16, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

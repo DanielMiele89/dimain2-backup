@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>Monitor</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{829b8a76-339e-457a-a583-a52f49ec358b}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>Monitor</RootNamespace>
+    <AssemblyName>Monitor</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="AWS\" />
+    <Folder Include="AWS\Tables\" />
+    <Folder Include="Security\" />
+    <Folder Include="dbo\Stored Procedures\" />
+    <Folder Include="PRTG\" />
+    <Folder Include="PRTG\Stored Procedures\" />
+    <Folder Include="AWS\Stored Procedures\" />
+    <Folder Include="Database Triggers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\DatabaseFileSizeHistory.sql" />
+    <Build Include="dbo\Tables\ServerActivityLog.sql" />
+    <Build Include="dbo\Tables\LockSnapshot.sql" />
+    <Build Include="dbo\Tables\SQLLogImport.sql" />
+    <Build Include="dbo\Tables\ExpensiveWarehouseQueries20161108.sql" />
+    <Build Include="AWS\Tables\FileUploadExceptions.sql" />
+    <Build Include="dbo\Tables\PRTG_monitor_ReadsWrites.sql" />
+    <Build Include="AWS\Tables\FileUploadLog.sql" />
+    <Build Include="AWS\Tables\FileUploadProcessRun.sql" />
+    <Build Include="AWS\Tables\TempLog.sql" />
+    <Build Include="dbo\Tables\Reporting_IndexUsage.sql" />
+    <Build Include="dbo\Tables\PRTG_Monitor_IOLatency.sql" />
+    <Build Include="dbo\Tables\PRTG_Monitor_Level04Alerts.sql" />
+    <Build Include="dbo\Tables\IndexFragmentation.sql" />
+    <Build Include="dbo\Tables\WarehouseRestoreCommands.sql" />
+    <Build Include="dbo\Tables\RobocopyOutput.sql" />
+    <Build Include="dbo\Tables\SnapshotHealthCheck.sql" />
+    <Build Include="dbo\Tables\ETLTableList.sql" />
+    <Build Include="dbo\Tables\IndexUsageTracker.sql" />
+    <Build Include="dbo\Tables\IndexRuntimeStats.sql" />
+    <Build Include="dbo\Tables\Admin_Indexes_Missing.sql" />
+    <Build Include="dbo\Tables\Admin_Indexes_ReadWriteStats.sql" />
+    <Build Include="dbo\Tables\TableUsageData.sql" />
+    <Build Include="dbo\Tables\DDLEvents.sql" />
+    <Build Include="dbo\Tables\WhoIsActive.sql" />
+    <Build Include="dbo\Tables\DDLLog.sql" />
+    <Build Include="dbo\Tables\PRTG_monitor_LockingBlocking.sql" />
+    <Build Include="Security\monitor.sql" />
+    <Build Include="Security\GAS.sql" />
+    <Build Include="Security\GAS_1.sql" />
+    <Build Include="Security\PRTGBuddy.sql" />
+    <Build Include="Security\PRTGBuddy_1.sql" />
+    <Build Include="Security\datarecon.sql" />
+    <Build Include="Security\datarecon_1.sql" />
+    <Build Include="Security\CRTImport.sql" />
+    <Build Include="Security\CRTImport_1.sql" />
+    <Build Include="Security\ProcessOp.sql" />
+    <Build Include="Security\ProcessOp_1.sql" />
+    <Build Include="Security\AWSUploads.sql" />
+    <Build Include="Security\AWSUploads_1.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_MonitorLockingBlocking.sql" />
+    <Build Include="dbo\Stored Procedures\CongestionChecker.sql" />
+    <Build Include="dbo\Stored Procedures\GetDatabaseSizes.sql" />
+    <Build Include="dbo\Stored Procedures\ActivityMonitor.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_MonitorIOLatency.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_Level01Alerts.sql" />
+    <Build Include="PRTG\Stored Procedures\Level01Alerts.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_ReadsAndWrites.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_ReadsAndWritesByDB.sql" />
+    <Build Include="AWS\Stored Procedures\GetFileCountForUpload.sql" />
+    <Build Include="AWS\Stored Procedures\GetNextFileForUpload.sql" />
+    <Build Include="AWS\Stored Procedures\LogFilesForUpload.sql" />
+    <Build Include="AWS\Stored Procedures\LogProcessEnd.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_Monitor_WhoIsActive.sql" />
+    <Build Include="AWS\Stored Procedures\LogProcessStart.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_CongestionChecker.sql" />
+    <Build Include="AWS\Stored Procedures\SendFileUploadReport.sql" />
+    <Build Include="dbo\Stored Procedures\Reports_Indexing_PersistData.sql" />
+    <Build Include="AWS\Stored Procedures\SendFileUploadSummaryReport.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_MonitorIOLatency_v2.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_MonitorIOLatencyByDB.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_Level04Alerts.sql" />
+    <Build Include="dbo\Stored Procedures\REPL_CanaryTables.sql" />
+    <Build Include="dbo\Stored Procedures\sp_BlitzIndex.sql" />
+    <Build Include="dbo\Stored Procedures\sp_BlitzCache.sql" />
+    <Build Include="dbo\Stored Procedures\DefragIndexes.sql" />
+    <Build Include="dbo\Stored Procedures\SnapshotHealthCheck_Check.sql" />
+    <Build Include="dbo\Stored Procedures\GetPoorPerformingProcesses.sql" />
+    <Build Include="dbo\Stored Procedures\JobMonitoring_Fetch_Errors.sql" />
+    <Build Include="dbo\Stored Procedures\JobMonitoring_Fetch_Running.sql" />
+    <Build Include="dbo\Stored Procedures\GatherIndexRuntimeStats.sql" />
+    <Build Include="dbo\Stored Procedures\PRTG_Level02Alerts.sql" />
+    <Build Include="dbo\Stored Procedures\JobMonitoring_Fetch_Completed.sql" />
+    <Build Include="dbo\Stored Procedures\WhenWasThisTableLastUsed.sql" />
+    <Build Include="dbo\Stored Procedures\ListHugeUnusedTables.sql" />
+    <Build Include="dbo\Stored Procedures\DBCC_LightweightPageChecker.sql" />
+    <Build Include="Database Triggers\AuditDBDDL.sql" />
+    <Build Include="Security\AWS.sql" />
+    <Build Include="Security\PRTG.sql" />
+  </ItemGroup>
+</Project>
