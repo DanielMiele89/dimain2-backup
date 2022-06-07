@@ -1,0 +1,429 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>Finance</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{afe8ba89-5599-4ace-847b-c80d0cf3d9f8}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>Finance</RootNamespace>
+    <AssemblyName>Finance</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="Staging\" />
+    <Folder Include="Staging\Tables\" />
+    <Folder Include="FIFO\" />
+    <Folder Include="FIFO\Tables\" />
+    <Folder Include="Reporting\" />
+    <Folder Include="Reporting\Tables\" />
+    <Folder Include="ETL\" />
+    <Folder Include="ETL\Tables\" />
+    <Folder Include="DDLMonitor\" />
+    <Folder Include="DDLMonitor\Tables\" />
+    <Folder Include="Monitor\" />
+    <Folder Include="Monitor\Tables\" />
+    <Folder Include="WHB\" />
+    <Folder Include="WHB\Tables\" />
+    <Folder Include="FIFO\Views\" />
+    <Folder Include="ETL\Views\" />
+    <Folder Include="Monitor\Views\" />
+    <Folder Include="dbo\Views\" />
+    <Folder Include="Storage\" />
+    <Folder Include="Security\" />
+    <Folder Include="ETL\Functions\" />
+    <Folder Include="dbo\Functions\" />
+    <Folder Include="FIFO\Stored Procedures\" />
+    <Folder Include="Reporting\Stored Procedures\" />
+    <Folder Include="dbo\Stored Procedures\" />
+    <Folder Include="ETL\Stored Procedures\" />
+    <Folder Include="WHB\Stored Procedures\" />
+    <Folder Include="Monitor\Stored Procedures\" />
+    <Folder Include="Database Triggers\" />
+    <Folder Include="Reporting\User Defined Types\" />
+    <Folder Include="Monitor\Sequences\" />
+    <Folder Include="dbo\Sequences\" />
+    <Folder Include="WHB\Sequences\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\RedemptionType_OLD.sql" />
+    <Build Include="Staging\Tables\Transactions.sql" />
+    <Build Include="FIFO\Tables\Reductions.sql" />
+    <Build Include="Reporting\Tables\ERF_Cashback_Earnings.sql" />
+    <Build Include="Reporting\Tables\ERF_Cashback_Redeemed.sql" />
+    <Build Include="Reporting\Tables\ERF_CashbackTotals2.sql" />
+    <Build Include="dbo\Tables\PerformanceTest_Data.sql" />
+    <Build Include="dbo\Tables\DirectDebitOriginator_OLD.sql" />
+    <Build Include="Staging\Tables\CashbackAllocation_ERF_OLD.sql" />
+    <Build Include="dbo\Tables\TransactionType_OLD.sql" />
+    <Build Include="dbo\Tables\Transactions.sql" />
+    <Build Include="dbo\Tables\AdditionalCashbackAwardType_OLD.sql" />
+    <Build Include="Reporting\Tables\ERF_CashbackTotals_Old.sql" />
+    <Build Include="dbo\Tables\AdditionalCashbackAdjustmentCategory_OLD.sql" />
+    <Build Include="dbo\Tables\AdditionalCashbackAdjustmentType_OLD.sql" />
+    <Build Include="dbo\Tables\PartnerAlternate_OLD.sql" />
+    <Build Include="FIFO\Tables\ReductionIntervals.sql" />
+    <Build Include="dbo\Tables\SourceSystem_OLD.sql" />
+    <Build Include="dbo\Tables\MFDDRetailerTEST_KC.sql" />
+    <Build Include="Staging\Tables\MatchIDs_OLD.sql" />
+    <Build Include="dbo\Tables\SourceType_OLD.sql" />
+    <Build Include="Staging\Tables\MissingPartnerTrans_OLD.sql" />
+    <Build Include="Staging\Tables\MissingAdditionalCashbackAwards_OLD.sql" />
+    <Build Include="ETL\Tables\DeactivatedComment_OLD.sql" />
+    <Build Include="DDLMonitor\Tables\DDLEvents_OLD.sql" />
+    <Build Include="dbo\Tables\ReductionAllocation_OLD.sql" />
+    <Build Include="dbo\Tables\EarningSource_OLD.sql" />
+    <Build Include="dbo\Tables\DeactivatedBand_OLD.sql" />
+    <Build Include="ETL\Tables\Missing_Transactions_OLD_OLD.sql" />
+    <Build Include="dbo\Tables\Transactions_Updates_20220530.sql" />
+    <Build Include="ETL\Tables\LoopCheckpoint_OLD.sql" />
+    <Build Include="dbo\Tables\Test_OLD.sql" />
+    <Build Include="Reporting\Tables\SpendEarn_004.sql" />
+    <Build Include="ETL\Tables\TableCheckpointType_OLD.sql" />
+    <Build Include="dbo\Tables\Test2_OLD.sql" />
+    <Build Include="Reporting\Tables\ERF_CashbackTotals_20220531.sql" />
+    <Build Include="Reporting\Tables\ERF_Reductions_20220531.sql" />
+    <Build Include="ETL\Tables\TableCheckpoint_OLD.sql" />
+    <Build Include="FIFO\Tables\ReductionAllocations.sql" />
+    <Build Include="Reporting\Tables\ERF_Earnings_20220531.sql" />
+    <Build Include="Reporting\Tables\ERF_Report_Reductions.sql" />
+    <Build Include="Monitor\Tables\Package_Errors_OLD.sql" />
+    <Build Include="Monitor\Tables\Package_SourceType_OLD.sql" />
+    <Build Include="Monitor\Tables\Package_Log_OLD.sql" />
+    <Build Include="dbo\Tables\o_OLD.sql" />
+    <Build Include="Staging\Tables\SLC_ACA_OLD.sql" />
+    <Build Include="Reporting\Tables\ERF_ClosedBuckets.sql" />
+    <Build Include="Staging\Tables\SLC_ACAMissing_OLD.sql" />
+    <Build Include="dbo\Tables\EarningSource2_OLD.sql" />
+    <Build Include="dbo\Tables\testTable.sql" />
+    <Build Include="Reporting\Tables\ERF_Reductions_RF.sql" />
+    <Build Include="Staging\Tables\Temp_Customers_OLD.sql" />
+    <Build Include="dbo\Tables\SourceSystem.sql" />
+    <Build Include="dbo\Tables\SourceType.sql" />
+    <Build Include="dbo\Tables\Redemptions_OLD.sql" />
+    <Build Include="dbo\Tables\FIFO_Reductions_OLD.sql" />
+    <Build Include="WHB\Tables\TableCheckpoint.sql" />
+    <Build Include="Staging\Tables\Temp_Customers2_OLD.sql" />
+    <Build Include="ETL\Tables\Missing_Transactions_OLD.sql" />
+    <Build Include="WHB\Tables\Build_Log.sql" />
+    <Build Include="dbo\Tables\Calendar.sql" />
+    <Build Include="Staging\Tables\AdditionalCashbackAward_OLD.sql" />
+    <Build Include="dbo\Tables\CurrencyCode.sql" />
+    <Build Include="dbo\Tables\FIFO_Earnings_OLD.sql" />
+    <Build Include="dbo\Tables\DeactivatedBand.sql" />
+    <Build Include="Staging\Tables\AllocatedTranID_OLD.sql" />
+    <Build Include="Reporting\Tables\ERF_Earnings.sql" />
+    <Build Include="dbo\Tables\Partner.sql" />
+    <Build Include="Reporting\Tables\ERF_Reductions.sql" />
+    <Build Include="dbo\Tables\RedeemOffer_OLD.sql" />
+    <Build Include="dbo\Tables\PaymentCard.sql" />
+    <Build Include="dbo\Tables\ReductionSourceSystem_OLD.sql" />
+    <Build Include="dbo\Tables\FIFO_MovedEarnings_OLD.sql" />
+    <Build Include="Staging\Tables\temp_customers3_OLD.sql" />
+    <Build Include="Reporting\Tables\ERF_Redemptions.sql" />
+    <Build Include="dbo\Tables\ReductionType_OLD.sql" />
+    <Build Include="dbo\Tables\PaymentMethod.sql" />
+    <Build Include="FIFO\Tables\Earnings.sql" />
+    <Build Include="dbo\Tables\FIFO_MovedReductions_OLD.sql" />
+    <Build Include="dbo\Tables\EarningType_OLD.sql" />
+    <Build Include="dbo\Tables\Publisher.sql" />
+    <Build Include="ETL\Tables\System_Publisher_OLD.sql" />
+    <Build Include="dbo\Tables\RedemptionPartner.sql" />
+    <Build Include="dbo\Tables\Retailer.sql" />
+    <Build Include="dbo\Tables\Reductions_OLD.sql" />
+    <Build Include="dbo\Tables\SLC_TransactionType.sql" />
+    <Build Include="Reporting\Tables\ERF_CashbackTotals.sql" />
+    <Build Include="WHB\Tables\RedemptionTypeMapping.sql" />
+    <Build Include="WHB\Tables\SLC_DeactivatedComment.sql" />
+    <Build Include="Staging\Tables\Temp_WrongEarnings_OLD.sql" />
+    <Build Include="Staging\Tables\Temp_WrongEarningCustomers_OLD.sql" />
+    <Build Include="dbo\Tables\Customer.sql" />
+    <Build Include="ETL\Tables\FIFO_Checkpoint_OLD.sql" />
+    <Build Include="dbo\Tables\Audit_MergeLogging_OLD.sql" />
+    <Build Include="FIFO\Tables\Staging_Customers.sql" />
+    <Build Include="dbo\Tables\Calendar_OLD.sql" />
+    <Build Include="ETL\Tables\FIFO_Customers_OLD.sql" />
+    <Build Include="dbo\Tables\EarningSource.sql" />
+    <Build Include="ETL\Tables\FIFO_CheckpointEnd_OLD.sql" />
+    <Build Include="dbo\Tables\Transactions_OLD.sql" />
+    <Build Include="dbo\Tables\CustomerStatus_OLD.sql" />
+    <Build Include="dbo\Tables\Publisher_OLD.sql" />
+    <Build Include="dbo\Tables\Offer.sql" />
+    <Build Include="dbo\Tables\Customer_OLD.sql" />
+    <Build Include="dbo\Tables\PartitionInfo.sql" />
+    <Build Include="dbo\Tables\TestData_HR.sql" />
+    <Build Include="dbo\Tables\Earnings_HR.sql" />
+    <Build Include="dbo\Tables\Partner_OLD.sql" />
+    <Build Include="dbo\Tables\RedemptionItem.sql" />
+    <Build Include="dbo\Tables\Reductions_HR.sql" />
+    <Build Include="dbo\Tables\EarningsRated_HR.sql" />
+    <Build Include="dbo\Tables\IronOffer_OLD.sql" />
+    <Build Include="dbo\Tables\RedemptionIntervals_HR.sql" />
+    <Build Include="dbo\Tables\Redemptions.sql" />
+    <Build Include="FIFO\Tables\Reductions_Breakage.sql" />
+    <Build Include="dbo\Tables\PartnerCommissionRule_OLD.sql" />
+    <Build Include="dbo\Tables\Supplier_OLD.sql" />
+    <Build Include="Staging\Tables\Temp_BreakageCustomers_OLD.sql" />
+    <Build Include="FIFO\Views\vw_Reductions.sql" />
+    <Build Include="ETL\Views\vw_TableCheckpoint_Latest.sql" />
+    <Build Include="Monitor\Views\vw_PackageLog.sql" />
+    <Build Include="Monitor\Views\vw_PackageLog_Latest.sql" />
+    <Build Include="Monitor\Views\vw_PackageLog_LatestRunID.sql" />
+    <Build Include="dbo\Views\Earnings2.sql" />
+    <Build Include="dbo\Views\vw_Earnings.sql" />
+    <Build Include="dbo\Views\vw_PartitionInfo_Transactions.sql" />
+    <Build Include="dbo\Views\Earnings.sql" />
+    <Build Include="dbo\Views\vw_PartitionInfo.sql" />
+    <Build Include="Storage\Finance_Indexes.sql" />
+    <Build Include="Storage\FG_Transactions_2011.sql" />
+    <Build Include="Storage\FG_Transactions_2012.sql" />
+    <Build Include="Storage\FG_Transactions_2013.sql" />
+    <Build Include="Storage\FG_Transactions_2014.sql" />
+    <Build Include="Storage\FG_Transactions_2015.sql" />
+    <Build Include="Storage\FG_Transactions_2016.sql" />
+    <Build Include="Storage\FG_Transactions_2017.sql" />
+    <Build Include="Storage\FG_Transactions_2018.sql" />
+    <Build Include="Storage\FG_Transactions_2019.sql" />
+    <Build Include="Storage\FG_Transactions_2020.sql" />
+    <Build Include="Storage\FG_Transactions_2021.sql" />
+    <Build Include="Storage\FG_Transactions_2022.sql" />
+    <Build Include="Security\Insight.sql" />
+    <Build Include="Security\DataOps.sql" />
+    <Build Include="Security\OnCall.sql" />
+    <Build Include="Security\ReadOnly.sql" />
+    <Build Include="Security\datarecon.sql" />
+    <Build Include="Security\datarecon_1.sql" />
+    <Build Include="Security\hayden.sql" />
+    <Build Include="Security\hayden_1.sql" />
+    <Build Include="Security\kevinc.sql" />
+    <Build Include="Security\kevinc_1.sql" />
+    <Build Include="Security\patrickm.sql" />
+    <Build Include="Security\patrickm_1.sql" />
+    <Build Include="Security\conord.sql" />
+    <Build Include="Security\conord_1.sql" />
+    <Build Include="Security\DIMAIN_conordimain.sql" />
+    <Build Include="Security\glynd.sql" />
+    <Build Include="Security\DanielM.sql" />
+    <Build Include="Security\DanielM_1.sql" />
+    <Build Include="Security\ConalM.sql" />
+    <Build Include="Security\ConalM_1.sql" />
+    <Build Include="Security\RichardS.sql" />
+    <Build Include="Security\RichardS_1.sql" />
+    <Build Include="Security\MatthewL.sql" />
+    <Build Include="Security\MatthewL_1.sql" />
+    <Build Include="Security\ShannonM.sql" />
+    <Build Include="Security\ShannonM_1.sql" />
+    <Build Include="Security\Process_AWS_SpendEarn.sql" />
+    <Build Include="Security\Process_AWS_SpendEarn_1.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="ETL\Functions\getTableCheckpoint.sql" />
+    <Build Include="dbo\Functions\fn_GetPartitionDate_Transactions.sql" />
+    <Build Include="ETL\Functions\ConvertToTextChars.sql" />
+    <Build Include="FIFO\Stored Procedures\Reductions_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_Fetch_SpendEarn_OLD.sql" />
+    <Build Include="dbo\Stored Procedures\get_FanMapping_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_Fetch_Reductions.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_PartnerBreakdown_Virgin_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_Reduction_Fetch.sql" />
+    <Build Include="ETL\Stored Procedures\DirectDebitOriginator_Load_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_CashbackStatus_Fetch.sql" />
+    <Build Include="Reporting\Stored Procedures\RedemptionItem_Redemptions_Fetch.sql" />
+    <Build Include="Reporting\Stored Procedures\RedemptionItem_EAYB_Fetch.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_Fetch_Reductions_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_CashbackStatus_Fetch2.sql" />
+    <Build Include="WHB\Stored Procedures\Customer_SLC_dboFan_Load.sql" />
+    <Build Include="ETL\Stored Procedures\PartnerAlternate_Load_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\Customer_WHVirgin_DerivedCustomer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Customer_WHVisa_DerivedCustomer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\EarningSource_Finance_dboPartner_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_CashbackOverview_Visa_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\EarningSource_SLC_dboDirectDebitOriginator_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_Overview_Visa_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\EarningSource_SLC_dboRedeemSupplier_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_PartnerBreakdown_Visa_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_AdditionalCashbackAdjustment_Load_DELETE_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\EarningSource_SLC_dboSLCPoints_Load.sql" />
+    <Build Include="WHB\Stored Procedures\EarningSource_SLC_dboSLCPointsNegative_Load.sql" />
+    <Build Include="WHB\Stored Procedures\EarningSource_SLC_dboTransactionType_Load.sql" />
+    <Build Include="WHB\Stored Procedures\EarningSource_WHVirgin_DerivedGoodwillTypes_Load.sql" />
+    <Build Include="WHB\Stored Procedures\EarningSource_WHVisa_DerivedGoodwillTypes_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Offer__Unknown_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Offer_SLC_dboIronOffer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Offer_WHVirgin_DerivedIronOffer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Offer_WHVisa_DerivedIronOffer_Load.sql" />
+    <Build Include="ETL\Stored Procedures\EarningSource_Load_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\Partner_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\RedemptionItem_Redemptions_Fetch_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\PaymentCard__Unknown_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\RedemptionItem_EAYB_Fetch_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\PaymentCard_SLC_dboPaymentCard_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Publisher_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_PartnerBreakdown_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\RedemptionItem_Warehouse_RelationalRedemptionItem_Load.sql" />
+    <Build Include="WHB\Stored Procedures\RedemptionItem_WHVirgin_DerivedRedemptions_Load.sql" />
+    <Build Include="WHB\Stored Procedures\RedemptionPartner__Unknown_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_ClosedBuckets_Fetch.sql" />
+    <Build Include="WHB\Stored Procedures\RedemptionPartner_Warehouse_RelationalRedemptionItemTradeUpValue_Load.sql" />
+    <Build Include="WHB\Stored Procedures\RedemptionPartner_WHVisa_DerivedRedemptionPartners_Load.sql" />
+    <Build Include="ETL\Stored Procedures\EarningSource_Load_DELETE_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\Redemptions_SLC_dboTrans_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Redemptions_WHVirgin_DerivedRedemptions_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Retailer_Load.sql" />
+    <Build Include="WHB\Stored Procedures\SLC_TransactionType_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Transactions__Staging_Load.sql" />
+    <Build Include="WHB\Stored Procedures\Transactions_SLC_dboTrans_Load_Staging.sql" />
+    <Build Include="WHB\Stored Procedures\Transactions_WHVirgin_DerivedBalanceAdjustmentsGoodwill_Load_Staging.sql" />
+    <Build Include="dbo\Stored Procedures\testproc_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\Transactions_WHVirgin_DerivedPartnerTrans_Load_Staging.sql" />
+    <Build Include="WHB\Stored Procedures\Transactions_WHVisa_DerivedBalanceAdjustmentsGoodwill_Load_Staging.sql" />
+    <Build Include="WHB\Stored Procedures\Transactions_WHVisa_DerivedPartnerTrans_Load_Staging.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_Redemptions_Fetch.sql" />
+    <Build Include="WHB\Stored Procedures\__Build.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_Redemption_Load.sql" />
+    <Build Include="WHB\Stored Procedures\_PartitionMaintenance_Transactions_AddNew.sql" />
+    <Build Include="FIFO\Stored Procedures\ReductionIntervals_Load.sql" />
+    <Build Include="ETL\Stored Procedures\SourceType_CheckID_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_Redemptions_Load.sql" />
+    <Build Include="FIFO\Stored Procedures\ReductionAllocations_Load.sql" />
+    <Build Include="ETL\Stored Procedures\TableCheckpointType_Create_OLD.sql" />
+    <Build Include="FIFO\Stored Procedures\Reporting_ERF_Build.sql" />
+    <Build Include="ETL\Stored Procedures\IronOffer_Load_OLD.sql" />
+    <Build Include="FIFO\Stored Procedures\_Build.sql" />
+    <Build Include="ETL\Stored Procedures\Partner_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\AdditionalCashbackAdjustmentCategory_Load_OLD.sql" />
+    <Build Include="dbo\Stored Procedures\Test_execlist_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\AdditionalCashbackAdjustmentType_Load_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\TransactionComparison_Fetch_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\AdditionalCashbackAwardType_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Publisher_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\RedeemOffer_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Supplier_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\TransactionType_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Customer_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\PartnerCommissionRule_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Redemptions_Load_DELETE_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_AdditionalCashbackAdjustment_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_AdditionalCashbackAward_ApplePay_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_AdditionalCashbackAward_Load_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\Get_SourceTypeID.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_AdditionalCashbackAward_MonthlyAwards_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_AdditionalCashbackAward_WH_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_PartnerTrans_Load_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\SpendEarn_004_Build.sql" />
+    <Build Include="Monitor\Stored Procedures\Email_Failure_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_CashbackOverview_Virgin_OLD.sql" />
+    <Build Include="Monitor\Stored Procedures\Email_Success_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\Get_TableCheckpoint.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_Overview_Virgin_OLD.sql" />
+    <Build Include="Monitor\Stored Procedures\PackageLog_Errors_Insert_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\Update_TableCheckpoint.sql" />
+    <Build Include="Monitor\Stored Procedures\PackageLog_Insert_OLD.sql" />
+    <Build Include="Monitor\Stored Procedures\PackageLog_Update_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_Publishers_Fetch.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_CashbackOverview_Fetch.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_CashbackOverview_Fetch_Virgin.sql" />
+    <Build Include="Reporting\Stored Procedures\SpendEarn_004_Fetch.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_CashbackOverview_Fetch_VirginPCA.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_CashbackOverview_Fetch_Visa.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_Overview_Fetch.sql" />
+    <Build Include="ETL\Stored Procedures\CustomerType_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\SourceSystem_Load_DELETE_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_Overview_Fetch_Virgin.sql" />
+    <Build Include="ETL\Stored Procedures\SourceType_Load_DELETE_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_Overview_Fetch_VirginPCA.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_Overview_Fetch_Visa.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_PartnerBreakdown_Fetch.sql" />
+    <Build Include="FIFO\Stored Procedures\Earnings_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_PartnerBreakdown_Fetch_Virgin.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_PartnerBreakdown_VirginPCA_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_Overview_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_PartnerBreakdown_Fetch_VirginPCA.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_CashbackOverview_VirginPCA_OLD.sql" />
+    <Build Include="dbo\Stored Procedures\Reduction_Allocation_FetchERF_KCTest_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\MonthlyStats_PartnerBreakdown_Fetch_Visa.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_Overview_VirginPCA_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\Monthly_Fetch_CashbackOverview_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF__Build.sql" />
+    <Build Include="ETL\Stored Procedures\Reductions_Load_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\RedemptionItem_WHVisa_DerivedRedemptionOffers_Load.sql" />
+    <Build Include="Reporting\Stored Procedures\TransactionComparisonAll_Fetch_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\Redemptions_WHVisa_DerivedRedemptions_Load.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_DisableIndexes_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_RebuildIndexes_OLD.sql" />
+    <Build Include="FIFO\Stored Procedures\_Build_Resume.sql" />
+    <Build Include="dbo\Stored Procedures\GetPartitionDates_Transactions.sql" />
+    <Build Include="ETL\Stored Procedures\Redemptions_Load_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\FIFO_Refresh_Incremental_OLD.sql" />
+    <Build Include="WHB\Stored Procedures\_PartitionMaintenance_PartitionInfo_Reload.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_Refresh_OLD.sql" />
+    <Build Include="ETL\Stored Procedures\Transactions_AdditionalCashbackAward_CCMonthlyAwards_Load_OLD.sql" />
+    <Build Include="Reporting\Stored Procedures\ERF_SpendEarn_Fetch.sql" />
+    <Build Include="Database Triggers\DDLTrigger_Monitor.sql" />
+    <Build Include="Reporting\User Defined Types\KPI.sql" />
+    <Build Include="Reporting\User Defined Types\CB.sql" />
+    <Build Include="Reporting\User Defined Types\PartnerBreakdown.sql" />
+    <Build Include="Storage\PFn_Transactions_ByMonth.sql" />
+    <Build Include="Storage\PS_Month.sql" />
+    <Build Include="Security\DDLMonitor.sql" />
+    <Build Include="Security\ETL.sql" />
+    <Build Include="Security\FIFO.sql" />
+    <Build Include="Security\Monitor.sql" />
+    <Build Include="Security\Reporting.sql" />
+    <Build Include="Security\Staging.sql" />
+    <Build Include="Security\WHB.sql" />
+    <Build Include="Monitor\Sequences\Package_Log_RunID.sql" />
+    <Build Include="dbo\Sequences\SEQ_TransactionID.sql" />
+    <Build Include="WHB\Sequences\RunID.sql" />
+    <Build Include="dbo\Sequences\SEQ_NoTran.sql" />
+    <Build Include="Security\Permissions.sql" />
+  </ItemGroup>
+</Project>

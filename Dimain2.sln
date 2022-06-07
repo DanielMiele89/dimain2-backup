@@ -29,6 +29,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "nFI", "nFI\nFI.sqlproj", "{
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Sandbox", "Sandbox\Sandbox.sqlproj", "{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Finance", "Finance\Finance.sqlproj", "{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +115,12 @@ Global
 		{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A62E0F7C-E86F-42C0-BF37-5C9DE3D66E9A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFE8BA89-5599-4ACE-847B-C80D0CF3D9F8}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

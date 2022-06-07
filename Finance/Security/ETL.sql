@@ -1,0 +1,111 @@
+CREATE SCHEMA [ETL]
+    AUTHORIZATION [hayden];
+
+
+
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT VIEW CHANGE TRACKING
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT TAKE OWNERSHIP
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT REFERENCES
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT CREATE SEQUENCE
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT CONTROL
+    ON SCHEMA::[ETL] TO [DataOps];
+
+
+GO
+GRANT ALTER
+    ON SCHEMA::[ETL] TO [DataOps];
+
