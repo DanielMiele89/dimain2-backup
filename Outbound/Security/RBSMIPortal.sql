@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [RBSMIPortal]
+    AUTHORIZATION [dbo];
+
