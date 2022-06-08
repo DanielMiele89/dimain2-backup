@@ -35,6 +35,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Monitor", "Monitor\Monitor.
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "PapiMemberOffer", "PapiMemberOffer\PapiMemberOffer.sqlproj", "{F46AA88B-5844-449D-B72D-E144CD5A7508}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ReportServerTempDB", "ReportServerTempDV\ReportServerTempDB.sqlproj", "{3E79261C-1B5D-4CC3-8591-3CE99FD7FFB2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,12 @@ Global
 		{F46AA88B-5844-449D-B72D-E144CD5A7508}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F46AA88B-5844-449D-B72D-E144CD5A7508}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F46AA88B-5844-449D-B72D-E144CD5A7508}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{3E79261C-1B5D-4CC3-8591-3CE99FD7FFB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E79261C-1B5D-4CC3-8591-3CE99FD7FFB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E79261C-1B5D-4CC3-8591-3CE99FD7FFB2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{3E79261C-1B5D-4CC3-8591-3CE99FD7FFB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E79261C-1B5D-4CC3-8591-3CE99FD7FFB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E79261C-1B5D-4CC3-8591-3CE99FD7FFB2}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
