@@ -1,2 +1,0 @@
-﻿CREATE USER [DIMAIN2\zoedimain2] FOR LOGIN [DIMAIN2\zoedimain2];
-

@@ -1,2 +1,0 @@
-﻿CREATE USER [DIMAIN2\Chrisdimain2] FOR LOGIN [DIMAIN2\Chrisdimain2];
-
