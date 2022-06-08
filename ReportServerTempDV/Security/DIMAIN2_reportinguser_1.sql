@@ -1,3 +1,0 @@
-﻿CREATE LOGIN [DIMAIN2\reportinguser]
-    FROM WINDOWS WITH DEFAULT_LANGUAGE = [us_english];
-
