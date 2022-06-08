@@ -1,0 +1,474 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>ReportServer</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{d891c81f-a4cc-4cab-849d-3d39ce3e0058}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>ReportServer</RootNamespace>
+    <AssemblyName>ReportServer</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>Latin1_General_CI_AS_KS_WS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Views\" />
+    <Folder Include="Security\" />
+    <Folder Include="dbo\Functions\" />
+    <Folder Include="dbo\Stored Procedures\" />
+    <Folder Include="dbo\User Defined Types\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\Keys.sql" />
+    <Build Include="dbo\Tables\Favorites.sql" />
+    <Build Include="dbo\Tables\History.sql" />
+    <Build Include="dbo\Tables\DBUpgradeHistory.sql" />
+    <Build Include="dbo\Tables\Comments.sql" />
+    <Build Include="dbo\Tables\ConfigurationInfo.sql" />
+    <Build Include="dbo\Tables\Catalog.sql" />
+    <Build Include="dbo\Tables\DataSets.sql" />
+    <Build Include="dbo\Tables\CleanupLock.sql" />
+    <Build Include="dbo\Tables\UpgradeInfo.sql" />
+    <Build Include="dbo\Tables\SubscriptionsBeingDeleted.sql" />
+    <Build Include="dbo\Tables\ModelDrill.sql" />
+    <Build Include="dbo\Tables\Segment.sql" />
+    <Build Include="dbo\Tables\ServerUpgradeHistory.sql" />
+    <Build Include="dbo\Tables\ChunkSegmentMapping.sql" />
+    <Build Include="dbo\Tables\ProductInfoHistory.sql" />
+    <Build Include="dbo\Tables\ModelPerspective.sql" />
+    <Build Include="dbo\Tables\CachePolicy.sql" />
+    <Build Include="dbo\Tables\AlertSubscribers.sql" />
+    <Build Include="dbo\Tables\SegmentedChunk.sql" />
+    <Build Include="dbo\Tables\Users.sql" />
+    <Build Include="dbo\Tables\UserContactInfo.sql" />
+    <Build Include="dbo\Tables\ExecutionLogStorage.sql" />
+    <Build Include="dbo\Tables\DataSource.sql" />
+    <Build Include="dbo\Tables\DataModelDataSource.sql" />
+    <Build Include="dbo\Tables\Policies.sql" />
+    <Build Include="dbo\Tables\CatalogItemExtendedContent.sql" />
+    <Build Include="dbo\Tables\ModelItemPolicy.sql" />
+    <Build Include="dbo\Tables\SecData.sql" />
+    <Build Include="dbo\Tables\Roles.sql" />
+    <Build Include="dbo\Tables\SubscriptionHistory.sql" />
+    <Build Include="dbo\Tables\PolicyUserRole.sql" />
+    <Build Include="dbo\Tables\DataModelRole.sql" />
+    <Build Include="dbo\Tables\UserDataModelRole.sql" />
+    <Build Include="dbo\Tables\Event.sql" />
+    <Build Include="dbo\Tables\Subscriptions.sql" />
+    <Build Include="dbo\Tables\ActiveSubscriptions.sql" />
+    <Build Include="dbo\Tables\SnapshotData.sql" />
+    <Build Include="dbo\Tables\ChunkData.sql" />
+    <Build Include="dbo\Tables\Notifications.sql" />
+    <Build Include="dbo\Tables\Batch.sql" />
+    <Build Include="dbo\Tables\Schedule.sql" />
+    <Build Include="dbo\Tables\ReportSchedule.sql" />
+    <Build Include="dbo\Tables\RunningJobs.sql" />
+    <Build Include="dbo\Tables\ServerParametersInstance.sql" />
+    <Build Include="dbo\Tables\SubscriptionResults.sql" />
+    <Build Include="dbo\Views\ExtendedDataSets.sql" />
+    <Build Include="dbo\Views\ExecutionLog3.sql" />
+    <Build Include="dbo\Views\ExecutionLog2.sql" />
+    <Build Include="dbo\Views\ExecutionLog.sql" />
+    <Build Include="dbo\Views\ExtendedDataSources.sql" />
+    <Build Include="dbo\Views\ReportsAndSubscriptions.sql" />
+    <Build Include="Security\RSExecRole.sql" />
+    <Build Include="Security\NT SERVICE_ReportServer.sql" />
+    <Build Include="Security\Suraj.sql" />
+    <Build Include="Security\PRTGBuddy.sql" />
+    <Build Include="Security\PRTGBuddy_1.sql" />
+    <Build Include="Security\Zoe.sql" />
+    <Build Include="Security\Zoe_1.sql" />
+    <Build Include="Security\jason.sql" />
+    <Build Include="Security\Rory.sql" />
+    <Build Include="Security\Rory_1.sql" />
+    <Build Include="Security\Michael.sql" />
+    <Build Include="Security\Michael_1.sql" />
+    <Build Include="Security\ChrisN.sql" />
+    <Build Include="Security\ChrisN_1.sql" />
+    <Build Include="Security\kevinc.sql" />
+    <Build Include="Security\kevinc_1.sql" />
+    <Build Include="Security\DIMAIN2_Chrisdimain2.sql" />
+    <Build Include="Security\DIMAIN2_Chrisdimain2_1.sql" />
+    <Build Include="Security\DIMAIN2_zoedimain2.sql" />
+    <Build Include="Security\DIMAIN2_zoedimain2_1.sql" />
+    <Build Include="Security\DIMAIN2_reportinguser.sql" />
+    <Build Include="Security\DIMAIN2_reportinguser_1.sql" />
+    <Build Include="Security\DIMAIN2_rorydimain2.sql" />
+    <Build Include="Security\DIMAIN2_rorydimain2_1.sql" />
+    <Build Include="Security\NT SERVICE_SQLServerReportingServices.sql" />
+    <Build Include="Security\NT SERVICE_SQLServerReportingServices_1.sql" />
+    <Build Include="Security\DIMAIN2_alwyndimain2.sql" />
+    <Build Include="Security\DIMAIN2_alwyndimain2_1.sql" />
+    <Build Include="Security\DIMAIN2_garethdimain2.sql" />
+    <Build Include="Security\DIMAIN2_gerarddimain2.sql" />
+    <Build Include="Security\DIMAIN2_gerarddimain2_1.sql" />
+    <Build Include="Security\DIMAIN2_jordondimain2.sql" />
+    <Build Include="Security\DIMAIN2_jordondimain2_1.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="dbo\Functions\ExtendedCatalog.sql" />
+    <Build Include="dbo\Stored Procedures\WriteNextPortionPersistedStream.sql" />
+    <Build Include="dbo\Stored Procedures\ListHistorySnapshots.sql" />
+    <Build Include="dbo\Stored Procedures\GetFirstPortionPersistedStream.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteHistoryRecordByHistoryId.sql" />
+    <Build Include="dbo\Stored Procedures\SetPersistedStreamError.sql" />
+    <Build Include="dbo\Stored Procedures\CleanHistoryForReport.sql" />
+    <Build Include="dbo\Stored Procedures\GetNextPortionPersistedStream.sql" />
+    <Build Include="dbo\Stored Procedures\CleanAllHistories.sql" />
+    <Build Include="dbo\Stored Procedures\GetSnapshotChunks.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteHistoryRecord.sql" />
+    <Build Include="dbo\Stored Procedures\SetDrillthroughReports.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteAllHistoryForReport.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteDrillthroughReports.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteHistoriesWithNoPolicy.sql" />
+    <Build Include="dbo\Stored Procedures\GetDrillthroughReports.sql" />
+    <Build Include="dbo\Stored Procedures\Get_sqlagent_job_status.sql" />
+    <Build Include="dbo\Stored Procedures\GetDrillthroughReport.sql" />
+    <Build Include="dbo\Stored Procedures\CreateTask.sql" />
+    <Build Include="dbo\Stored Procedures\GetUpgradeItems.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateTask.sql" />
+    <Build Include="dbo\Stored Procedures\SetUpgradeItemStatus.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateScheduleNextRunTime.sql" />
+    <Build Include="dbo\Stored Procedures\GetPolicyRoots.sql" />
+    <Build Include="dbo\Stored Procedures\ListScheduledReports.sql" />
+    <Build Include="dbo\Stored Procedures\GetDataSourceForUpgrade.sql" />
+    <Build Include="dbo\Stored Procedures\ListTasks.sql" />
+    <Build Include="dbo\Stored Procedures\GetSubscriptionsForUpgrade.sql" />
+    <Build Include="dbo\Stored Procedures\ListTasksForMaintenance.sql" />
+    <Build Include="dbo\Stored Procedures\StoreServerParameters.sql" />
+    <Build Include="dbo\Stored Procedures\ClearScheduleConsistancyFlags.sql" />
+    <Build Include="dbo\Stored Procedures\GetServerParameters.sql" />
+    <Build Include="dbo\Stored Procedures\GetAReportsReportAction.sql" />
+    <Build Include="dbo\Stored Procedures\CleanExpiredServerParameters.sql" />
+    <Build Include="dbo\Stored Procedures\GetTimeBasedSubscriptionReportAction.sql" />
+    <Build Include="dbo\Stored Procedures\CopyChunks.sql" />
+    <Build Include="dbo\Stored Procedures\GetTaskProperties.sql" />
+    <Build Include="dbo\Stored Procedures\CreateNewSnapshotVersion.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteTask.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateSnapshotReferences.sql" />
+    <Build Include="dbo\Stored Procedures\GetSchedulesReports.sql" />
+    <Build Include="dbo\Stored Procedures\OpenSegmentedChunk.sql" />
+    <Build Include="dbo\Stored Procedures\EnforceCacheLimits.sql" />
+    <Build Include="dbo\Stored Procedures\CreateSegmentedChunk.sql" />
+    <Build Include="dbo\Stored Procedures\AddReportSchedule.sql" />
+    <Build Include="dbo\Stored Procedures\ReadChunkSegment.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteReportSchedule.sql" />
+    <Build Include="dbo\Stored Procedures\WriteChunkSegment.sql" />
+    <Build Include="dbo\Stored Procedures\GetSnapShotSchedule.sql" />
+    <Build Include="dbo\Stored Procedures\CreateChunkSegment.sql" />
+    <Build Include="dbo\Stored Procedures\CreateTimeBasedSubscriptionSchedule.sql" />
+    <Build Include="dbo\Stored Procedures\IsSegmentedChunk.sql" />
+    <Build Include="dbo\Stored Procedures\GetTimeBasedSubscriptionSchedule.sql" />
+    <Build Include="dbo\Stored Procedures\ShallowCopyChunk.sql" />
+    <Build Include="dbo\Stored Procedures\AddRunningJob.sql" />
+    <Build Include="dbo\Stored Procedures\DeepCopySegment.sql" />
+    <Build Include="dbo\Stored Procedures\RemoveRunningJob.sql" />
+    <Build Include="dbo\Stored Procedures\RemoveSegmentedMapping.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateRunningJob.sql" />
+    <Build Include="dbo\Stored Procedures\RemoveSegment.sql" />
+    <Build Include="dbo\Stored Procedures\GetMyRunningJobs.sql" />
+    <Build Include="dbo\Stored Procedures\MigrateExecutionLog.sql" />
+    <Build Include="dbo\Stored Procedures\ListRunningJobs.sql" />
+    <Build Include="dbo\Stored Procedures\TempChunkExists.sql" />
+    <Build Include="dbo\Stored Procedures\CleanExpiredJobs.sql" />
+    <Build Include="dbo\Stored Procedures\CreateEditSession.sql" />
+    <Build Include="dbo\Stored Procedures\CreateObject.sql" />
+    <Build Include="dbo\Stored Procedures\ExtendEditSessionLifetime.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteObject.sql" />
+    <Build Include="dbo\Stored Procedures\GetDBVersion.sql" />
+    <Build Include="dbo\Stored Procedures\CleanExpiredEditSessions.sql" />
+    <Build Include="dbo\Stored Procedures\FindObjectsNonRecursive.sql" />
+    <Build Include="dbo\Stored Procedures\SetCacheLastUsed.sql" />
+    <Build Include="dbo\Stored Procedures\FindObjectsRecursive.sql" />
+    <Build Include="dbo\Stored Procedures\GetSharePointPathsForUpgrade.sql" />
+    <Build Include="dbo\Stored Procedures\FindParents.sql" />
+    <Build Include="dbo\Stored Procedures\GetSharePointSchedulePathsForUpgrade.sql" />
+    <Build Include="dbo\Stored Procedures\FindObjectsByLink.sql" />
+    <Build Include="dbo\Stored Procedures\GetIDPairsByLink.sql" />
+    <Build Include="dbo\Stored Procedures\UpgradeSharePointPaths.sql" />
+    <Build Include="dbo\Stored Procedures\GetChildrenBeforeDelete.sql" />
+    <Build Include="dbo\Stored Procedures\UpgradeSharePointSchedulePaths.sql" />
+    <Build Include="dbo\Stored Procedures\GetAllProperties.sql" />
+    <Build Include="dbo\Stored Procedures\GetDataSets.sql" />
+    <Build Include="dbo\Stored Procedures\GetParameters.sql" />
+    <Build Include="dbo\Stored Procedures\AddDataSet.sql" />
+    <Build Include="dbo\Stored Procedures\GetObjectContent.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteDataSets.sql" />
+    <Build Include="dbo\Stored Procedures\LoadForDefinitionCheck.sql" />
+    <Build Include="dbo\Stored Procedures\GetDataSetForExecution.sql" />
+    <Build Include="dbo\Stored Procedures\LoadForRepublishing.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateCompiledDefinition.sql" />
+    <Build Include="dbo\Stored Procedures\RebindDataSource.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateSubscriptionResult.sql" />
+    <Build Include="dbo\Stored Procedures\RebindDataSet.sql" />
+    <Build Include="dbo\Stored Procedures\FindItemsToUpdateByDataSet.sql" />
+    <Build Include="dbo\Stored Procedures\SetUserServiceToken.sql" />
+    <Build Include="dbo\Stored Procedures\GetAllFavoriteItems.sql" />
+    <Build Include="dbo\Stored Procedures\GetUserServiceToken.sql" />
+    <Build Include="dbo\Stored Procedures\FindFavoriteableItemsNonRecursive.sql" />
+    <Build Include="dbo\Stored Procedures\SetUserSettings.sql" />
+    <Build Include="dbo\Stored Procedures\FindFavoriteableItemsRecursive.sql" />
+    <Build Include="dbo\Stored Procedures\GetUserSettings.sql" />
+    <Build Include="dbo\Stored Procedures\IsFavoriteItem.sql" />
+    <Build Include="dbo\Stored Procedures\GetCompiledDefinition.sql" />
+    <Build Include="dbo\Stored Procedures\RemoveItemFromFavorites.sql" />
+    <Build Include="dbo\Stored Procedures\GetReportForExecution.sql" />
+    <Build Include="dbo\Stored Procedures\AddItemToFavorites.sql" />
+    <Build Include="dbo\Stored Procedures\GetReportParametersForExecution.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateUsernameFromSID.sql" />
+    <Build Include="dbo\Stored Procedures\MoveObject.sql" />
+    <Build Include="dbo\Stored Procedures\GetCommentsByItemID.sql" />
+    <Build Include="dbo\Stored Procedures\ObjectExists.sql" />
+    <Build Include="dbo\Stored Procedures\GetCommentByCommentID.sql" />
+    <Build Include="dbo\Stored Procedures\SetAllProperties.sql" />
+    <Build Include="dbo\Stored Procedures\CommentBelongsToUser.sql" />
+    <Build Include="dbo\Stored Procedures\FlushCacheByID.sql" />
+    <Build Include="dbo\Stored Procedures\InsertComment.sql" />
+    <Build Include="dbo\Stored Procedures\FlushReportFromCache.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateComment.sql" />
+    <Build Include="dbo\Stored Procedures\SetParameters.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteComment.sql" />
+    <Build Include="dbo\Stored Procedures\SetObjectContent.sql" />
+    <Build Include="dbo\Stored Procedures\SetKeysForInstallation.sql" />
+    <Build Include="dbo\Stored Procedures\TryAcquireCleanupLock.sql" />
+    <Build Include="dbo\Stored Procedures\SetLastModified.sql" />
+    <Build Include="dbo\Stored Procedures\GetAnnouncedKey.sql" />
+    <Build Include="dbo\Stored Procedures\CreateOrUpdateContentCache.sql" />
+    <Build Include="dbo\Stored Procedures\GetNameById.sql" />
+    <Build Include="dbo\Stored Procedures\AnnounceOrGetKey.sql" />
+    <Build Include="dbo\Stored Procedures\GetContentCache.sql" />
+    <Build Include="dbo\Stored Procedures\AddDataSource.sql" />
+    <Build Include="dbo\Stored Procedures\SetMachineName.sql" />
+    <Build Include="dbo\Stored Procedures\GetContentCacheDetails.sql" />
+    <Build Include="dbo\Stored Procedures\GetDataSources.sql" />
+    <Build Include="dbo\Stored Procedures\ListInstallations.sql" />
+    <Build Include="dbo\Stored Procedures\CleanExpiredContentCache.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteDataSources.sql" />
+    <Build Include="dbo\Stored Procedures\ListSubscriptionIDs.sql" />
+    <Build Include="dbo\Stored Procedures\GetCurrentProductInfo.sql" />
+    <Build Include="dbo\Stored Procedures\ChangeStateOfDataSource.sql" />
+    <Build Include="dbo\Stored Procedures\ListInfoForReencryption.sql" />
+    <Build Include="dbo\Stored Procedures\AddProductInfo.sql" />
+    <Build Include="dbo\Stored Procedures\FindItemsByDataSource.sql" />
+    <Build Include="dbo\Stored Procedures\GetDatasourceInfoForReencryption.sql" />
+    <Build Include="dbo\Stored Procedures\GetAlertSubscribers.sql" />
+    <Build Include="dbo\Stored Procedures\FindItemsByDataSet.sql" />
+    <Build Include="dbo\Stored Procedures\SetReencryptedDatasourceInfo.sql" />
+    <Build Include="dbo\Stored Procedures\GetAlertSubscriptionID.sql" />
+    <Build Include="dbo\Stored Procedures\FindItemsByDataSourceRecursive.sql" />
+    <Build Include="dbo\Stored Procedures\GetSubscriptionInfoForReencryption.sql" />
+    <Build Include="dbo\Stored Procedures\AddAlertSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\CreateRole.sql" />
+    <Build Include="dbo\Stored Procedures\SetReencryptedSubscriptionInfo.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteAlertSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\GetRoles.sql" />
+    <Build Include="dbo\Stored Procedures\SetConfigurationInfoValue.sql" />
+    <Build Include="dbo\Stored Procedures\SetDefaultEmail.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteRole.sql" />
+    <Build Include="dbo\Stored Procedures\RemoveConfigurationInfoValue.sql" />
+    <Build Include="dbo\Stored Procedures\GetDefaultEmail.sql" />
+    <Build Include="dbo\Stored Procedures\ReadRoleProperties.sql" />
+    <Build Include="dbo\Stored Procedures\GetUserServiceTokenForReencryption.sql" />
+    <Build Include="dbo\Stored Procedures\GetCatalogItemProperties.sql" />
+    <Build Include="dbo\Stored Procedures\SetRoleProperties.sql" />
+    <Build Include="dbo\Stored Procedures\SetReencryptedUserServiceToken.sql" />
+    <Build Include="dbo\Stored Procedures\TakeEventFromQueue.sql" />
+    <Build Include="dbo\Stored Procedures\SetRolePropertiesAndInvalidatePolicies.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteEncryptedContent.sql" />
+    <Build Include="dbo\Stored Procedures\PollEventsForRSProcess.sql" />
+    <Build Include="dbo\Stored Procedures\GetPoliciesForRole.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteKey.sql" />
+    <Build Include="dbo\Stored Procedures\GetDataModelDataSourcesByItemID.sql" />
+    <Build Include="dbo\Stored Procedures\UpdatePolicy.sql" />
+    <Build Include="dbo\Stored Procedures\GetAllConfigurationInfo.sql" />
+    <Build Include="dbo\Stored Procedures\AddDataModelDataSource.sql" />
+    <Build Include="dbo\Stored Procedures\UpdatePolicyStatus.sql" />
+    <Build Include="dbo\Stored Procedures\GetOneConfigurationInfo.sql" />
+    <Build Include="dbo\Stored Procedures\GetDataModelDatasourceForReencryption.sql" />
+    <Build Include="dbo\Stored Procedures\GetInvalidPolicies.sql" />
+    <Build Include="dbo\Stored Procedures\SetConfigurationInfo.sql" />
+    <Build Include="dbo\Stored Procedures\SetReencryptedDataModelDataSource.sql" />
+    <Build Include="dbo\Stored Procedures\SetPolicy.sql" />
+    <Build Include="dbo\Stored Procedures\AddEvent.sql" />
+    <Build Include="dbo\Stored Procedures\GetCatalogContentData.sql" />
+    <Build Include="dbo\Stored Procedures\SetSystemPolicy.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteEvent.sql" />
+    <Build Include="dbo\Stored Procedures\InitializeCatalogContentWrite.sql" />
+    <Build Include="dbo\Stored Procedures\SetModelItemPolicy.sql" />
+    <Build Include="dbo\Stored Procedures\CleanEventRecords.sql" />
+    <Build Include="dbo\Stored Procedures\WriteCatalogContentChunk.sql" />
+    <Build Include="dbo\Stored Procedures\UpdatePolicyPrincipal.sql" />
+    <Build Include="dbo\Stored Procedures\AddExecutionLogEntry.sql" />
+    <Build Include="dbo\Stored Procedures\GetCatalogExtendedContentData.sql" />
+    <Build Include="dbo\Stored Procedures\UpdatePolicyRole.sql" />
+    <Build Include="dbo\Stored Procedures\AddExecutionLogEntryByReportId.sql" />
+    <Build Include="dbo\Stored Procedures\InitializeCatalogExtendedContentWrite.sql" />
+    <Build Include="dbo\Stored Procedures\GetPolicy.sql" />
+    <Build Include="dbo\Stored Procedures\ExpireExecutionLogEntries.sql" />
+    <Build Include="dbo\Stored Procedures\WriteCatalogExtendedContentChunk.sql" />
+    <Build Include="dbo\Stored Procedures\GetSystemPolicy.sql" />
+    <Build Include="dbo\Stored Procedures\GetUserIDBySid.sql" />
+    <Build Include="dbo\Stored Procedures\IsCatalogExtendedContentAvailable.sql" />
+    <Build Include="dbo\Stored Procedures\DeletePolicy.sql" />
+    <Build Include="dbo\Stored Procedures\GetUserIDByName.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateDataModelDataSourceByID.sql" />
+    <Build Include="dbo\Stored Procedures\CreateSession.sql" />
+    <Build Include="dbo\Stored Procedures\GetUserID.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteDataModelDataSourceByID.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteModelItemPolicy.sql" />
+    <Build Include="dbo\Stored Procedures\GetUserIDWithNoCreate.sql" />
+    <Build Include="dbo\Stored Procedures\WriteCatalogExtendedContentChunkById.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteAllModelItemPolicies.sql" />
+    <Build Include="dbo\Stored Procedures\GetPrincipalID.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateCatalogContentSize.sql" />
+    <Build Include="dbo\Stored Procedures\GetModelItemInfo.sql" />
+    <Build Include="dbo\Stored Procedures\CreateSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\FinalizeTempCatalogExtendedContentWrite.sql" />
+    <Build Include="dbo\Stored Procedures\GetModelDefinition.sql" />
+    <Build Include="dbo\Stored Procedures\DeliveryRemovedInactivateSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteCatalogExtendedContent.sql" />
+    <Build Include="dbo\Stored Procedures\AddModelPerspective.sql" />
+    <Build Include="dbo\Stored Procedures\AddSubscriptionToBeingDeleted.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateSubscriptionHistoryEntry.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteModelPerspectives.sql" />
+    <Build Include="dbo\Stored Procedures\RemoveSubscriptionFromBeingDeleted.sql" />
+    <Build Include="dbo\Stored Procedures\GetSubscriptionHistory.sql" />
+    <Build Include="dbo\Stored Procedures\GetModelsAndPerspectives.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\AddSubscriptionHistoryEntry.sql" />
+    <Build Include="dbo\Stored Procedures\GetModelPerspectives.sql" />
+    <Build Include="dbo\Stored Procedures\GetSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\GetPolicyByItemId.sql" />
+    <Build Include="dbo\Stored Procedures\DereferenceSessionSnapshot.sql" />
+    <Build Include="dbo\Stored Procedures\ListSubscriptionsUsingDataSource.sql" />
+    <Build Include="dbo\Stored Procedures\GetDataModelRolesByItemID.sql" />
+    <Build Include="dbo\Stored Procedures\SetSessionData.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateSubscriptionStatus.sql" />
+    <Build Include="dbo\Stored Procedures\AddDataModelRole.sql" />
+    <Build Include="dbo\Stored Procedures\WriteLockSession.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateSubscriptionLastRunInfo.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateDataModelRoleByID.sql" />
+    <Build Include="dbo\Stored Procedures\CheckSessionLock.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteDataModelRoleByID.sql" />
+    <Build Include="dbo\Stored Procedures\GetSessionData.sql" />
+    <Build Include="dbo\Stored Procedures\InvalidateSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\GetDataModelRoleAssignmentsByItemID.sql" />
+    <Build Include="dbo\Stored Procedures\GetSnapshotFromHistory.sql" />
+    <Build Include="dbo\Stored Procedures\CleanNotificationRecords.sql" />
+    <Build Include="dbo\Stored Procedures\AddUserDataModelRole.sql" />
+    <Build Include="dbo\Stored Procedures\CleanExpiredSessions.sql" />
+    <Build Include="dbo\Stored Procedures\CreateSnapShotNotifications.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteUserDataModelRole.sql" />
+    <Build Include="dbo\Stored Procedures\CleanExpiredCache.sql" />
+    <Build Include="dbo\Stored Procedures\CreateDataDrivenNotification.sql" />
+    <Build Include="dbo\Stored Procedures\GetCatalogExtendedContentLastUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\SetSessionCredentials.sql" />
+    <Build Include="dbo\Stored Procedures\CreateNewActiveSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\SetSessionParameters.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateActiveSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\ClearSessionSnapshot.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteActiveSubscription.sql" />
+    <Build Include="dbo\Stored Procedures\RemoveReportFromSession.sql" />
+    <Build Include="dbo\Stored Procedures\CreateCacheUpdateNotifications.sql" />
+    <Build Include="dbo\Stored Procedures\CleanBrokenSnapshots.sql" />
+    <Build Include="dbo\Stored Procedures\GetCacheSchedule.sql" />
+    <Build Include="dbo\Stored Procedures\CleanOrphanedSnapshots.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteNotification.sql" />
+    <Build Include="dbo\Stored Procedures\FlushContentCache.sql" />
+    <Build Include="dbo\Stored Procedures\SetNotificationAttempt.sql" />
+    <Build Include="dbo\Stored Procedures\SetCacheOptions.sql" />
+    <Build Include="dbo\Stored Procedures\CreateTimeBasedSubscriptionNotification.sql" />
+    <Build Include="dbo\Stored Procedures\GetCacheOptions.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteTimeBasedSubscriptionSchedule.sql" />
+    <Build Include="dbo\Stored Procedures\AddReportToCache.sql" />
+    <Build Include="dbo\Stored Procedures\ListUsedDeliveryProviders.sql" />
+    <Build Include="dbo\Stored Procedures\GetExecutionOptions.sql" />
+    <Build Include="dbo\Stored Procedures\AddBatchRecord.sql" />
+    <Build Include="dbo\Stored Procedures\SetExecutionOptions.sql" />
+    <Build Include="dbo\Stored Procedures\GetBatchRecords.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateSnapshot.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteBatchRecords.sql" />
+    <Build Include="dbo\Stored Procedures\CreateChunkAndGetPointer.sql" />
+    <Build Include="dbo\Stored Procedures\CleanBatchRecords.sql" />
+    <Build Include="dbo\Stored Procedures\WriteChunkPortion.sql" />
+    <Build Include="dbo\Stored Procedures\CleanOrphanedPolicies.sql" />
+    <Build Include="dbo\Stored Procedures\GetChunkPointerAndLength.sql" />
+    <Build Include="dbo\Stored Procedures\IncreaseTransientSnapshotRefcount.sql" />
+    <Build Include="dbo\Stored Procedures\GetChunkInformation.sql" />
+    <Build Include="dbo\Stored Procedures\DecreaseTransientSnapshotRefcount.sql" />
+    <Build Include="dbo\Stored Procedures\ReadChunkPortion.sql" />
+    <Build Include="dbo\Stored Procedures\MarkSnapshotAsDependentOnUser.sql" />
+    <Build Include="dbo\Stored Procedures\CopyChunksOfType.sql" />
+    <Build Include="dbo\Stored Procedures\SetSnapshotProcessingFlags.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteSnapshotAndChunks.sql" />
+    <Build Include="dbo\Stored Procedures\SetSnapshotChunksVersion.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteOneChunk.sql" />
+    <Build Include="dbo\Stored Procedures\LockSnapshotForUpgrade.sql" />
+    <Build Include="dbo\Stored Procedures\CreateRdlChunk.sql" />
+    <Build Include="dbo\Stored Procedures\InsertUnreferencedSnapshot.sql" />
+    <Build Include="dbo\Stored Procedures\DeletePersistedStreams.sql" />
+    <Build Include="dbo\Stored Procedures\PromoteSnapshotInfo.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteExpiredPersistedStreams.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateSnapshotPaginationInfo.sql" />
+    <Build Include="dbo\Stored Procedures\DeletePersistedStream.sql" />
+    <Build Include="dbo\Stored Procedures\GetSnapshotPromotedInfo.sql" />
+    <Build Include="dbo\Stored Procedures\AddPersistedStream.sql" />
+    <Build Include="dbo\Stored Procedures\AddHistoryRecord.sql" />
+    <Build Include="dbo\Stored Procedures\LockPersistedStream.sql" />
+    <Build Include="dbo\Stored Procedures\SetHistoryLimit.sql" />
+    <Build Include="dbo\Stored Procedures\WriteFirstPortionPersistedStream.sql" />
+    <Build Include="dbo\Stored Procedures\ListHistory.sql" />
+    <Build Include="dbo\User Defined Types\EncryptedConfigList.sql" />
+    <Build Include="Security\NT SERVICE_ReportServer_1.sql" />
+    <Build Include="Security\RSExecRole_1.sql" />
+    <Build Include="Security\Permissions.sql" />
+  </ItemGroup>
+</Project>
