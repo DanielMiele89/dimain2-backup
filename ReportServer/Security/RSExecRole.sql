@@ -1,0 +1,19 @@
+﻿CREATE ROLE [RSExecRole]
+    AUTHORIZATION [dbo];
+
+
+GO
+ALTER ROLE [RSExecRole] ADD MEMBER [NT SERVICE\ReportServer];
+
+
+GO
+ALTER ROLE [RSExecRole] ADD MEMBER [Rory];
+
+
+GO
+ALTER ROLE [RSExecRole] ADD MEMBER [ChrisN];
+
+
+GO
+ALTER ROLE [RSExecRole] ADD MEMBER [kevinc];
+
