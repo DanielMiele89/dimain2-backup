@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [DIMAIN2\SQLAgentJobUser]
+    FROM WINDOWS WITH DEFAULT_LANGUAGE = [us_english];
+
