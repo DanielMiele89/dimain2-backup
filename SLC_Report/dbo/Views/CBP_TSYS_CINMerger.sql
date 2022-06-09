@@ -1,0 +1,18 @@
+﻿
+  CREATE VIEW [dbo].[CBP_TSYS_CINMerger]
+AS
+  SELECT [SecondaryFanID]
+      ,[MasterFanID]
+      ,[FirstNameMatch]
+      ,[LastNameMatch]
+      ,[FullNameBonus]
+      ,[DOBMatch]
+      ,[AddressMatch]
+      ,[PostCodeMatch]
+      ,[OtherDetailBonus]
+      ,[TotalMatchScore]
+      ,[DateMatchIdentified]
+      ,[DateMerged]
+      ,[DateMatchConfirmed]
+      ,[MatchConfirmed]
+  FROM SLC_Snapshot.[dbo].[CBP_TSYS_CINMerger]

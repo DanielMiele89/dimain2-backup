@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [DanielM]
+    WITH PASSWORD = N'{fh6u31nfgsc~lqCXyawuubzmsFT7_&#$!~<o?ruipy$uvj7', SID = 0xDE0F9B290750054EAAE77B61E80930C8, DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

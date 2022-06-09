@@ -45,6 +45,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ReportServer", "ReportServe
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ReportServerTempDB", "ReportServerTempDB\ReportServerTempDB.sqlproj", "{9F3E6511-CBE8-4978-8285-A6D0CD3B0763}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SLC_Report", "SLC_Report\SLC_Report.sqlproj", "{ECC41B45-4BBE-4328-AF10-B339C58CEDAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -177,6 +179,12 @@ Global
 		{9F3E6511-CBE8-4978-8285-A6D0CD3B0763}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F3E6511-CBE8-4978-8285-A6D0CD3B0763}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9F3E6511-CBE8-4978-8285-A6D0CD3B0763}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{ECC41B45-4BBE-4328-AF10-B339C58CEDAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECC41B45-4BBE-4328-AF10-B339C58CEDAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECC41B45-4BBE-4328-AF10-B339C58CEDAE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{ECC41B45-4BBE-4328-AF10-B339C58CEDAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECC41B45-4BBE-4328-AF10-B339C58CEDAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECC41B45-4BBE-4328-AF10-B339C58CEDAE}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

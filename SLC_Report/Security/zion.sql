@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [zion]
+    AUTHORIZATION [dbo];
+

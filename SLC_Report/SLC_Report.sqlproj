@@ -1,0 +1,288 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>SLC_Report</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{ecc41b45-4bbe-4328-af10-b339c58cedae}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>SLC_Report</RootNamespace>
+    <AssemblyName>SLC_Report</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="zion\" />
+    <Folder Include="zion\Tables\" />
+    <Folder Include="APW\" />
+    <Folder Include="APW\Tables\" />
+    <Folder Include="dbo\Views\" />
+    <Folder Include="ras\" />
+    <Folder Include="ras\Views\" />
+    <Folder Include="zion\Views\" />
+    <Folder Include="hydra\" />
+    <Folder Include="hydra\Views\" />
+    <Folder Include="Lion\" />
+    <Folder Include="Lion\Views\" />
+    <Folder Include="Redemption\" />
+    <Folder Include="Redemption\Views\" />
+    <Folder Include="Security\" />
+    <Folder Include="dbo\Functions\" />
+    <Folder Include="dbo\Stored Procedures\" />
+    <Folder Include="DIRepETL\" />
+    <Folder Include="DIRepETL\Stored Procedures\" />
+    <Folder Include="APW\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\FanSFDDailyUploadData_DirectDebit.sql" />
+    <Build Include="dbo\Tables\FanSFDDailyUploadDataStaging.sql" />
+    <Build Include="dbo\Tables\CBP_CustomerUpdate_CJS.sql" />
+    <Build Include="dbo\Tables\CustomerJourneyStaging.sql" />
+    <Build Include="dbo\Tables\CBP_Credit_ProductType.sql" />
+    <Build Include="dbo\Tables\CustomerLapse.sql" />
+    <Build Include="dbo\Tables\CBP_Credit_ProductTypeRates.sql" />
+    <Build Include="dbo\Tables\CustomerJourney.sql" />
+    <Build Include="dbo\Tables\AdSpace.sql" />
+    <Build Include="dbo\Tables\FanSFDDailyUploadData.sql" />
+    <Build Include="dbo\Tables\OnlineRegistrationSource.sql" />
+    <Build Include="dbo\Tables\PartnerStatus.sql" />
+    <Build Include="zion\Tables\ZionAction.sql" />
+    <Build Include="APW\Tables\BinRange.sql" />
+    <Build Include="APW\Tables\PaymentCardExclude.sql" />
+    <Build Include="APW\Tables\Publisher.sql" />
+    <Build Include="dbo\Tables\PartnerCommissionRuleType.sql" />
+    <Build Include="dbo\Tables\IssuerCustomerAttributeType.sql" />
+    <Build Include="dbo\Tables\TestSplitOwnership.sql" />
+    <Build Include="dbo\Tables\Holidays.sql" />
+    <Build Include="dbo\Tables\CollateralType.sql" />
+    <Build Include="dbo\Views\DirectDebitCategory2.sql" />
+    <Build Include="dbo\Views\DirectDebitOffers.sql" />
+    <Build Include="dbo\Views\hydra_offeremailassetcollateral.sql" />
+    <Build Include="dbo\Views\hydra_offerwebassetcollateral.sql" />
+    <Build Include="dbo\Views\Match.sql" />
+    <Build Include="dbo\Views\ActivationBonus.sql" />
+    <Build Include="dbo\Views\BankAccountTransaction.sql" />
+    <Build Include="dbo\Views\IronOffer.sql" />
+    <Build Include="dbo\Views\BinRange.sql" />
+    <Build Include="dbo\Views\BinRangeIssuer.sql" />
+    <Build Include="ras\Views\PANless_Transaction.sql" />
+    <Build Include="dbo\Views\Comments.sql" />
+    <Build Include="dbo\Views\Date.sql" />
+    <Build Include="zion\Views\Member_LifeTimeValue.sql" />
+    <Build Include="dbo\Views\EmailActivity.sql" />
+    <Build Include="dbo\Views\EmailCampaign.sql" />
+    <Build Include="dbo\Views\EmailEvent.sql" />
+    <Build Include="dbo\Views\CBP_Credit_TSYSIDToCINMapping.sql" />
+    <Build Include="dbo\Views\EmailEventCode.sql" />
+    <Build Include="dbo\Views\CBP_TSYS_CINMerger.sql" />
+    <Build Include="dbo\Views\ClubAndRedeem.sql" />
+    <Build Include="dbo\Views\IronOfferClub.sql" />
+    <Build Include="dbo\Views\Issuer.sql" />
+    <Build Include="dbo\Views\IssuerCustomer.sql" />
+    <Build Include="zion\Views\ZionActionFan.sql" />
+    <Build Include="dbo\Views\RedeemAction.sql" />
+    <Build Include="dbo\Views\RetailOutlet.sql" />
+    <Build Include="dbo\Views\TransactionType.sql" />
+    <Build Include="dbo\Views\Fan.sql" />
+    <Build Include="dbo\Views\IssuerPaymentCard.sql" />
+    <Build Include="dbo\Views\NobleFiles.sql" />
+    <Build Include="dbo\Views\Club.sql" />
+    <Build Include="dbo\Views\_FanSFDDailyUploadData_DirectDebit.sql" />
+    <Build Include="dbo\Views\PaymentCardProductType.sql" />
+    <Build Include="dbo\Views\BankProductOptOuts.sql" />
+    <Build Include="dbo\Views\NobleFanAttributes.sql" />
+    <Build Include="dbo\Views\CustomerContactCode.sql" />
+    <Build Include="hydra\Views\PublisherLink.sql" />
+    <Build Include="Lion\Views\LionSend.sql" />
+    <Build Include="hydra\Views\PartnerPublisherLink.sql" />
+    <Build Include="dbo\Views\IssuerBankAccount.sql" />
+    <Build Include="hydra\Views\OfferConverterAudit.sql" />
+    <Build Include="dbo\Views\Trans.sql" />
+    <Build Include="dbo\Views\BankAccount.sql" />
+    <Build Include="dbo\Views\Redeem.sql" />
+    <Build Include="dbo\Views\BankAccountTypeHistory.sql" />
+    <Build Include="Redemption\Views\ECode.sql" />
+    <Build Include="Redemption\Views\ECodeStatusHistory.sql" />
+    <Build Include="dbo\Views\DDCashbackNominee.sql" />
+    <Build Include="dbo\Views\IssuerCustomerAttribute.sql" />
+    <Build Include="dbo\Views\IronOfferAdSpace.sql" />
+    <Build Include="dbo\Views\Collateral.sql" />
+    <Build Include="ras\Views\FailedPANlessTransaction.sql" />
+    <Build Include="dbo\Views\RedeemSupplier.sql" />
+    <Build Include="dbo\Views\PartnerOffer.sql" />
+    <Build Include="dbo\Views\PartnerCommissionRule.sql" />
+    <Build Include="dbo\Views\Pan.sql" />
+    <Build Include="dbo\Views\PaymentCard.sql" />
+    <Build Include="dbo\Views\TransactionVector.sql" />
+    <Build Include="dbo\Views\vwTestSplitOwnership.sql" />
+    <Build Include="dbo\Views\vwTestSplitOwnership_2.sql" />
+    <Build Include="dbo\Views\BankAccountTypeEligibility.sql" />
+    <Build Include="dbo\Views\MatchSelfFundedTransaction.sql" />
+    <Build Include="dbo\Views\IronOfferMember.sql" />
+    <Build Include="dbo\Views\Invoice.sql" />
+    <Build Include="dbo\Views\SLCPoints.sql" />
+    <Build Include="dbo\Views\FanCredentials.sql" />
+    <Build Include="zion\Views\Member_OneClickActivation.sql" />
+    <Build Include="dbo\Views\Partner.sql" />
+    <Build Include="Redemption\Views\ECodeBatch.sql" />
+    <Build Include="dbo\Views\TrackingData.sql" />
+    <Build Include="dbo\Views\DirectDebitOriginator.sql" />
+    <Build Include="dbo\Views\DirectDebitOfferOINs.sql" />
+    <Build Include="dbo\Views\DirectDebitCategory1.sql" />
+    <Build Include="dbo\Views\DirectDebitOfferRules.sql" />
+    <Build Include="Security\Analyst.sql" />
+    <Build Include="Security\datarecon.sql" />
+    <Build Include="Security\datarecon_1.sql" />
+    <Build Include="Security\Lloyd.sql" />
+    <Build Include="Security\shaun.sql" />
+    <Build Include="Security\jason.sql" />
+    <Build Include="Security\gabor.sql" />
+    <Build Include="Security\Ajith.sql" />
+    <Build Include="Security\Matt.sql" />
+    <Build Include="Security\peter.sql" />
+    <Build Include="Security\peter_1.sql" />
+    <Build Include="Security\PRTGBuddy.sql" />
+    <Build Include="Security\PRTGBuddy_1.sql" />
+    <Build Include="Security\Rory.sql" />
+    <Build Include="Security\Rory_1.sql" />
+    <Build Include="Security\GAS.sql" />
+    <Build Include="Security\GAS_1.sql" />
+    <Build Include="Security\tasfia.sql" />
+    <Build Include="Security\tasfia_1.sql" />
+    <Build Include="Security\conal.sql" />
+    <Build Include="Security\Michael.sql" />
+    <Build Include="Security\Michael_1.sql" />
+    <Build Include="Security\SamW.sql" />
+    <Build Include="Security\SamW_1.sql" />
+    <Build Include="Security\ProcessOp.sql" />
+    <Build Include="Security\ProcessOp_1.sql" />
+    <Build Include="Security\Vernon.sql" />
+    <Build Include="Security\Vernon_1.sql" />
+    <Build Include="Security\Ewan.sql" />
+    <Build Include="Security\Ewan_1.sql" />
+    <Build Include="Security\SmartEmailClickUser.sql" />
+    <Build Include="Security\SmartEmailClickUser_1.sql" />
+    <Build Include="Security\ChrisN.sql" />
+    <Build Include="Security\ChrisN_1.sql" />
+    <Build Include="Security\CRTImport.sql" />
+    <Build Include="Security\CRTImport_1.sql" />
+    <Build Include="Security\kevinc.sql" />
+    <Build Include="Security\kevinc_1.sql" />
+    <Build Include="Security\patrickm.sql" />
+    <Build Include="Security\patrickm_1.sql" />
+    <Build Include="Security\BastienC.sql" />
+    <Build Include="Security\BastienC_1.sql" />
+    <Build Include="Security\RukanK.sql" />
+    <Build Include="Security\RukanK_1.sql" />
+    <Build Include="Security\WilliamA.sql" />
+    <Build Include="Security\WilliamA_1.sql" />
+    <Build Include="Security\virgin_etl_user.sql" />
+    <Build Include="Security\virgin_etl_user_1.sql" />
+    <Build Include="Security\Ed.sql" />
+    <Build Include="Security\Ed_1.sql" />
+    <Build Include="Security\SamH.sql" />
+    <Build Include="Security\SamH_1.sql" />
+    <Build Include="Security\conord.sql" />
+    <Build Include="Security\conord_1.sql" />
+    <Build Include="Security\DarrenW.sql" />
+    <Build Include="Security\JoanneK.sql" />
+    <Build Include="Security\JoanneK_1.sql" />
+    <Build Include="Security\VitaliiV.sql" />
+    <Build Include="Security\MarkD.sql" />
+    <Build Include="Security\GunayS.sql" />
+    <Build Include="Security\LeoP.sql" />
+    <Build Include="Security\JosephS.sql" />
+    <Build Include="Security\JosephS_1.sql" />
+    <Build Include="Security\ConalM.sql" />
+    <Build Include="Security\ConalM_1.sql" />
+    <Build Include="Security\PhillipB.sql" />
+    <Build Include="Security\PhillipB_1.sql" />
+    <Build Include="Security\MatthewL.sql" />
+    <Build Include="Security\MatthewL_1.sql" />
+    <Build Include="Security\DanielM.sql" />
+    <Build Include="Security\DanielM_1.sql" />
+    <Build Include="Security\RichardS.sql" />
+    <Build Include="Security\RichardS_1.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="dbo\Functions\fn_FormatTimeSpan.sql" />
+    <Build Include="dbo\Functions\fn_FormatDate.sql" />
+    <Build Include="dbo\Functions\fn_TruncateDate.sql">
+      <AnsiNulls>Off</AnsiNulls>
+    </Build>
+    <Build Include="dbo\Functions\fn_FormatDateRange.sql" />
+    <Build Include="dbo\Functions\fn_IsValidEmail.sql" />
+    <Build Include="dbo\Functions\tfn_Tally.sql" />
+    <Build Include="dbo\Functions\tfn_GetWorkingDays_X.sql" />
+    <Build Include="dbo\Functions\IF_GetWorkingDays.sql" />
+    <Build Include="dbo\Stored Procedures\__AdminCalcPointsPerFan.sql" />
+    <Build Include="dbo\Stored Procedures\CBP_Process_CustomerJourney_and_Lapsing.sql" />
+    <Build Include="dbo\Stored Procedures\__CBP_Process_CustomerJourneyStages.sql" />
+    <Build Include="dbo\Stored Procedures\__CBP_Process_CustomerLapsing.sql" />
+    <Build Include="dbo\Stored Procedures\ResetAnalystSecurity.sql" />
+    <Build Include="dbo\Stored Procedures\__CBP_Process_CustomerJourneyStages_SFD.sql" />
+    <Build Include="dbo\Stored Procedures\__CBP_DailyProductWelcomeDataForSFD.sql" />
+    <Build Include="dbo\Stored Procedures\__CBP_DailyCreditDebit_SFD.sql" />
+    <Build Include="dbo\Stored Procedures\oo_TimerMessageV2.sql" />
+    <Build Include="dbo\Stored Procedures\CBP_Process_CustomerJourney_and_Lapsing_Play_CJM.sql" />
+    <Build Include="DIRepETL\Stored Procedures\FullLoadTables_Clear.sql" />
+    <Build Include="APW\Stored Procedures\PanPaymentCard_Fetch.sql" />
+    <Build Include="APW\Stored Procedures\PaymentCardExclude_Refresh.sql" />
+    <Build Include="dbo\Stored Procedures\oo_TimerMessage.sql" />
+    <Build Include="Security\APW.sql" />
+    <Build Include="Security\DIRepETL.sql" />
+    <Build Include="Security\hydra.sql" />
+    <Build Include="Security\Lion.sql" />
+    <Build Include="Security\ras.sql" />
+    <Build Include="Security\Redemption.sql" />
+    <Build Include="Security\zion.sql" />
+    <Build Include="Security\Permissions.sql" />
+  </ItemGroup>
+</Project>
