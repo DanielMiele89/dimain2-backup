@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [DIMAIN2\awsetluser]
+    FROM WINDOWS WITH DEFAULT_LANGUAGE = [us_english];
+
