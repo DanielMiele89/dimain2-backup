@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [CRTImport]
+    WITH PASSWORD = N'i7xkfkoanj{qerekwtf_mkSjmsFT7_&#$!~<n{dd1n,|^zg#', SID = 0x4CD3B3DDF48D9E42B45FE90C978DE595, DEFAULT_DATABASE = [Archive_Light], DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [Ed]
+    WITH PASSWORD = N'iaxfkoanj}d{qde|^r%:vrwtmsFT7_&#$!~<gf9mok|jn{%d', SID = 0xAF15672925A6314C85169B128C11E5A8, DEFAULT_DATABASE = [Sandbox], DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+
