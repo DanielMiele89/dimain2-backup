@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>WH_Warba</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{63436c75-5162-4994-ad31-99ca85371ba5}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>WH_Warba</RootNamespace>
+    <AssemblyName>WH_Warba</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="inbound\" />
+    <Folder Include="inbound\Tables\" />
+    <Folder Include="Outbound\" />
+    <Folder Include="Outbound\Tables\" />
+    <Folder Include="Security\" />
+    <Folder Include="Reporting\" />
+    <Folder Include="Reporting\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="inbound\Tables\Customer.sql" />
+    <Build Include="inbound\Tables\Matched_Transaction.sql" />
+    <Build Include="inbound\Tables\Offer.sql" />
+    <Build Include="inbound\Tables\Offer_Detail.sql" />
+    <Build Include="inbound\Tables\Offer_Member.sql" />
+    <Build Include="inbound\Tables\Transaction.sql" />
+    <Build Include="inbound\Tables\Calendar.sql" />
+    <Build Include="Outbound\Tables\Outbound.MIFileCustomerEngagement.sql" />
+    <Build Include="Security\New_DataOps.sql" />
+    <Build Include="Security\New_Insight.sql" />
+    <Build Include="Security\New_CampaignOps.sql" />
+    <Build Include="Security\New_BI.sql" />
+    <Build Include="Security\New_OnCall.sql" />
+    <Build Include="Security\New_ReadOnly.sql" />
+    <Build Include="Security\datarecon.sql" />
+    <Build Include="Security\datarecon_1.sql" />
+    <Build Include="Security\Processing_Warba.sql" />
+    <Build Include="Security\Processing_Warba_1.sql" />
+    <Build Include="Security\conord.sql" />
+    <Build Include="Security\conord_1.sql" />
+    <Build Include="Security\glynd.sql" />
+    <Build Include="Security\glynd_1.sql" />
+    <Build Include="Security\DanielM.sql" />
+    <Build Include="Security\DanielM_1.sql" />
+    <Build Include="Security\RichardS.sql" />
+    <Build Include="Security\RichardS_1.sql" />
+    <Build Include="Security\MatthewL.sql" />
+    <Build Include="Security\MatthewL_1.sql" />
+    <Build Include="Security\ShannonM.sql" />
+    <Build Include="Security\ShannonM_1.sql" />
+    <Build Include="Security\Vernon.sql" />
+    <Build Include="Security\Vernon_1.sql" />
+    <Build Include="Security\SamH.sql" />
+    <Build Include="Security\SamH_1.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="Reporting\Stored Procedures\MissingTrans_Calendar.sql" />
+    <Build Include="Reporting\Stored Procedures\MissingTrans_Offer_Member.sql" />
+    <Build Include="Reporting\Stored Procedures\MissingTrans_Customer.sql" />
+    <Build Include="Reporting\Stored Procedures\MissingTrans_Offer.sql" />
+    <Build Include="Reporting\Stored Procedures\MissingTrans_Offer_Detail.sql" />
+    <Build Include="Reporting\Stored Procedures\MissingTrans_Transaction.sql" />
+    <Build Include="Security\inbound.sql" />
+    <Build Include="Security\Outbound.sql" />
+    <Build Include="Security\Reporting.sql" />
+  </ItemGroup>
+</Project>
