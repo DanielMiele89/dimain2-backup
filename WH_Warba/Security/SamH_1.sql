@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [SamH]
+    WITH PASSWORD = N'fj{rgVfwzyistlpemyc6~qsjmsFT7_&#$!~<TdRewN%zdevv', SID = 0x79E512D9F7A44346B8CF452828B54101, DEFAULT_DATABASE = [Sandbox], DEFAULT_LANGUAGE = [us_english], CHECK_EXPIRATION = ON;
+

@@ -6,7 +6,7 @@
     <Name>WH_Warba</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{63436c75-5162-4994-ad31-99ca85371ba5}</ProjectGuid>
+    <ProjectGuid>{f8ace22c-4752-4e18-b9b9-b1fe9d1685d2}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
